@@ -75,12 +75,12 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L STM32F407VG U?
+L STM32F407VG U4
 U 1 1 585DBF7E
 P 7850 4850
-F 0 "U?" H 7850 4850 60  0000 C CNN
+F 0 "U4" H 7850 4850 60  0000 C CNN
 F 1 "STM32F407VG" H 7850 4950 60  0000 C CNN
-F 2 "TQFP100" H 7850 4750 60  0000 C CNN
+F 2 "Housings_QFP:LQFP-100_14x14mm_Pitch0.5mm" H 7850 4750 60  0000 C CNN
 F 3 "" H 7850 4850 60  0001 C CNN
 	1    7850 4850
 	1    0    0    -1  
@@ -126,13 +126,13 @@ B4
 Text GLabel 2850 6800 0    60   Input ~ 0
 Audio_SDA
 Text GLabel 2850 7400 0    60   Input ~ 0
-BF4
+BD
 Text GLabel 12850 5900 2    60   Input ~ 0
 COL5
 Text GLabel 12850 6000 2    60   Input ~ 0
-BF1
+BA
 Text GLabel 12850 6100 2    60   Input ~ 0
-BF2
+BB
 Text GLabel 12850 6200 2    60   Input ~ 0
 COL4
 Text GLabel 12850 6500 2    60   Input ~ 0
@@ -172,11 +172,11 @@ B7
 Text GLabel 12850 4800 2    60   Input ~ 0
 B6
 Text GLabel 12850 4900 2    60   Input ~ 0
-BF3
+BC
 Text GLabel 12850 5000 2    60   Input ~ 0
 BPM_VOL
 Text GLabel 12850 5100 2    60   Input ~ 0
-BF5
+BE
 Text GLabel 12850 5200 2    60   Input ~ 0
 FX
 Text GLabel 12850 2500 2    60   Input ~ 0
