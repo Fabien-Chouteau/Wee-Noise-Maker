@@ -1,4 +1,4 @@
-update=12/12/2016 00:36:17
+update=12/12/2016 01:19:54
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=OLIME_KICAD/KiCAD_Components
+LibDir=library
 [eeschema/libraries]
 LibName1=poss_discovery-rescue
 LibName2=power
@@ -73,3 +73,4 @@ LibName41=OLIME_KICAD/KiCAD_Components/OLIMEX_Regulators
 LibName42=OLIME_KICAD/KiCAD_Components/OLIMEX_Switches
 LibName43=OLIME_KICAD/KiCAD_Components/OLIMEX_THERES
 LibName44=OLIME_KICAD/KiCAD_Components/OLIMEX_Transistors
+LibName45=library/stm32f4_disco_header

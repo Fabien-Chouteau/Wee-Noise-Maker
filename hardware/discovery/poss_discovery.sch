@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:poss_discovery-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -29,29 +30,17 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:w_connectors
-LIBS:OLIMEX_Buttons
-LIBS:OLIMEX_Connectors
-LIBS:OLIMEX_Devices
-LIBS:OLIMEX_Diodes
-LIBS:OLIMEX_IC
-LIBS:OLIMEX_Jumpers
-LIBS:OLIMEX_OTHER
-LIBS:OLIMEX_Power
-LIBS:OLIMEX_RCL
-LIBS:OLIMEX_Regulators
-LIBS:OLIMEX_Switches
-LIBS:OLIMEX_THERES
-LIBS:OLIMEX_Transistors
-LIBS:stm32f4_disco_extention_board-cache
+LIBS:stm32f4_disco_header
+LIBS:poss_discovery-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
+Title "Pocket Open Source Syntesizer - Discovery"
 Date ""
-Rev ""
-Comp ""
+Rev "B"
+Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
 Comment3 ""
@@ -145,22 +134,6 @@ F 3 "" H 7100 3150 50  0000 C CNN
 	1    7100 3150
 	1    0    0    -1  
 $EndComp
-Text Label 6550 750  0    60   ~ 0
-B1
-Text Label 6550 1100 0    60   ~ 0
-B2
-Text Label 6550 1450 0    60   ~ 0
-B3
-Text Label 6550 1800 0    60   ~ 0
-B4
-Text Label 6550 2100 0    60   ~ 0
-B5
-Text Label 6550 2450 0    60   ~ 0
-B6
-Text Label 6550 2800 0    60   ~ 0
-B7
-Text Label 6550 3150 0    60   ~ 0
-B8
 $Comp
 L SW_PUSH SW9
 U 1 1 583DD8BC
@@ -249,320 +222,6 @@ F 3 "" H 8350 3150 50  0000 C CNN
 	1    8350 3150
 	1    0    0    -1  
 $EndComp
-Text Label 7800 750  0    60   ~ 0
-B9
-Text Label 7800 1100 0    60   ~ 0
-B10
-Text Label 7800 1450 0    60   ~ 0
-B11
-Text Label 7800 1800 0    60   ~ 0
-B12
-Text Label 7800 2100 0    60   ~ 0
-B13
-Text Label 7800 2450 0    60   ~ 0
-B14
-Text Label 7800 2800 0    60   ~ 0
-B15
-Text Label 7800 3150 0    60   ~ 0
-B16
-$Comp
-L HEADER_25x2 J2
-U 1 1 583E58CD
-P 2650 2200
-F 0 "J2" H 2650 3500 60  0000 C CNN
-F 1 "HEADER_25x2" H 2650 900 60  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_2x25" H 2650 2200 60  0001 C CNN
-F 3 "" H 2650 2200 60  0000 C CNN
-	1    2650 2200
-	1    0    0    -1  
-$EndComp
-$Comp
-L HEADER_25x2 J3
-U 1 1 583E5E5C
-P 4950 2200
-F 0 "J3" H 4950 3500 60  0000 C CNN
-F 1 "HEADER_25x2" H 4950 900 60  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_2x25" H 4950 2200 60  0001 C CNN
-F 3 "" H 4950 2200 60  0000 C CNN
-	1    4950 2200
-	1    0    0    -1  
-$EndComp
-Text Label 2150 1100 0    60   ~ 0
-PD15
-Text Label 2150 1000 0    60   ~ 0
-GND
-Text Label 2150 1200 0    60   ~ 0
-PD13
-Text Label 2150 1300 0    60   ~ 0
-PD11
-Text Label 2150 1400 0    60   ~ 0
-PD9
-Text Label 2150 1500 0    60   ~ 0
-PB15
-Text Label 2150 1600 0    60   ~ 0
-PB13
-Text Label 2150 1700 0    60   ~ 0
-PB11
-Text Label 2150 1800 0    60   ~ 0
-PE15
-Text Label 2150 1900 0    60   ~ 0
-PE13
-Text Label 2150 2000 0    60   ~ 0
-PE11
-Text Label 2150 2100 0    60   ~ 0
-PE9
-Text Label 2150 2200 0    60   ~ 0
-PE7
-Text Label 2150 2300 0    60   ~ 0
-GND
-Text Label 2150 2400 0    60   ~ 0
-PB1
-Text Label 2150 2500 0    60   ~ 0
-PC5
-Text Label 2150 2600 0    60   ~ 0
-PA7
-Text Label 2150 2700 0    60   ~ 0
-PA5
-Text Label 2150 2800 0    60   ~ 0
-PA3
-Text Label 2150 2900 0    60   ~ 0
-PA1
-Text Label 2150 3000 0    60   ~ 0
-PC3
-Text Label 2150 3100 0    60   ~ 0
-PC1
-Text Label 2150 3200 0    60   ~ 0
-GND
-Text Label 2150 3300 0    60   ~ 0
-VDD
-Text Label 2150 3400 0    60   ~ 0
-GND
-Text Label 2950 3400 0    60   ~ 0
-GND
-Text Label 2950 3300 0    60   ~ 0
-VDD
-Text Label 2950 3200 0    60   ~ 0
-NRTS
-Text Label 2950 3100 0    60   ~ 0
-PC0
-Text Label 2950 3000 0    60   ~ 0
-PC2
-Text Label 2950 2900 0    60   ~ 0
-PA0
-Text Label 2950 2800 0    60   ~ 0
-PA2
-Text Label 2950 2700 0    60   ~ 0
-PA4
-Text Label 2950 2600 0    60   ~ 0
-PA6
-Text Label 2950 2500 0    60   ~ 0
-PC4
-Text Label 2950 2400 0    60   ~ 0
-PB0
-Text Label 2950 2300 0    60   ~ 0
-PB2
-Text Label 2950 2200 0    60   ~ 0
-PE8
-Text Label 2950 2100 0    60   ~ 0
-PE10
-Text Label 2950 2000 0    60   ~ 0
-PE12
-Text Label 2950 1900 0    60   ~ 0
-PE14
-Text Label 2950 1800 0    60   ~ 0
-PB10
-Text Label 2950 1700 0    60   ~ 0
-PB12
-Text Label 2950 1600 0    60   ~ 0
-PB14
-Text Label 2950 1500 0    60   ~ 0
-PD8
-Text Label 2950 1400 0    60   ~ 0
-PD10
-Text Label 2950 1300 0    60   ~ 0
-PD12
-Text Label 2950 1200 0    60   ~ 0
-PD14
-Text Label 2950 1100 0    60   ~ 0
-NC
-Text Label 2950 1000 0    60   ~ 0
-GND
-Text Label 4450 1100 0    60   ~ 0
-PC6
-Text Label 4450 1000 0    60   ~ 0
-GND
-Text Label 4450 1200 0    60   ~ 0
-PC8
-Text Label 4450 1300 0    60   ~ 0
-PA8
-Text Label 4450 1400 0    60   ~ 0
-PA10
-Text Label 4450 1500 0    60   ~ 0
-PA14
-Text Label 4450 1600 0    60   ~ 0
-PC10
-Text Label 4450 1700 0    60   ~ 0
-PC12
-Text Label 4450 1800 0    60   ~ 0
-PD1
-Text Label 4450 1900 0    60   ~ 0
-PD3
-Text Label 4450 2000 0    60   ~ 0
-PD5
-Text Label 4450 2100 0    60   ~ 0
-PD7
-Text Label 4450 2200 0    60   ~ 0
-PB4
-Text Label 4450 2300 0    60   ~ 0
-PB6
-Text Label 4450 2400 0    60   ~ 0
-BOOT0
-Text Label 4450 2500 0    60   ~ 0
-PB8
-Text Label 4450 2600 0    60   ~ 0
-PE0
-Text Label 4450 2700 0    60   ~ 0
-PE2
-Text Label 4450 2800 0    60   ~ 0
-PE4
-Text Label 4450 2900 0    60   ~ 0
-PE6
-Text Label 4450 3000 0    60   ~ 0
-PC14
-Text Label 4450 3100 0    60   ~ 0
-PH0
-Text Label 4450 3200 0    60   ~ 0
-3V
-Text Label 4450 3300 0    60   ~ 0
-5V
-Text Label 4450 3400 0    60   ~ 0
-GND
-Text Label 5250 3400 0    60   ~ 0
-GND
-Text Label 5250 3300 0    60   ~ 0
-5V
-Text Label 5250 3200 0    60   ~ 0
-3V
-Text Label 5250 3100 0    60   ~ 0
-PH1
-Text Label 5250 3000 0    60   ~ 0
-PC15
-Text Label 5250 2900 0    60   ~ 0
-PC13
-Text Label 5250 2800 0    60   ~ 0
-PE5
-Text Label 5250 2700 0    60   ~ 0
-PE3
-Text Label 5250 2600 0    60   ~ 0
-PE1
-Text Label 5250 2500 0    60   ~ 0
-PB9
-Text Label 5250 2400 0    60   ~ 0
-VDD2
-Text Label 5250 2300 0    60   ~ 0
-BP7
-Text Label 5250 2200 0    60   ~ 0
-PB5
-Text Label 5250 2100 0    60   ~ 0
-PB3
-Text Label 5250 2000 0    60   ~ 0
-PD6
-Text Label 5250 1900 0    60   ~ 0
-PD4
-Text Label 5250 1800 0    60   ~ 0
-PD2
-Text Label 5250 1700 0    60   ~ 0
-PD0
-Text Label 5250 1600 0    60   ~ 0
-PC11
-Text Label 5250 1500 0    60   ~ 0
-PA15
-Text Label 5250 1400 0    60   ~ 0
-PA13
-Text Label 5250 1300 0    60   ~ 0
-PA9
-Text Label 5250 1200 0    60   ~ 0
-PC9
-Text Label 5250 1100 0    60   ~ 0
-PC7
-Text Label 5250 1000 0    60   ~ 0
-GND
-Text Label 3250 1300 0    60   ~ 0
-STM_LED_1
-Text Label 3250 1200 0    60   ~ 0
-STM_LED3
-Text Label 1600 1200 0    60   ~ 0
-STM_LED2
-Text Label 1600 1100 0    60   ~ 0
-STM_LED4
-Text Label 3300 2900 0    60   ~ 0
-STM_USER_BTN
-Text Label 1550 2700 0    60   ~ 0
-SPI1_SCK
-Text Label 1550 2600 0    60   ~ 0
-SPI1_MOSI
-Text Label 3300 2600 0    60   ~ 0
-SPI1_MISO
-Text Label 5600 2700 0    60   ~ 0
-CS_I2C/SPI
-Text Label 5600 2600 0    60   ~ 0
-MEMS_INT2
-Text Label 3950 2600 0    60   ~ 0
-MEMS_INT1
-Text Label 5600 2500 0    60   ~ 0
-Audio_SDA
-Text Label 3900 2300 0    60   ~ 0
-Audio_SCL
-Text Label 5600 1100 0    60   ~ 0
-I2S3_MCK
-Text Label 3900 1600 0    60   ~ 0
-I2S3_SCK
-Text Label 3900 1700 0    60   ~ 0
-I2S3_SD
-Text Label 3300 2700 0    60   ~ 0
-I2S3_WS
-Text Label 5600 1900 0    60   ~ 0
-Audio_Reset
-Text Label 5600 1300 0    60   ~ 0
-Vbus_FS
-Text Label 3900 2000 0    60   ~ 0
-USB_Over_I
-Text Label 5600 3000 0    60   ~ 0
-B1
-Text Label 4150 3000 0    60   ~ 0
-B10
-Text Label 5600 2900 0    60   ~ 0
-B2
-Text Label 4150 2900 0    60   ~ 0
-B11
-Text Label 5600 2800 0    60   ~ 0
-B12
-Text Label 4150 2800 0    60   ~ 0
-B3
-Text Label 4150 2700 0    60   ~ 0
-B13
-Text Label 4150 2500 0    60   ~ 0
-B4
-Text Label 5600 2300 0    60   ~ 0
-B9
-Text Label 4150 2200 0    60   ~ 0
-B14
-Text Label 5600 2200 0    60   ~ 0
-B5
-Text Label 4150 2100 0    60   ~ 0
-B6
-Text Label 5600 2100 0    60   ~ 0
-B15
-Text Label 5600 2000 0    60   ~ 0
-B7
-Text Label 4150 1900 0    60   ~ 0
-B16
-Text Label 5600 1800 0    60   ~ 0
-Write
-Text Label 8650 3400 0    60   ~ 0
-GND
-Text Label 7400 3400 0    60   ~ 0
-GND
 $Comp
 L SW_PUSH Write1
 U 1 1 583F99CD
@@ -585,44 +244,6 @@ F 3 "" H 8350 3500 50  0000 C CNN
 	1    8350 3500
 	1    0    0    -1  
 $EndComp
-Text Label 7800 3500 0    60   ~ 0
-Play
-Text Label 6550 3500 0    60   ~ 0
-Write
-Text Label 3900 1800 0    60   ~ 0
-B8
-Text Label 5600 1700 0    60   ~ 0
-Play
-$Comp
-L HEADER_2 J1
-U 1 1 583FBBC2
-P 2600 3850
-F 0 "J1" H 2600 4000 60  0000 C CNN
-F 1 "HEADER_2" H 2600 3700 60  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_2x01" H 2600 3850 60  0001 C CNN
-F 3 "" H 2600 3850 60  0000 C CNN
-	1    2600 3850
-	1    0    0    -1  
-$EndComp
-Text Label 2200 3800 0    60   ~ 0
-GND
-Text Label 2200 3900 0    60   ~ 0
-GND
-$Comp
-L HEADER_2 J5
-U 1 1 583FC378
-P 4900 3850
-F 0 "J5" H 4900 4000 60  0000 C CNN
-F 1 "HEADER_2" H 4900 3700 60  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_2x01" H 4900 3850 60  0001 C CNN
-F 3 "" H 4900 3850 60  0000 C CNN
-	1    4900 3850
-	1    0    0    -1  
-$EndComp
-Text Label 4500 3800 0    60   ~ 0
-GND
-Text Label 4500 3900 0    60   ~ 0
-GND
 $Comp
 L SW_PUSH SW17
 U 1 1 583EF8EE
@@ -689,20 +310,6 @@ F 3 "" H 9650 3150 50  0000 C CNN
 	1    9650 3150
 	1    0    0    -1  
 $EndComp
-Text Label 9100 1450 0    60   ~ 0
-BF1
-Text Label 9100 1800 0    60   ~ 0
-BF2
-Text Label 9100 2100 0    60   ~ 0
-BF3
-Text Label 9100 2450 0    60   ~ 0
-BF4
-Text Label 9100 2800 0    60   ~ 0
-BF5
-Text Label 9100 3150 0    60   ~ 0
-BPM
-Text Label 9950 3400 0    60   ~ 0
-GND
 $Comp
 L SW_PUSH Play2
 U 1 1 583EF932
@@ -714,22 +321,6 @@ F 3 "" H 9650 3500 50  0000 C CNN
 	1    9650 3500
 	1    0    0    -1  
 $EndComp
-Text Label 9100 3500 0    60   ~ 0
-FX
-Text Label 1600 1300 0    60   ~ 0
-FX
-Text Label 1600 1400 0    60   ~ 0
-BPM
-Text Label 3250 1400 0    60   ~ 0
-BF5
-Text Label 1600 1500 0    60   ~ 0
-BF4
-Text Label 3250 1500 0    60   ~ 0
-BF3
-Text Label 1550 3100 0    60   ~ 0
-BF1
-Text Label 3300 3100 0    60   ~ 0
-COL5
 $Comp
 L LED D6
 U 1 1 583F4445
@@ -1015,22 +606,6 @@ Connection ~ 7400 1800
 Connection ~ 7400 1450
 Connection ~ 7400 1100
 Wire Wire Line
-	6800 750  6550 750 
-Wire Wire Line
-	6800 1100 6550 1100
-Wire Wire Line
-	6800 1450 6550 1450
-Wire Wire Line
-	6800 1800 6550 1800
-Wire Wire Line
-	6800 2100 6550 2100
-Wire Wire Line
-	6800 2450 6550 2450
-Wire Wire Line
-	6800 2800 6550 2800
-Wire Wire Line
-	6800 3150 6550 3150
-Wire Wire Line
 	8650 750  8650 3500
 Connection ~ 8650 3150
 Connection ~ 8650 2800
@@ -1040,255 +615,13 @@ Connection ~ 8650 1800
 Connection ~ 8650 1450
 Connection ~ 8650 1100
 Wire Wire Line
-	8050 750  7800 750 
-Wire Wire Line
-	8050 1100 7800 1100
-Wire Wire Line
-	8050 1450 7800 1450
-Wire Wire Line
-	8050 1800 7800 1800
-Wire Wire Line
-	8050 2100 7800 2100
-Wire Wire Line
-	8050 2450 7800 2450
-Wire Wire Line
-	8050 2800 7800 2800
-Wire Wire Line
-	8050 3150 7800 3150
-Wire Wire Line
-	1600 1200 2500 1200
-Wire Wire Line
-	1600 1300 2500 1300
-Wire Wire Line
-	1600 1400 2500 1400
-Wire Wire Line
-	1600 1500 2500 1500
-Wire Wire Line
-	2500 1600 2150 1600
-Wire Wire Line
-	2500 1700 2150 1700
-Wire Wire Line
-	2500 1800 2150 1800
-Wire Wire Line
-	2500 1900 2150 1900
-Wire Wire Line
-	2500 2000 2150 2000
-Wire Wire Line
-	2500 2100 2150 2100
-Wire Wire Line
-	2500 2200 2150 2200
-Wire Wire Line
-	2500 2300 2150 2300
-Wire Wire Line
-	2500 2400 2150 2400
-Wire Wire Line
-	2500 2500 2150 2500
-Wire Wire Line
-	1550 2600 2500 2600
-Wire Wire Line
-	1550 2700 2500 2700
-Wire Wire Line
-	1550 2800 2500 2800
-Wire Wire Line
-	1550 2900 2500 2900
-Wire Wire Line
-	1550 3000 2500 3000
-Wire Wire Line
-	1550 3100 2500 3100
-Wire Wire Line
-	2500 3200 2150 3200
-Wire Wire Line
-	2500 3300 2150 3300
-Wire Wire Line
-	2500 3400 2150 3400
-Wire Wire Line
-	2800 1900 2950 1900
-Wire Wire Line
-	2800 2000 2950 2000
-Wire Wire Line
-	2800 2100 2950 2100
-Wire Wire Line
-	2800 2200 2950 2200
-Wire Wire Line
-	2800 2300 2950 2300
-Wire Wire Line
-	2800 2400 2950 2400
-Wire Wire Line
-	2800 2500 2950 2500
-Wire Wire Line
-	2800 2600 3300 2600
-Wire Wire Line
-	2800 2700 3300 2700
-Wire Wire Line
-	2800 2800 3300 2800
-Wire Wire Line
-	2800 2900 3300 2900
-Wire Wire Line
-	2800 3000 3300 3000
-Wire Wire Line
-	2800 3100 3300 3100
-Wire Wire Line
-	2800 3200 2950 3200
-Wire Wire Line
-	2800 3300 2950 3300
-Wire Wire Line
-	2800 3400 2950 3400
-Wire Wire Line
-	2800 1100 2950 1100
-Wire Wire Line
-	2800 1200 3250 1200
-Wire Wire Line
-	2800 1300 3250 1300
-Wire Wire Line
-	2800 1400 3250 1400
-Wire Wire Line
-	2800 1500 3250 1500
-Wire Wire Line
-	2800 1600 2950 1600
-Wire Wire Line
-	2800 1700 2950 1700
-Wire Wire Line
-	2800 1800 2950 1800
-Wire Wire Line
-	2500 1000 2150 1000
-Wire Wire Line
-	1600 1100 2500 1100
-Wire Wire Line
-	2800 1000 2950 1000
-Wire Wire Line
-	4450 1200 4800 1200
-Wire Wire Line
-	3900 1300 4800 1300
-Wire Wire Line
-	3900 1400 4800 1400
-Wire Wire Line
-	3900 1500 4800 1500
-Wire Wire Line
-	3900 1600 4800 1600
-Wire Wire Line
-	3900 1700 4800 1700
-Wire Wire Line
-	3900 1800 4800 1800
-Wire Wire Line
-	4150 1900 4800 1900
-Wire Wire Line
-	3900 2000 4800 2000
-Wire Wire Line
-	4150 2100 4800 2100
-Wire Wire Line
-	4150 2200 4800 2200
-Wire Wire Line
-	3900 2300 4800 2300
-Wire Wire Line
-	4800 2400 4450 2400
-Wire Wire Line
-	4150 2500 4800 2500
-Wire Wire Line
-	3950 2600 4800 2600
-Wire Wire Line
-	4150 2700 4800 2700
-Wire Wire Line
-	4150 2800 4800 2800
-Wire Wire Line
-	4150 2900 4800 2900
-Wire Wire Line
-	4150 3000 4800 3000
-Wire Wire Line
-	4800 3100 4450 3100
-Wire Wire Line
-	4800 3200 4450 3200
-Wire Wire Line
-	4800 3300 4450 3300
-Wire Wire Line
-	4800 3400 4450 3400
-Wire Wire Line
-	4800 1000 4450 1000
-Wire Wire Line
-	4450 1100 4800 1100
-Wire Wire Line
-	5100 1900 5600 1900
-Wire Wire Line
-	5100 2000 5600 2000
-Wire Wire Line
-	5100 2100 5600 2100
-Wire Wire Line
-	5100 2200 5600 2200
-Wire Wire Line
-	5100 2300 5600 2300
-Wire Wire Line
-	5100 2400 5250 2400
-Wire Wire Line
-	5100 2500 5600 2500
-Wire Wire Line
-	5100 2600 5600 2600
-Wire Wire Line
-	5100 2700 5600 2700
-Wire Wire Line
-	5100 2800 5600 2800
-Wire Wire Line
-	5100 2900 5600 2900
-Wire Wire Line
-	5100 3000 5600 3000
-Wire Wire Line
-	5100 3100 5250 3100
-Wire Wire Line
-	5100 3200 5250 3200
-Wire Wire Line
-	5100 3300 5250 3300
-Wire Wire Line
-	5100 3400 5250 3400
-Wire Wire Line
-	5100 1100 5600 1100
-Wire Wire Line
-	5100 1200 5600 1200
-Wire Wire Line
-	5100 1300 5600 1300
-Wire Wire Line
-	5100 1400 5600 1400
-Wire Wire Line
-	5100 1500 5600 1500
-Wire Wire Line
-	5100 1600 5600 1600
-Wire Wire Line
-	5100 1700 5600 1700
-Wire Wire Line
-	5100 1800 5600 1800
-Wire Wire Line
-	5100 1000 5250 1000
-Wire Wire Line
-	6800 3500 6550 3500
-Wire Wire Line
-	8050 3500 7800 3500
-Wire Wire Line
-	2500 3800 2200 3800
-Wire Wire Line
-	2500 3900 2200 3900
-Wire Wire Line
-	4800 3800 4500 3800
-Wire Wire Line
-	4800 3900 4500 3900
-Wire Wire Line
-	9950 1450 9950 3500
+	9950 1450 9950 3750
 Connection ~ 9950 3150
 Connection ~ 9950 2800
 Connection ~ 9950 2450
 Connection ~ 9950 2100
 Connection ~ 9950 1800
 Connection ~ 9950 1450
-Wire Wire Line
-	9350 1450 9100 1450
-Wire Wire Line
-	9350 1800 9100 1800
-Wire Wire Line
-	9350 2100 9100 2100
-Wire Wire Line
-	9350 2450 9100 2450
-Wire Wire Line
-	9350 2800 9100 2800
-Wire Wire Line
-	9350 3150 9100 3150
-Wire Wire Line
-	9350 3500 9100 3500
 Wire Wire Line
 	7350 4350 7350 6000
 Connection ~ 7350 4950
@@ -1394,99 +727,304 @@ Connection ~ 9950 4600
 Connection ~ 8650 4600
 Connection ~ 8000 4600
 Connection ~ 7350 4600
-Text Label 7350 4350 0    60   ~ 0
-COL1
-Text Label 8000 4350 0    60   ~ 0
-COL2
-Text Label 8650 4350 0    60   ~ 0
-COL3
-Text Label 9300 4350 0    60   ~ 0
-COL4
-Text Label 9950 4350 0    60   ~ 0
-COL5
-Text Label 6600 4800 0    60   ~ 0
-ROW1
-Text Label 6600 5150 0    60   ~ 0
-ROW2
-Text Label 6600 5500 0    60   ~ 0
-ROW3
-Text Label 6600 5850 0    60   ~ 0
-ROW4
-Text Label 6600 6250 0    60   ~ 0
-ROW5
 Wire Wire Line
 	8900 4800 8900 4600
 Connection ~ 8900 4800
 Wire Wire Line
 	6600 4800 9550 4800
-Text Label 5600 1600 0    60   ~ 0
-ROW4
-Text Label 5600 1500 0    60   ~ 0
-ROW3
-Text Label 5600 1400 0    60   ~ 0
-ROW2
-Text Label 3900 1500 0    60   ~ 0
-COL1
-Text Label 3900 1400 0    60   ~ 0
-COL2
-Text Label 3900 1300 0    60   ~ 0
-ROW5
-Text Label 5600 1200 0    60   ~ 0
-ROW1
-Text Label 3300 3000 0    60   ~ 0
-BF2
-Text Label 1550 3000 0    60   ~ 0
-COL4
-Text Label 3300 2800 0    60   ~ 0
-COL3
 $Comp
-L POT RV2
+L POT-RESCUE-poss_discovery RV2
 U 1 1 583F8AB3
-P 2500 6000
-F 0 "RV2" H 2500 5920 50  0000 C CNN
-F 1 "POT" H 2500 6000 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_WirePads_Small" H 2500 6000 50  0001 C CNN
-F 3 "" H 2500 6000 50  0000 C CNN
-	1    2500 6000
+P 4700 5900
+F 0 "RV2" H 4700 5820 50  0000 C CNN
+F 1 "POT" H 4700 5900 50  0000 C CNN
+F 2 "Potentiometers:Potentiometer_WirePads_Small" H 4700 5900 50  0001 C CNN
+F 3 "" H 4700 5900 50  0000 C CNN
+	1    4700 5900
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2650 6000 2900 6000
-Text Label 2900 6000 0    60   ~ 0
-GND
+	4850 5900 4950 5900
 Wire Wire Line
-	2500 5850 2500 5550
-Text Label 2500 5550 0    60   ~ 0
-POT2
+	4700 5750 4700 5650
 Wire Wire Line
-	2350 6000 1950 6000
-Text Label 1950 6000 0    60   ~ 0
-3V
+	4550 5900 4450 5900
 $Comp
-L POT RV1
+L POT-RESCUE-poss_discovery RV1
 U 1 1 583FAB8F
-P 2500 5100
-F 0 "RV1" H 2500 5020 50  0000 C CNN
-F 1 "POT" H 2500 5100 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_WirePads_Small" H 2500 5100 50  0001 C CNN
-F 3 "" H 2500 5100 50  0000 C CNN
-	1    2500 5100
+P 3350 5900
+F 0 "RV1" H 3350 5820 50  0000 C CNN
+F 1 "POT" H 3350 5900 50  0000 C CNN
+F 2 "Potentiometers:Potentiometer_WirePads_Small" H 3350 5900 50  0001 C CNN
+F 3 "" H 3350 5900 50  0000 C CNN
+	1    3350 5900
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2650 5100 2900 5100
-Text Label 2900 5100 0    60   ~ 0
-GND
+	3500 5900 3600 5900
 Wire Wire Line
-	2500 4950 2500 4650
-Text Label 2500 4650 0    60   ~ 0
+	3350 5750 3350 5650
+Wire Wire Line
+	3200 5900 3100 5900
+$Comp
+L STM32F4_DISCO_Header U1
+U 1 1 584E2A3A
+P 3350 2900
+F 0 "U1" H 1550 5200 60  0000 C CNN
+F 1 "STM32F4_DISCO_Header" H 2000 5050 60  0000 C CNN
+F 2 "stm32f4-disco:STM32F4-DISCO-HEADERS-TH" H 3350 2900 60  0001 C CNN
+F 3 "" H 3350 2900 60  0001 C CNN
+	1    3350 2900
+	1    0    0    -1  
+$EndComp
+Text GLabel 1250 1800 0    60   Input ~ 0
+BF1
+Text GLabel 1250 1950 0    60   Input ~ 0
+COL4
+Text GLabel 1250 2100 0    60   Input ~ 0
 POT1
-Wire Wire Line
-	2350 5100 1950 5100
-Text Label 1950 5100 0    60   ~ 0
-3V
-Text Label 1550 2800 0    60   ~ 0
+Text GLabel 1250 2250 0    60   Input ~ 0
 POT2
-Text Label 1550 2900 0    60   ~ 0
+Text GLabel 1250 2400 0    60   Input ~ 0
+SPI1_SCK
+Text GLabel 1250 2550 0    60   Input ~ 0
+SPI1_MOSI
+Text GLabel 2200 1800 2    60   Input ~ 0
+COL5
+Text GLabel 2200 1950 2    60   Input ~ 0
+BF2
+Text GLabel 2200 2100 2    60   Input ~ 0
+DISCO_USER_BTN
+Text GLabel 2200 2250 2    60   Input ~ 0
+COL3
+Text GLabel 2200 2400 2    60   Input ~ 0
+I2S3_WS
+Text GLabel 2200 2550 2    60   Input ~ 0
+SPI1_MISO
+Text GLabel 1250 4800 0    60   Input ~ 0
+STM_LED4
+Text GLabel 1250 4650 0    60   Input ~ 0
+STM_LED2
+Text GLabel 1250 4500 0    60   Input ~ 0
+FX
+Text GLabel 1250 4350 0    60   Input ~ 0
+BPM_VOL
+Text GLabel 1250 4200 0    60   Input ~ 0
+BF4
+Text GLabel 2200 4650 2    60   Input ~ 0
+STM_LED3
+Text GLabel 2200 4500 2    60   Input ~ 0
+STM_LED1
+Text GLabel 2200 4350 2    60   Input ~ 0
+BF5
+Text GLabel 2200 4200 2    60   Input ~ 0
+BF3
+Text GLabel 5350 4800 2    60   Input ~ 0
+I2S3_MCK
+Text GLabel 5350 4650 2    60   Input ~ 0
+ROW1
+Text GLabel 5350 4500 2    60   Input ~ 0
+VBUS_FS
+Text GLabel 5350 4350 2    60   Input ~ 0
+SWDIO
+Text GLabel 5350 4200 2    60   Input ~ 0
+ROW3
+Text GLabel 5350 4050 2    60   Input ~ 0
+ROW4
+Text GLabel 5350 3900 2    60   Input ~ 0
+Play
+Text GLabel 5350 3750 2    60   Input ~ 0
+Write
+Text GLabel 5350 3600 2    60   Input ~ 0
+Audio_Reset
+Text GLabel 5350 3450 2    60   Input ~ 0
+B7
+Text GLabel 5350 3300 2    60   Input ~ 0
+B15
+Text GLabel 5350 3150 2    60   Input ~ 0
+B5
+Text GLabel 5350 3000 2    60   Input ~ 0
+B9
+Text GLabel 5350 2700 2    60   Input ~ 0
+Audio_SDA
+Text GLabel 5350 2550 2    60   Input ~ 0
+MEMS_INT2
+Text GLabel 5350 2400 2    60   Input ~ 0
+CS_I2C/SPI
+Text GLabel 5350 2250 2    60   Input ~ 0
+B12
+Text GLabel 5350 2100 2    60   Input ~ 0
+B2
+Text GLabel 5350 1950 2    60   Input ~ 0
+B1
+Text GLabel 4400 4800 0    60   Input ~ 0
+COL1
+Text GLabel 4400 4650 0    60   Input ~ 0
+ROW2
+Text GLabel 4400 4500 0    60   Input ~ 0
+ROW5
+Text GLabel 4400 4350 0    60   Input ~ 0
+COL2
+Text GLabel 4400 4200 0    60   Input ~ 0
+SWDCLK
+Text GLabel 4400 4050 0    60   Input ~ 0
+I2S3_SCK
+Text GLabel 4400 3900 0    60   Input ~ 0
+I2S3_SD
+Text GLabel 4400 3750 0    60   Input ~ 0
+B8
+Text GLabel 4400 3600 0    60   Input ~ 0
+B16
+Text GLabel 4400 3450 0    60   Input ~ 0
+USB_Over_Current
+Text GLabel 4400 3300 0    60   Input ~ 0
+B6
+Text GLabel 4400 3150 0    60   Input ~ 0
+B14
+Text GLabel 4400 3000 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 4400 2700 0    60   Input ~ 0
+B4
+Text GLabel 4400 2550 0    60   Input ~ 0
+MEMS_INT1
+Text GLabel 4400 2400 0    60   Input ~ 0
+B13
+Text GLabel 4400 2250 0    60   Input ~ 0
+B3
+Text GLabel 4400 2100 0    60   Input ~ 0
+B11
+Text GLabel 4400 1950 0    60   Input ~ 0
+B10
+Text GLabel 1250 950  0    60   Input ~ 0
+GND
+Text GLabel 1250 1350 0    60   Input ~ 0
+GND
+Text GLabel 1250 1650 0    60   Input ~ 0
+GND
+Text GLabel 4400 950  0    60   Input ~ 0
+GND
+Text GLabel 4400 1350 0    60   Input ~ 0
+GND
+Text GLabel 4400 4950 0    60   Input ~ 0
+GND
+Text GLabel 1250 4950 0    60   Input ~ 0
+GND
+Text GLabel 2200 4950 2    60   Input ~ 0
+GND
+Text GLabel 5350 4950 2    60   Input ~ 0
+GND
+Text GLabel 5350 1350 2    60   Input ~ 0
+GND
+Text GLabel 1250 3000 0    60   Input ~ 0
+GND
+Text GLabel 5350 950  2    60   Input ~ 0
+GND
+Text GLabel 2200 950  2    60   Input ~ 0
+GND
+Text GLabel 9350 1450 0    60   Input ~ 0
+BA
+Text GLabel 9350 1800 0    60   Input ~ 0
+BB
+Text GLabel 9350 2100 0    60   Input ~ 0
+BC
+Text GLabel 9350 2450 0    60   Input ~ 0
+BD
+Text GLabel 9350 2800 0    60   Input ~ 0
+BE
+Text GLabel 9350 3150 0    60   Input ~ 0
+BPM_VOL
+Text GLabel 9350 3500 0    60   Input ~ 0
+FX
+Text GLabel 6800 750  0    60   Input ~ 0
+B1
+Text GLabel 6800 1100 0    60   Input ~ 0
+B2
+Text GLabel 6800 1450 0    60   Input ~ 0
+B3
+Text GLabel 6800 1800 0    60   Input ~ 0
+B4
+Text GLabel 6800 2100 0    60   Input ~ 0
+B5
+Text GLabel 6800 2450 0    60   Input ~ 0
+B6
+Text GLabel 6800 2800 0    60   Input ~ 0
+B7
+Text GLabel 6800 3150 0    60   Input ~ 0
+B8
+Text GLabel 6800 3500 0    60   Input ~ 0
+Write
+Text GLabel 8050 3500 0    60   Input ~ 0
+Play
+Text GLabel 8050 750  0    60   Input ~ 0
+B9
+Text GLabel 8050 1100 0    60   Input ~ 0
+B10
+Text GLabel 8050 1450 0    60   Input ~ 0
+B11
+Text GLabel 8050 1800 0    60   Input ~ 0
+B12
+Text GLabel 8050 2100 0    60   Input ~ 0
+B13
+Text GLabel 8050 2450 0    60   Input ~ 0
+B14
+Text GLabel 8050 2800 0    60   Input ~ 0
+B15
+Text GLabel 8050 3150 0    60   Input ~ 0
+B16
+Text GLabel 7350 4350 2    60   Input ~ 0
+COL1
+Text GLabel 8000 4350 2    60   Input ~ 0
+COL2
+Text GLabel 8650 4350 2    60   Input ~ 0
+COL3
+Text GLabel 9300 4350 2    60   Input ~ 0
+COL4
+Text GLabel 9950 4350 2    60   Input ~ 0
+COL5
+Text GLabel 6600 4800 0    60   Input ~ 0
+ROW1
+Text GLabel 6600 5150 0    60   Input ~ 0
+ROW2
+Text GLabel 6600 5500 0    60   Input ~ 0
+ROW3
+Text GLabel 6600 5850 0    60   Input ~ 0
+ROW4
+Text GLabel 6600 6250 0    60   Input ~ 0
+ROW5
+Text GLabel 5350 1650 2    60   Input ~ 0
+3V
+Text GLabel 4400 1650 0    60   Input ~ 0
+3V
+Text GLabel 3350 5650 2    60   Input ~ 0
 POT1
+Text GLabel 4700 5650 2    60   Input ~ 0
+POT2
+Text GLabel 4950 5900 2    60   Input ~ 0
+GND
+Text GLabel 3600 5900 2    60   Input ~ 0
+GND
+Text GLabel 3100 5900 0    60   Input ~ 0
+3V
+Text GLabel 4450 5900 0    60   Input ~ 0
+3V
+Text GLabel 9950 3500 2    60   Input ~ 0
+GND
+Text GLabel 8650 3500 2    60   Input ~ 0
+GND
+Text GLabel 7400 3500 2    60   Input ~ 0
+GND
+$Comp
+L GND #PWR01
+U 1 1 585CFBB5
+P 9950 3750
+F 0 "#PWR01" H 9950 3750 30  0001 C CNN
+F 1 "GND" H 9950 3680 30  0001 C CNN
+F 2 "" H 9950 3750 60  0001 C CNN
+F 3 "" H 9950 3750 60  0001 C CNN
+	1    9950 3750
+	1    0    0    -1  
+$EndComp
+Connection ~ 9950 3500
+Text GLabel 2200 1350 2    60   Input ~ 0
+GND
 $EndSCHEMATC
