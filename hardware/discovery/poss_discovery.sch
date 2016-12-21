@@ -31,12 +31,40 @@ LIBS:contrib
 LIBS:valves
 LIBS:w_connectors
 LIBS:stm32f4_disco_header
+LIBS:74xgxx
+LIBS:ac-dc
+LIBS:brooktre
+LIBS:cmos_ieee
+LIBS:dc-dc
+LIBS:elec-unifil
+LIBS:ftdi
+LIBS:gennum
+LIBS:graphic
+LIBS:logo
+LIBS:microchip_pic10mcu
+LIBS:microchip_pic12mcu
+LIBS:microchip_pic16mcu
+LIBS:microchip1
+LIBS:msp430
+LIBS:nxp_armmcu
+LIBS:powerint
+LIBS:pspice
+LIBS:references
+LIBS:relays
+LIBS:sensors
+LIBS:special
+LIBS:stm8
+LIBS:stm32
+LIBS:supertex
+LIBS:transf
+LIBS:ttl_ieee
+LIBS:video
 LIBS:poss_discovery-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 1
+Sheet 1 3
 Title "Pocket Open Source Syntesizer - Discovery"
 Date ""
 Rev "B"
@@ -597,7 +625,7 @@ F 3 "" H 9750 6000 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7400 750  7400 3500
+	7400 750  7400 3750
 Connection ~ 7400 3150
 Connection ~ 7400 2800
 Connection ~ 7400 2450
@@ -606,7 +634,7 @@ Connection ~ 7400 1800
 Connection ~ 7400 1450
 Connection ~ 7400 1100
 Wire Wire Line
-	8650 750  8650 3500
+	8650 750  8650 3750
 Connection ~ 8650 3150
 Connection ~ 8650 2800
 Connection ~ 8650 2450
@@ -911,8 +939,6 @@ Text GLabel 1250 4950 0    60   Input ~ 0
 GND
 Text GLabel 2200 4950 2    60   Input ~ 0
 GND
-Text GLabel 5350 4950 2    60   Input ~ 0
-GND
 Text GLabel 5350 1350 2    60   Input ~ 0
 GND
 Text GLabel 1250 3000 0    60   Input ~ 0
@@ -992,27 +1018,17 @@ ROW4
 Text GLabel 6600 6250 0    60   Input ~ 0
 ROW5
 Text GLabel 5350 1650 2    60   Input ~ 0
-3V
+3V3
 Text GLabel 4400 1650 0    60   Input ~ 0
-3V
+3V3
 Text GLabel 3350 5650 2    60   Input ~ 0
 POT1
 Text GLabel 4700 5650 2    60   Input ~ 0
 POT2
-Text GLabel 4950 5900 2    60   Input ~ 0
-GND
-Text GLabel 3600 5900 2    60   Input ~ 0
-GND
 Text GLabel 3100 5900 0    60   Input ~ 0
-3V
+3V3
 Text GLabel 4450 5900 0    60   Input ~ 0
-3V
-Text GLabel 9950 3500 2    60   Input ~ 0
-GND
-Text GLabel 8650 3500 2    60   Input ~ 0
-GND
-Text GLabel 7400 3500 2    60   Input ~ 0
-GND
+3V3
 $Comp
 L GND #PWR01
 U 1 1 585CFBB5
@@ -1027,4 +1043,83 @@ $EndComp
 Connection ~ 9950 3500
 Text GLabel 2200 1350 2    60   Input ~ 0
 GND
+$Sheet
+S 1550 6600 1350 1100
+U 585D2CBE
+F0 "Power" 60
+F1 "power.sch" 60
+$EndSheet
+$Comp
+L GND #PWR?
+U 1 1 585D97BE
+P 8650 3750
+F 0 "#PWR?" H 8650 3750 30  0001 C CNN
+F 1 "GND" H 8650 3680 30  0001 C CNN
+F 2 "" H 8650 3750 60  0001 C CNN
+F 3 "" H 8650 3750 60  0001 C CNN
+	1    8650 3750
+	1    0    0    -1  
+$EndComp
+Connection ~ 8650 3500
+$Comp
+L GND #PWR?
+U 1 1 585D9E6B
+P 7400 3750
+F 0 "#PWR?" H 7400 3750 30  0001 C CNN
+F 1 "GND" H 7400 3680 30  0001 C CNN
+F 2 "" H 7400 3750 60  0001 C CNN
+F 3 "" H 7400 3750 60  0001 C CNN
+	1    7400 3750
+	1    0    0    -1  
+$EndComp
+Connection ~ 7400 3500
+$Comp
+L GND #PWR?
+U 1 1 585DAFE1
+P 4950 6000
+F 0 "#PWR?" H 4950 6000 30  0001 C CNN
+F 1 "GND" H 4950 5930 30  0001 C CNN
+F 2 "" H 4950 6000 60  0001 C CNN
+F 3 "" H 4950 6000 60  0001 C CNN
+	1    4950 6000
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 585DB05F
+P 3600 6000
+F 0 "#PWR?" H 3600 6000 30  0001 C CNN
+F 1 "GND" H 3600 5930 30  0001 C CNN
+F 2 "" H 3600 6000 60  0001 C CNN
+F 3 "" H 3600 6000 60  0001 C CNN
+	1    3600 6000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 5900 3600 6000
+Wire Wire Line
+	4950 5900 4950 6000
+Wire Wire Line
+	5350 4950 5500 4950
+Wire Wire Line
+	5500 4950 5500 5100
+Text GLabel 5500 4950 2    60   Input ~ 0
+GND
+$Comp
+L GND #PWR?
+U 1 1 585DBA46
+P 5500 5100
+F 0 "#PWR?" H 5500 5100 30  0001 C CNN
+F 1 "GND" H 5500 5030 30  0001 C CNN
+F 2 "" H 5500 5100 60  0001 C CNN
+F 3 "" H 5500 5100 60  0001 C CNN
+	1    5500 5100
+	1    0    0    -1  
+$EndComp
+$Sheet
+S 3200 6600 1400 1100
+U 585DBE08
+F0 "Micro-Controller" 60
+F1 "micro-controller.sch" 60
+$EndSheet
 $EndSCHEMATC
