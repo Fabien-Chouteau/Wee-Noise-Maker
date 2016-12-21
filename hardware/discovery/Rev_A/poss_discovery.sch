@@ -36,10 +36,10 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
+Title "Pocket Open Source Synthesizer"
 Date ""
-Rev ""
-Comp ""
+Rev "A"
+Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
 Comment3 ""
@@ -1477,4 +1477,10 @@ Text Label 1550 2800 0    60   ~ 0
 POT2
 Text Label 1550 2900 0    60   ~ 0
 POT1
+Text Notes 550  7450 0    118  ~ 0
+Known Problems:\n - ROW2 and COL1 are connect to debug IO PA13 and PA14\n - Sharp corners\n - Vias under silkscreen\n - Octave up arrow should be to the right instead of left\n - Octave down arrow should be to the left instead of right
+Wire Notes Line
+	500  6300 6200 6300
+Wire Notes Line
+	6200 6300 6200 7750
 $EndSCHEMATC
