@@ -1,4 +1,4 @@
-update=21/12/2016 22:52:38
+update=22/12/2016 00:00:57
 version=1
 last_client=kicad
 [pcbnew]
@@ -89,3 +89,13 @@ LibName57=supertex
 LibName58=transf
 LibName59=ttl_ieee
 LibName60=video
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60

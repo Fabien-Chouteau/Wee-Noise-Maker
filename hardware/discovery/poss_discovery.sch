@@ -894,7 +894,7 @@ ROW5
 Text GLabel 4400 4350 0    60   Input ~ 0
 COL2
 Text GLabel 4400 4200 0    60   Input ~ 0
-SWDCLK
+SWCLK
 Text GLabel 4400 4050 0    60   Input ~ 0
 I2S3_SCK
 Text GLabel 4400 3900 0    60   Input ~ 0
