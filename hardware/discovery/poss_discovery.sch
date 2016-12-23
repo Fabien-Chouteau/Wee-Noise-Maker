@@ -63,7 +63,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 4
+Sheet 1 5
 Title "Pocket Open Source Syntesizer - Discovery"
 Date ""
 Rev "B"
@@ -726,4 +726,16 @@ Text GLabel 2200 4050 2    60   Input ~ 0
 COL8
 Text GLabel 1250 4050 0    60   Input ~ 0
 COL9
+$Sheet
+S 6550 5300 1350 1050
+U 585E4C2D
+F0 "Audio" 60
+F1 "audio.sch" 60
+$EndSheet
+Text Notes 9000 5500 0    157  ~ 0
+TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - 
+Wire Notes Line
+	11150 4100 8850 4100
+Wire Notes Line
+	8850 4100 8850 6450
 $EndSCHEMATC

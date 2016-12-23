@@ -63,7 +63,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
-Sheet 3 4
+Sheet 3 5
 Title "Pocket Open Source Syntesizer - Discovery"
 Date ""
 Rev "B"
