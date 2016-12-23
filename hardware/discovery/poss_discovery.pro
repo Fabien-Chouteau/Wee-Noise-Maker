@@ -1,4 +1,4 @@
-update=22/12/2016 00:00:57
+update=23/12/2016 11:32:07
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,16 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
+[schematic_editor]
 version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [eeschema]
 version=1
 LibDir=library
@@ -89,13 +97,5 @@ LibName57=supertex
 LibName58=transf
 LibName59=ttl_ieee
 LibName60=video
-[schematic_editor]
+[general]
 version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=Pcbnew
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60

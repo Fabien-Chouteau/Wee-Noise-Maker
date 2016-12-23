@@ -29,7 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:w_connectors
 LIBS:stm32f4_disco_header
 LIBS:74xgxx
 LIBS:ac-dc
@@ -187,4 +186,8 @@ Text GLabel 12850 2800 2    60   Input ~ 0
 B12
 Text GLabel 12850 2900 2    60   Input ~ 0
 B11
+Text GLabel 2850 5200 0    60   Input ~ 0
+FS_DM
+Text GLabel 2850 5300 0    60   Input ~ 0
+FS_DP
 $EndSCHEMATC
