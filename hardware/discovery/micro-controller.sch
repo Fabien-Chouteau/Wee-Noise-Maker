@@ -63,11 +63,11 @@ EELAYER 25 0
 EELAYER END
 $Descr A3 16535 11693
 encoding utf-8
-Sheet 3 3
-Title ""
+Sheet 3 4
+Title "Pocket Open Source Syntesizer - Discovery"
 Date ""
-Rev ""
-Comp ""
+Rev "B"
+Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
 Comment3 ""
