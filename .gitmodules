@@ -1,0 +1,6 @@
+[submodule "software/Ada_Drivers_Library"]
+	path = software/Ada_Drivers_Library
+	url = https://github.com/AdaCore/Ada_Drivers_Library.git
+[submodule "software/ada-synth-lib"]
+	path = software/ada-synth-lib
+	url = https://github.com/raph-amiard/ada-synth-lib.git
