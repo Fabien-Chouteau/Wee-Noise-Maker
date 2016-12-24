@@ -91,7 +91,7 @@ COL3
 Text GLabel 2850 4400 0    60   Input ~ 0
 POT2
 Text GLabel 2850 4500 0    60   Input ~ 0
-I2S3_WS
+I2S_LRCLK
 Text GLabel 2850 4600 0    60   Input ~ 0
 SPI1_SCK
 Text GLabel 2850 4700 0    60   Input ~ 0
@@ -99,7 +99,7 @@ SPI1_MISO
 Text GLabel 2850 4800 0    60   Input ~ 0
 SPI1_MOSI
 Text GLabel 2850 4900 0    60   Input ~ 0
-ROw5
+ROW5
 Text GLabel 2850 5000 0    60   Input ~ 0
 VBUS
 Text GLabel 2850 5100 0    60   Input ~ 0
@@ -137,17 +137,17 @@ COL4
 Text GLabel 12850 6500 2    60   Input ~ 0
 COL1
 Text GLabel 12850 6600 2    60   Input ~ 0
-I2S3_MCK
+I2S_MCLK
 Text GLabel 12850 6700 2    60   Input ~ 0
 ROW2
 Text GLabel 12850 6800 2    60   Input ~ 0
 ROW1
 Text GLabel 12850 6900 2    60   Input ~ 0
-I2S3_SCK
+I2S_SCLK
 Text GLabel 12850 7000 2    60   Input ~ 0
-ROW4
+I2S_DOUT
 Text GLabel 12850 7100 2    60   Input ~ 0
-I2S3_SD
+I2S_DIN
 Text GLabel 12850 7200 2    60   Input ~ 0
 B2
 Text GLabel 12850 7300 2    60   Input ~ 0
@@ -162,8 +162,6 @@ Text GLabel 12850 4300 2    60   Input ~ 0
 Write
 Text GLabel 12850 4400 2    60   Input ~ 0
 B16
-Text GLabel 12850 4500 2    60   Input ~ 0
-Audio_Reset
 Text GLabel 12850 4600 2    60   Input ~ 0
 USB_Over_Current
 Text GLabel 12850 4700 2    60   Input ~ 0
@@ -289,4 +287,6 @@ F 3 "" H 9250 8250 60  0001 C CNN
 	1    9250 8250
 	1    0    0    -1  
 $EndComp
+Text GLabel 12850 6400 2    60   Input ~ 0
+ROW4
 $EndSCHEMATC
