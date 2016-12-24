@@ -348,32 +348,6 @@ F 3 "" H 9650 3500 50  0000 C CNN
 	1    9650 3500
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	7400 750  7400 3750
-Connection ~ 7400 3150
-Connection ~ 7400 2800
-Connection ~ 7400 2450
-Connection ~ 7400 2100
-Connection ~ 7400 1800
-Connection ~ 7400 1450
-Connection ~ 7400 1100
-Wire Wire Line
-	8650 750  8650 3750
-Connection ~ 8650 3150
-Connection ~ 8650 2800
-Connection ~ 8650 2450
-Connection ~ 8650 2100
-Connection ~ 8650 1800
-Connection ~ 8650 1450
-Connection ~ 8650 1100
-Wire Wire Line
-	9950 1450 9950 3750
-Connection ~ 9950 3150
-Connection ~ 9950 2800
-Connection ~ 9950 2450
-Connection ~ 9950 2100
-Connection ~ 9950 1800
-Connection ~ 9950 1450
 $Comp
 L POT-RESCUE-poss_discovery RV2
 U 1 1 583F8AB3
@@ -385,12 +359,6 @@ F 3 "" H 4700 5900 50  0000 C CNN
 	1    4700 5900
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4850 5900 4950 5900
-Wire Wire Line
-	4700 5750 4700 5650
-Wire Wire Line
-	4550 5900 4450 5900
 $Comp
 L POT-RESCUE-poss_discovery RV1
 U 1 1 583FAB8F
@@ -402,12 +370,6 @@ F 3 "" H 3350 5900 50  0000 C CNN
 	1    3350 5900
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3500 5900 3600 5900
-Wire Wire Line
-	3350 5750 3350 5650
-Wire Wire Line
-	3200 5900 3100 5900
 $Comp
 L STM32F4_DISCO_Header U1
 U 1 1 584E2A3A
@@ -623,18 +585,6 @@ Text GLabel 3100 5900 0    60   Input ~ 0
 3V3
 Text GLabel 4450 5900 0    60   Input ~ 0
 3V3
-$Comp
-L GND #PWR01
-U 1 1 585CFBB5
-P 9950 3750
-F 0 "#PWR01" H 9950 3750 30  0001 C CNN
-F 1 "GND" H 9950 3680 30  0001 C CNN
-F 2 "" H 9950 3750 60  0001 C CNN
-F 3 "" H 9950 3750 60  0001 C CNN
-	1    9950 3750
-	1    0    0    -1  
-$EndComp
-Connection ~ 9950 3500
 Text GLabel 2200 1350 2    60   Input ~ 0
 GND
 $Sheet
@@ -644,34 +594,10 @@ F0 "Power" 60
 F1 "power.sch" 60
 $EndSheet
 $Comp
-L GND #PWR02
-U 1 1 585D97BE
-P 8650 3750
-F 0 "#PWR02" H 8650 3750 30  0001 C CNN
-F 1 "GND" H 8650 3680 30  0001 C CNN
-F 2 "" H 8650 3750 60  0001 C CNN
-F 3 "" H 8650 3750 60  0001 C CNN
-	1    8650 3750
-	1    0    0    -1  
-$EndComp
-Connection ~ 8650 3500
-$Comp
-L GND #PWR03
-U 1 1 585D9E6B
-P 7400 3750
-F 0 "#PWR03" H 7400 3750 30  0001 C CNN
-F 1 "GND" H 7400 3680 30  0001 C CNN
-F 2 "" H 7400 3750 60  0001 C CNN
-F 3 "" H 7400 3750 60  0001 C CNN
-	1    7400 3750
-	1    0    0    -1  
-$EndComp
-Connection ~ 7400 3500
-$Comp
-L GND #PWR04
+L GND #PWR01
 U 1 1 585DAFE1
 P 4950 6000
-F 0 "#PWR04" H 4950 6000 30  0001 C CNN
+F 0 "#PWR01" H 4950 6000 30  0001 C CNN
 F 1 "GND" H 4950 5930 30  0001 C CNN
 F 2 "" H 4950 6000 60  0001 C CNN
 F 3 "" H 4950 6000 60  0001 C CNN
@@ -679,31 +605,23 @@ F 3 "" H 4950 6000 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR05
+L GND #PWR02
 U 1 1 585DB05F
 P 3600 6000
-F 0 "#PWR05" H 3600 6000 30  0001 C CNN
+F 0 "#PWR02" H 3600 6000 30  0001 C CNN
 F 1 "GND" H 3600 5930 30  0001 C CNN
 F 2 "" H 3600 6000 60  0001 C CNN
 F 3 "" H 3600 6000 60  0001 C CNN
 	1    3600 6000
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3600 5900 3600 6000
-Wire Wire Line
-	4950 5900 4950 6000
-Wire Wire Line
-	5350 4950 5500 4950
-Wire Wire Line
-	5500 4950 5500 5100
 Text GLabel 5500 4950 2    60   Input ~ 0
 GND
 $Comp
-L GND #PWR06
+L GND #PWR03
 U 1 1 585DBA46
 P 5500 5100
-F 0 "#PWR06" H 5500 5100 30  0001 C CNN
+F 0 "#PWR03" H 5500 5100 30  0001 C CNN
 F 1 "GND" H 5500 5030 30  0001 C CNN
 F 2 "" H 5500 5100 60  0001 C CNN
 F 3 "" H 5500 5100 60  0001 C CNN
@@ -734,8 +652,63 @@ F1 "audio.sch" 60
 $EndSheet
 Text Notes 9000 5500 0    157  ~ 0
 TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - 
+Wire Wire Line
+	7400 750  7400 3750
+Connection ~ 7400 3150
+Connection ~ 7400 2800
+Connection ~ 7400 2450
+Connection ~ 7400 2100
+Connection ~ 7400 1800
+Connection ~ 7400 1450
+Connection ~ 7400 1100
+Wire Wire Line
+	8650 750  8650 3750
+Connection ~ 8650 3150
+Connection ~ 8650 2800
+Connection ~ 8650 2450
+Connection ~ 8650 2100
+Connection ~ 8650 1800
+Connection ~ 8650 1450
+Connection ~ 8650 1100
+Wire Wire Line
+	9950 3750 9950 1450
+Connection ~ 9950 3150
+Connection ~ 9950 2800
+Connection ~ 9950 2450
+Connection ~ 9950 2100
+Connection ~ 9950 1800
+Connection ~ 9950 1450
+Wire Wire Line
+	4850 5900 4950 5900
+Wire Wire Line
+	4700 5750 4700 5650
+Wire Wire Line
+	4550 5900 4450 5900
+Wire Wire Line
+	3500 5900 3600 5900
+Wire Wire Line
+	3350 5750 3350 5650
+Wire Wire Line
+	3200 5900 3100 5900
+Connection ~ 9950 3500
+Connection ~ 8650 3500
+Connection ~ 7400 3500
+Wire Wire Line
+	3600 5900 3600 6000
+Wire Wire Line
+	4950 5900 4950 6000
+Wire Wire Line
+	5350 4950 5500 4950
+Wire Wire Line
+	5500 4950 5500 5100
 Wire Notes Line
 	11150 4100 8850 4100
 Wire Notes Line
 	8850 4100 8850 6450
+Wire Wire Line
+	6800 3750 9950 3750
+Connection ~ 8650 3750
+Connection ~ 7400 3750
+Text GLabel 6800 3750 0    60   Input ~ 0
+WAKEUP
 $EndSCHEMATC
