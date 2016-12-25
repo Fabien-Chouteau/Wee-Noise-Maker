@@ -650,8 +650,8 @@ U 585E4C2D
 F0 "Audio" 60
 F1 "audio.sch" 60
 $EndSheet
-Text Notes 9000 5500 0    157  ~ 0
-TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - 
+Text Notes 8900 5600 0    157  ~ 0
+TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - BOOT line \n    and DFU mode
 Wire Wire Line
 	7400 750  7400 3750
 Connection ~ 7400 3150
