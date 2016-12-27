@@ -73,8 +73,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text GLabel 2850 4500 0    60   Input ~ 0
-I2S_LRCLK
 Text GLabel 2850 4600 0    60   Input ~ 0
 SPI1_SCK
 Text GLabel 2850 4700 0    60   Input ~ 0
@@ -87,12 +85,10 @@ Text GLabel 2850 5400 0    60   Input ~ 0
 SWDIO
 Text GLabel 2850 5500 0    60   Input ~ 0
 SWCLK
-Text GLabel 2850 6500 0    60   Input ~ 0
+Text GLabel 2850 4900 0    60   Input ~ 0
 Audio_SCL
-Text GLabel 2850 6800 0    60   Input ~ 0
+Text GLabel 12850 6800 2    60   Input ~ 0
 Audio_SDA
-Text GLabel 12850 6600 2    60   Input ~ 0
-I2S_MCLK
 Text GLabel 12850 6900 2    60   Input ~ 0
 I2S_SCLK
 Text GLabel 12850 7000 2    60   Input ~ 0
@@ -547,4 +543,30 @@ Wire Wire Line
 	2050 8250 1650 8250
 Wire Wire Line
 	1650 8250 1650 8400
+Text GLabel 2850 5600 0    60   Input ~ 0
+I2S_LRCLK
+Text GLabel 12850 6600 2    60   Input ~ 0
+I2S_MCLK
+Text GLabel 12850 6700 2    60   Input ~ 0
+Write
+Text GLabel 12850 6500 2    60   Input ~ 0
+Play
+Text GLabel 12850 5600 2    60   Input ~ 0
+FX
+Text GLabel 12850 5500 2    60   Input ~ 0
+COL9
+Text GLabel 12850 5400 2    60   Input ~ 0
+ROW1
+Text GLabel 12850 5300 2    60   Input ~ 0
+ROW2
+Text GLabel 12850 5200 2    60   Input ~ 0
+ROW3
+Text GLabel 12850 5100 2    60   Input ~ 0
+B16
+Text GLabel 12850 5000 2    60   Input ~ 0
+B8
+Text GLabel 12850 4900 2    60   Input ~ 0
+BPM_VOL
+Text GLabel 2850 7400 0    60   Input ~ 0
+COL8
 $EndSCHEMATC
