@@ -73,12 +73,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text GLabel 2850 4600 0    60   Input ~ 0
-SPI1_SCK
-Text GLabel 2850 4700 0    60   Input ~ 0
-SPI1_MISO
-Text GLabel 2850 4800 0    60   Input ~ 0
-SPI1_MOSI
 Text GLabel 2850 5000 0    60   Input ~ 0
 VBUS
 Text GLabel 2850 5400 0    60   Input ~ 0
@@ -569,4 +563,28 @@ Text GLabel 12850 4900 2    60   Input ~ 0
 BPM_VOL
 Text GLabel 2850 7400 0    60   Input ~ 0
 COL8
+Text GLabel 2850 7100 0    60   Input ~ 0
+B15
+Text GLabel 2850 7200 0    60   Input ~ 0
+B7
+Text GLabel 2850 7300 0    60   Input ~ 0
+BE
+Text GLabel 2850 7000 0    60   Input ~ 0
+COL7
+Text GLabel 2850 6900 0    60   Input ~ 0
+B14
+Text GLabel 12850 3800 2    60   Input ~ 0
+B6
+Text GLabel 12850 3700 2    60   Input ~ 0
+BD
+Text GLabel 12850 3600 2    60   Input ~ 0
+COL6
+Text GLabel 12850 3500 2    60   Input ~ 0
+B13
+Text GLabel 12850 3400 2    60   Input ~ 0
+B5
+Text GLabel 12850 3300 2    60   Input ~ 0
+BC
+Text GLabel 12850 3200 2    60   Input ~ 0
+COL5
 $EndSCHEMATC
