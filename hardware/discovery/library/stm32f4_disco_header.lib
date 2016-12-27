@@ -235,4 +235,24 @@ X SHELL4 6 550 -300 200 L 50 50 1 1 B
 ENDDRAW
 ENDDEF
 #
+# encoder_and_switch
+#
+DEF encoder_and_switch U 0 40 Y Y 1 F N
+F0 "U" 0 0 60 H V C CNN
+F1 "encoder_and_switch" 0 0 60 H V C CNN
+F2 "" 0 0 60 H I C CNN
+F3 "" 0 0 60 H I C CNN
+DRAW
+S 300 -600 -300 -250 0 1 0 N
+P 2 0 1 0 -150 -350 -50 -350 N
+P 2 0 1 0 50 -350 -50 -300 N
+P 2 0 1 0 150 -350 50 -350 N
+X D ~ -400 -350 100 R 40 40 0 1 w
+X E ~ 400 -350 100 L 40 40 0 1 w
+X A ~ -250 -700 100 U 40 40 1 1 w
+X B ~ 250 -700 100 U 40 40 1 1 w
+X C ~ 0 -700 100 U 40 40 1 1 w
+ENDDRAW
+ENDDEF
+#
 #End Library

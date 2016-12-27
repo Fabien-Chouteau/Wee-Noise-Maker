@@ -349,28 +349,6 @@ F 3 "" H 9650 3500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L POT-RESCUE-poss_discovery RV2
-U 1 1 583F8AB3
-P 4700 5900
-F 0 "RV2" H 4700 5820 50  0000 C CNN
-F 1 "POT" H 4700 5900 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_WirePads_Small" H 4700 5900 50  0001 C CNN
-F 3 "" H 4700 5900 50  0000 C CNN
-	1    4700 5900
-	1    0    0    -1  
-$EndComp
-$Comp
-L POT-RESCUE-poss_discovery RV1
-U 1 1 583FAB8F
-P 3350 5900
-F 0 "RV1" H 3350 5820 50  0000 C CNN
-F 1 "POT" H 3350 5900 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_WirePads_Small" H 3350 5900 50  0001 C CNN
-F 3 "" H 3350 5900 50  0000 C CNN
-	1    3350 5900
-	1    0    0    -1  
-$EndComp
-$Comp
 L STM32F4_DISCO_Header U1
 U 1 1 584E2A3A
 P 3350 2900
@@ -577,14 +555,6 @@ Text GLabel 5350 1650 2    60   Input ~ 0
 3V3
 Text GLabel 4400 1650 0    60   Input ~ 0
 3V3
-Text GLabel 3350 5650 2    60   Input ~ 0
-POT1
-Text GLabel 4700 5650 2    60   Input ~ 0
-POT2
-Text GLabel 3100 5900 0    60   Input ~ 0
-3V3
-Text GLabel 4450 5900 0    60   Input ~ 0
-3V3
 Text GLabel 2200 1350 2    60   Input ~ 0
 GND
 $Sheet
@@ -593,35 +563,13 @@ U 585D2CBE
 F0 "Power" 60
 F1 "power.sch" 60
 $EndSheet
-$Comp
-L GND #PWR01
-U 1 1 585DAFE1
-P 4950 6000
-F 0 "#PWR01" H 4950 6000 30  0001 C CNN
-F 1 "GND" H 4950 5930 30  0001 C CNN
-F 2 "" H 4950 6000 60  0001 C CNN
-F 3 "" H 4950 6000 60  0001 C CNN
-	1    4950 6000
-	1    0    0    -1  
-$EndComp
-$Comp
-L GND #PWR02
-U 1 1 585DB05F
-P 3600 6000
-F 0 "#PWR02" H 3600 6000 30  0001 C CNN
-F 1 "GND" H 3600 5930 30  0001 C CNN
-F 2 "" H 3600 6000 60  0001 C CNN
-F 3 "" H 3600 6000 60  0001 C CNN
-	1    3600 6000
-	1    0    0    -1  
-$EndComp
 Text GLabel 5500 4950 2    60   Input ~ 0
 GND
 $Comp
-L GND #PWR03
+L GND #PWR01
 U 1 1 585DBA46
 P 5500 5100
-F 0 "#PWR03" H 5500 5100 30  0001 C CNN
+F 0 "#PWR01" H 5500 5100 30  0001 C CNN
 F 1 "GND" H 5500 5030 30  0001 C CNN
 F 2 "" H 5500 5100 60  0001 C CNN
 F 3 "" H 5500 5100 60  0001 C CNN
@@ -650,8 +598,8 @@ U 585E4C2D
 F0 "Audio" 60
 F1 "audio.sch" 60
 $EndSheet
-Text Notes 8900 5600 0    157  ~ 0
-TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - BOOT line \n    and DFU mode
+Text Notes 8950 5850 0    157  ~ 0
+TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - BOOT line \n    and DFU mode\n - NReset pull-up
 Wire Wire Line
 	7400 750  7400 3750
 Connection ~ 7400 3150
@@ -678,25 +626,9 @@ Connection ~ 9950 2450
 Connection ~ 9950 2100
 Connection ~ 9950 1800
 Connection ~ 9950 1450
-Wire Wire Line
-	4850 5900 4950 5900
-Wire Wire Line
-	4700 5750 4700 5650
-Wire Wire Line
-	4550 5900 4450 5900
-Wire Wire Line
-	3500 5900 3600 5900
-Wire Wire Line
-	3350 5750 3350 5650
-Wire Wire Line
-	3200 5900 3100 5900
 Connection ~ 9950 3500
 Connection ~ 8650 3500
 Connection ~ 7400 3500
-Wire Wire Line
-	3600 5900 3600 6000
-Wire Wire Line
-	4950 5900 4950 6000
 Wire Wire Line
 	5350 4950 5500 4950
 Wire Wire Line
@@ -711,4 +643,46 @@ Connection ~ 8650 3750
 Connection ~ 7400 3750
 Text GLabel 6800 3750 0    60   Input ~ 0
 WAKEUP
+$Comp
+L encoder_and_switch U6
+U 1 1 585F9C7A
+P 1750 5250
+F 0 "U6" H 1500 5050 60  0000 C CNN
+F 1 "encoder_and_switch" H 2100 5100 60  0000 C CNN
+F 2 "" H 1750 5250 60  0001 C CNN
+F 3 "" H 1750 5250 60  0001 C CNN
+	1    1750 5250
+	1    0    0    -1  
+$EndComp
+$Comp
+L encoder_and_switch U7
+U 1 1 585FA833
+P 3750 5250
+F 0 "U7" H 3500 5050 60  0000 C CNN
+F 1 "encoder_and_switch" H 4100 5100 60  0000 C CNN
+F 2 "" H 3750 5250 60  0001 C CNN
+F 3 "" H 3750 5250 60  0001 C CNN
+	1    3750 5250
+	1    0    0    -1  
+$EndComp
+Text GLabel 2150 5600 2    60   Input ~ 0
+WAKEUP
+Text GLabel 4150 5600 2    60   Input ~ 0
+WAKEUP
+Text GLabel 1350 5600 0    60   Input ~ 0
+ENC_1_SW
+Text GLabel 3350 5600 0    60   Input ~ 0
+ENC_2_SW
+Text GLabel 1500 5950 3    60   Input ~ 0
+ENC_1_A
+Text GLabel 1750 5950 3    60   Input ~ 0
+WAKEUP
+Text GLabel 2000 5950 3    60   Input ~ 0
+ENC_1_B
+Text GLabel 3500 5950 3    60   Input ~ 0
+ENC_2_A
+Text GLabel 3750 5950 3    60   Input ~ 0
+WAKEUP
+Text GLabel 4000 5950 3    60   Input ~ 0
+ENC_2_B
 $EndSCHEMATC
