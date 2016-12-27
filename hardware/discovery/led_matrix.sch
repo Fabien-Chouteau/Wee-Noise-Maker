@@ -348,11 +348,11 @@ F 3 "" H 5450 5000 50  0000 C CNN
 	1    5450 5000
 	1    0    0    -1  
 $EndComp
-Text GLabel 4350 2250 2    60   Input ~ 0
+Text GLabel 4350 1750 2    60   Input ~ 0
 ROW1
-Text GLabel 5000 2250 2    60   Input ~ 0
+Text GLabel 5000 1750 2    60   Input ~ 0
 ROW2
-Text GLabel 5650 2250 2    60   Input ~ 0
+Text GLabel 5650 1750 2    60   Input ~ 0
 ROW3
 Text GLabel 3600 2750 0    60   Input ~ 0
 COL1
@@ -496,4 +496,37 @@ Wire Wire Line
 	3600 3100 4600 3100
 Text Notes 3150 1750 0    60   ~ 0
 With 25 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
+$Comp
+L R R7
+U 1 1 5862A3A6
+P 4350 2000
+F 0 "R7" V 4430 2000 40  0000 C CNN
+F 1 "R" V 4357 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4280 2000 30  0001 C CNN
+F 3 "" H 4350 2000 30  0000 C CNN
+	1    4350 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R8
+U 1 1 5862A65F
+P 5000 2000
+F 0 "R8" V 5080 2000 40  0000 C CNN
+F 1 "R" V 5007 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4930 2000 30  0001 C CNN
+F 3 "" H 5000 2000 30  0000 C CNN
+	1    5000 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R9
+U 1 1 5862A6DA
+P 5650 2000
+F 0 "R9" V 5730 2000 40  0000 C CNN
+F 1 "R" V 5657 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 5580 2000 30  0001 C CNN
+F 3 "" H 5650 2000 30  0000 C CNN
+	1    5650 2000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
