@@ -79,15 +79,15 @@ Text GLabel 2850 5400 0    60   Input ~ 0
 SWDIO
 Text GLabel 2850 5500 0    60   Input ~ 0
 SWCLK
-Text GLabel 2850 4900 0    60   Input ~ 0
+Text GLabel 2850 6500 0    60   Input ~ 0
 Audio_SCL
-Text GLabel 12850 6800 2    60   Input ~ 0
+Text GLabel 2850 6600 0    60   Input ~ 0
 Audio_SDA
-Text GLabel 12850 6900 2    60   Input ~ 0
+Text GLabel 2850 6200 0    60   Input ~ 0
 I2S_SCLK
-Text GLabel 12850 7000 2    60   Input ~ 0
+Text GLabel 2850 6300 0    60   Input ~ 0
 I2S_DOUT
-Text GLabel 12850 7100 2    60   Input ~ 0
+Text GLabel 2850 6400 0    60   Input ~ 0
 I2S_DIN
 Text GLabel 2850 5200 0    60   Input ~ 0
 FS_DM
@@ -542,7 +542,7 @@ I2S_LRCLK
 Text GLabel 12850 6600 2    60   Input ~ 0
 I2S_MCLK
 Text GLabel 12850 6700 2    60   Input ~ 0
-Write
+SD_DAT0
 Text GLabel 12850 6500 2    60   Input ~ 0
 Play
 Text GLabel 12850 5600 2    60   Input ~ 0
@@ -587,4 +587,71 @@ Text GLabel 12850 3300 2    60   Input ~ 0
 BC
 Text GLabel 12850 3200 2    60   Input ~ 0
 COL5
+$Comp
+L MOLEX_microSD_47219-2001 U8
+U 1 1 58639490
+P 7350 8750
+F 0 "U8" H 7350 8750 60  0000 C CNN
+F 1 "MOLEX_microSD_47219-2001" V 8350 7850 60  0000 C CNN
+F 2 "stm32f4-disco:MOLEX_microSD_47219-2001" H 7350 8750 60  0001 C CNN
+F 3 "" H 7350 8750 60  0001 C CNN
+	1    7350 8750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR022
+U 1 1 586394FE
+P 7800 10350
+F 0 "#PWR022" H 7800 10350 30  0001 C CNN
+F 1 "GND" H 7800 10280 30  0001 C CNN
+F 2 "" H 7800 10350 60  0001 C CNN
+F 3 "" H 7800 10350 60  0001 C CNN
+	1    7800 10350
+	1    0    0    -1  
+$EndComp
+Text GLabel 7250 9850 0    60   Input ~ 0
+SD_DAT2
+Text GLabel 7250 9700 0    60   Input ~ 0
+SD_DAT3
+Text GLabel 7250 9400 0    60   Input ~ 0
+SD_CMD
+Text GLabel 7250 9550 0    60   Input ~ 0
+SD_CLK
+Text GLabel 7250 10150 0    60   Input ~ 0
+SD_DAT0
+Text GLabel 7250 10000 0    60   Input ~ 0
+SD_DAT1
+Wire Wire Line
+	7000 9000 7800 9000
+Wire Wire Line
+	7000 9000 7000 8900
+Text GLabel 7000 8900 1    60   Input ~ 0
+3V3
+Text GLabel 12850 7000 2    60   Input ~ 0
+SD_DAT3
+Text GLabel 12850 6800 2    60   Input ~ 0
+SD_DAT1
+Text GLabel 12850 6900 2    60   Input ~ 0
+SD_DAT2
+Text GLabel 2850 5100 0    60   Input ~ 0
+Write
+Text GLabel 12850 7100 2    60   Input ~ 0
+SD_CLK
+Text GLabel 12850 4300 2    60   Input ~ 0
+SD_CMD
+Wire Wire Line
+	7250 9250 6300 9250
+Wire Wire Line
+	6300 9250 6300 9500
+$Comp
+L GND #PWR?
+U 1 1 58631320
+P 6300 9500
+F 0 "#PWR?" H 6300 9500 30  0001 C CNN
+F 1 "GND" H 6300 9430 30  0001 C CNN
+F 2 "" H 6300 9500 60  0001 C CNN
+F 3 "" H 6300 9500 60  0001 C CNN
+	1    6300 9500
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
