@@ -644,14 +644,42 @@ Wire Wire Line
 Wire Wire Line
 	6300 9250 6300 9500
 $Comp
-L GND #PWR?
+L GND #PWR023
 U 1 1 58631320
 P 6300 9500
-F 0 "#PWR?" H 6300 9500 30  0001 C CNN
+F 0 "#PWR023" H 6300 9500 30  0001 C CNN
 F 1 "GND" H 6300 9430 30  0001 C CNN
 F 2 "" H 6300 9500 60  0001 C CNN
 F 3 "" H 6300 9500 60  0001 C CNN
 	1    6300 9500
 	1    0    0    -1  
 $EndComp
+Text GLabel 12850 3100 2    60   Input ~ 0
+B12
+Text GLabel 12850 3000 2    60   Input ~ 0
+B4
+Text GLabel 2850 6000 0    60   Input ~ 0
+BB
+Text GLabel 2850 5900 0    60   Input ~ 0
+COL4
+Text GLabel 12850 6400 2    60   Input ~ 0
+B11
+Text GLabel 12850 6300 2    60   Input ~ 0
+B3
+Text GLabel 2850 4800 0    60   Input ~ 0
+BA
+Text GLabel 2850 4700 0    60   Input ~ 0
+COL3
+Text GLabel 2850 4600 0    60   Input ~ 0
+B10
+Text GLabel 2850 4500 0    60   Input ~ 0
+B9
+Text GLabel 2850 4400 0    60   Input ~ 0
+B2
+Text GLabel 2850 4300 0    60   Input ~ 0
+COL2
+Text GLabel 2850 4200 0    60   Input ~ 0
+B1
+Text GLabel 12850 6100 2    60   Input ~ 0
+COL1
 $EndSCHEMATC
