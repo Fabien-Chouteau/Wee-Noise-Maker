@@ -372,6 +372,82 @@ Text GLabel 3600 5200 0    60   Input ~ 0
 COL8
 Text GLabel 3600 5550 0    60   Input ~ 0
 COL9
+Text Notes 3150 1750 0    60   ~ 0
+With 25 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
+$Comp
+L R R7
+U 1 1 5862A3A6
+P 4350 2000
+F 0 "R7" V 4430 2000 40  0000 C CNN
+F 1 "R" V 4357 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4280 2000 30  0001 C CNN
+F 3 "" H 4350 2000 30  0000 C CNN
+	1    4350 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R8
+U 1 1 5862A65F
+P 5000 2000
+F 0 "R8" V 5080 2000 40  0000 C CNN
+F 1 "R" V 5007 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4930 2000 30  0001 C CNN
+F 3 "" H 5000 2000 30  0000 C CNN
+	1    5000 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R9
+U 1 1 5862A6DA
+P 5650 2000
+F 0 "R9" V 5730 2000 40  0000 C CNN
+F 1 "R" V 5657 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 5580 2000 30  0001 C CNN
+F 3 "" H 5650 2000 30  0000 C CNN
+	1    5650 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L SSD1306 U9
+U 1 1 58642D78
+P 9200 2375
+F 0 "U9" H 9200 2375 60  0000 C CNN
+F 1 "SSD1306" H 9850 2175 60  0000 C CNN
+F 2 "stm32f4-disco:MIDAS_MCOT096016AV_OLED" H 9200 2375 60  0001 C CNN
+F 3 "" H 9200 2375 60  0001 C CNN
+	1    9200 2375
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C28
+U 1 1 586433AA
+P 8675 2575
+F 0 "C28" V 8725 2650 40  0000 L CNN
+F 1 "1uF" V 8725 2425 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 8713 2425 30  0001 C CNN
+F 3 "" H 8675 2575 60  0000 C CNN
+	1    8675 2575
+	0    1    1    0   
+$EndComp
+$Comp
+L C C29
+U 1 1 58643880
+P 8675 2975
+F 0 "C29" V 8725 3050 40  0000 L CNN
+F 1 "1uF" V 8725 2825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 8713 2825 30  0001 C CNN
+F 3 "" H 8675 2975 60  0000 C CNN
+	1    8675 2975
+	0    1    1    0   
+$EndComp
+Text GLabel 7950 3025 0    60   Input ~ 0
+3V3
+Text GLabel 9000 4175 0    60   Input ~ 0
+Screen_NReset
+Text GLabel 9000 4375 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 9000 4575 0    60   Input ~ 0
+Audio_SDA
 Connection ~ 4350 2900
 Connection ~ 4350 3250
 Connection ~ 4350 3600
@@ -494,39 +570,105 @@ Wire Wire Line
 	4600 2750 3600 2750
 Wire Wire Line
 	3600 3100 4600 3100
-Text Notes 3150 1750 0    60   ~ 0
-With 25 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
+Wire Wire Line
+	9000 2575 8875 2575
+Wire Wire Line
+	8475 2575 8400 2575
+Wire Wire Line
+	8400 2575 8400 2775
+Wire Wire Line
+	8400 2775 9000 2775
+Wire Wire Line
+	9000 2975 8875 2975
+Wire Wire Line
+	8475 2975 8400 2975
+Wire Wire Line
+	8400 2975 8400 3175
+Wire Wire Line
+	8400 3175 9000 3175
+Wire Wire Line
+	9000 3375 7950 3375
+Wire Wire Line
+	7950 3025 7950 3975
+Connection ~ 7950 3375
+Wire Wire Line
+	7775 3975 9000 3975
+Wire Wire Line
+	9000 3775 7125 3775
+Wire Wire Line
+	7125 3775 7125 5500
 $Comp
-L R R7
-U 1 1 5862A3A6
-P 4350 2000
-F 0 "R7" V 4430 2000 40  0000 C CNN
-F 1 "R" V 4357 2001 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 4280 2000 30  0001 C CNN
-F 3 "" H 4350 2000 30  0000 C CNN
-	1    4350 2000
+L C C25
+U 1 1 586463AC
+P 7575 3975
+F 0 "C25" V 7625 4050 40  0000 L CNN
+F 1 "10uF" V 7625 3825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7613 3825 30  0001 C CNN
+F 3 "" H 7575 3975 60  0000 C CNN
+	1    7575 3975
+	0    1    1    0   
+$EndComp
+Connection ~ 7950 3975
+Wire Wire Line
+	7375 3975 7125 3975
+Connection ~ 7125 3975
+$Comp
+L GND #PWR025
+U 1 1 586468A3
+P 7125 5500
+F 0 "#PWR025" H 7125 5500 30  0001 C CNN
+F 1 "GND" H 7125 5430 30  0001 C CNN
+F 2 "" H 7125 5500 60  0001 C CNN
+F 3 "" H 7125 5500 60  0001 C CNN
+	1    7125 5500
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R8
-U 1 1 5862A65F
-P 5000 2000
-F 0 "R8" V 5080 2000 40  0000 C CNN
-F 1 "R" V 5007 2001 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 4930 2000 30  0001 C CNN
-F 3 "" H 5000 2000 30  0000 C CNN
-	1    5000 2000
-	1    0    0    -1  
+L R R15
+U 1 1 58646E77
+P 7950 4775
+F 0 "R15" V 8030 4775 40  0000 C CNN
+F 1 "R" V 7957 4776 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 7880 4775 30  0001 C CNN
+F 3 "" H 7950 4775 30  0000 C CNN
+	1    7950 4775
+	0    1    1    0   
 $EndComp
 $Comp
-L R R9
-U 1 1 5862A6DA
-P 5650 2000
-F 0 "R9" V 5730 2000 40  0000 C CNN
-F 1 "R" V 5657 2001 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 5580 2000 30  0001 C CNN
-F 3 "" H 5650 2000 30  0000 C CNN
-	1    5650 2000
-	1    0    0    -1  
+L C C26
+U 1 1 58646F61
+P 7950 4975
+F 0 "C26" V 8000 5050 40  0000 L CNN
+F 1 "10uF" V 8000 4825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7988 4825 30  0001 C CNN
+F 3 "" H 7950 4975 60  0000 C CNN
+	1    7950 4975
+	0    1    1    0   
 $EndComp
+$Comp
+L C C27
+U 1 1 58647031
+P 7950 5175
+F 0 "C27" V 8000 5250 40  0000 L CNN
+F 1 "10uF" V 8000 5025 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7988 5025 30  0001 C CNN
+F 3 "" H 7950 5175 60  0000 C CNN
+	1    7950 5175
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9000 4775 8200 4775
+Wire Wire Line
+	7700 4775 7125 4775
+Connection ~ 7125 4775
+Wire Wire Line
+	9000 4975 8150 4975
+Wire Wire Line
+	7750 4975 7125 4975
+Connection ~ 7125 4975
+Wire Wire Line
+	9000 5175 8150 5175
+Wire Wire Line
+	7750 5175 7125 5175
+Connection ~ 7125 5175
 $EndSCHEMATC
