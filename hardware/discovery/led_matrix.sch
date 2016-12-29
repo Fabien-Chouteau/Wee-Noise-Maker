@@ -239,17 +239,6 @@ F 3 "" H 5450 5350 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D19
-U 1 1 585D8AD7
-P 5450 3250
-F 0 "D19" H 5450 3350 50  0000 C CNN
-F 1 "LED" H 5450 3150 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 5450 3250 50  0001 C CNN
-F 3 "" H 5450 3250 50  0000 C CNN
-	1    5450 3250
-	1    0    0    -1  
-$EndComp
-$Comp
 L LED D20
 U 1 1 585D8ADE
 P 5450 3600
@@ -373,7 +362,7 @@ COL8
 Text GLabel 3600 5550 0    60   Input ~ 0
 COL9
 Text Notes 3150 1750 0    60   ~ 0
-With 25 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
+With 24 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
 $Comp
 L R R7
 U 1 1 5862A3A6
@@ -471,9 +460,6 @@ Wire Wire Line
 	4600 2750 4600 2550
 Connection ~ 4600 2750
 Wire Wire Line
-	5250 3450 5250 3250
-Connection ~ 5250 3450
-Wire Wire Line
 	4600 4850 4600 4650
 Wire Wire Line
 	3950 3100 3950 2900
@@ -527,7 +513,6 @@ Connection ~ 3950 3800
 Connection ~ 3950 4150
 Connection ~ 4350 4300
 Connection ~ 5000 4300
-Connection ~ 5650 3250
 Connection ~ 5000 2550
 Connection ~ 4350 2550
 Wire Wire Line
@@ -554,8 +539,6 @@ Wire Wire Line
 	3600 5550 5250 5550
 Wire Wire Line
 	5250 5550 5250 5350
-Wire Wire Line
-	3600 3450 5250 3450
 Wire Wire Line
 	5250 3800 3600 3800
 Wire Wire Line
@@ -613,10 +596,10 @@ Wire Wire Line
 	7375 3975 7125 3975
 Connection ~ 7125 3975
 $Comp
-L GND #PWR025
+L GND #PWR027
 U 1 1 586468A3
 P 7125 5500
-F 0 "#PWR025" H 7125 5500 30  0001 C CNN
+F 0 "#PWR027" H 7125 5500 30  0001 C CNN
 F 1 "GND" H 7125 5430 30  0001 C CNN
 F 2 "" H 7125 5500 60  0001 C CNN
 F 3 "" H 7125 5500 60  0001 C CNN
@@ -671,4 +654,6 @@ Wire Wire Line
 Wire Wire Line
 	7750 5175 7125 5175
 Connection ~ 7125 5175
+Wire Wire Line
+	3600 3450 4600 3450
 $EndSCHEMATC

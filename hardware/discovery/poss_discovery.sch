@@ -272,17 +272,6 @@ F 3 "" H 8350 3500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L SW_PUSH SW17
-U 1 1 583EF8EE
-P 9650 1450
-F 0 "SW17" H 9800 1560 50  0000 C CNN
-F 1 "SW_PUSH" H 9650 1370 50  0000 C CNN
-F 2 "Buttons_Switches_SMD:SW_SPST_B3SL-1002P" H 9650 1450 50  0001 C CNN
-F 3 "" H 9650 1450 50  0000 C CNN
-	1    9650 1450
-	1    0    0    -1  
-$EndComp
-$Comp
 L SW_PUSH SW18
 U 1 1 583EF8F4
 P 9650 1800
@@ -501,18 +490,16 @@ Text GLabel 5350 950  2    60   Input ~ 0
 GND
 Text GLabel 2200 950  2    60   Input ~ 0
 GND
-Text GLabel 9350 1450 0    60   Input ~ 0
-BA
 Text GLabel 9350 1800 0    60   Input ~ 0
-BB
+BA
 Text GLabel 9350 2100 0    60   Input ~ 0
-BC
+BB
 Text GLabel 9350 2450 0    60   Input ~ 0
-BD
+BC
 Text GLabel 9350 2800 0    60   Input ~ 0
-BE
+BD
 Text GLabel 9350 3150 0    60   Input ~ 0
-BPM_VOL
+BE
 Text GLabel 9350 3500 0    60   Input ~ 0
 FX
 Text GLabel 6800 750  0    60   Input ~ 0
@@ -600,6 +587,68 @@ F1 "audio.sch" 60
 $EndSheet
 Text Notes 8950 5850 0    157  ~ 0
 TODO:\n - Debug port\n - Encoders\n - VBAT sensing\n - BOOT line \n    and DFU mode
+Text GLabel 6800 3750 0    60   Input ~ 0
+WAKEUP
+$Comp
+L encoder_and_switch U6
+U 1 1 585F9C7A
+P 1750 5250
+F 0 "U6" H 1500 5050 60  0000 C CNN
+F 1 "encoder_and_switch" H 2100 5100 60  0000 C CNN
+F 2 "stm32f4-disco:encoder_EC12D" H 1750 5250 60  0001 C CNN
+F 3 "" H 1750 5250 60  0001 C CNN
+	1    1750 5250
+	1    0    0    -1  
+$EndComp
+$Comp
+L encoder_and_switch U7
+U 1 1 585FA833
+P 3750 5250
+F 0 "U7" H 3500 5050 60  0000 C CNN
+F 1 "encoder_and_switch" H 4100 5100 60  0000 C CNN
+F 2 "stm32f4-disco:encoder_EC12D" H 3750 5250 60  0001 C CNN
+F 3 "" H 3750 5250 60  0001 C CNN
+	1    3750 5250
+	1    0    0    -1  
+$EndComp
+Text GLabel 1350 5600 0    60   Input ~ 0
+WAKEUP
+Text GLabel 3350 5600 0    60   Input ~ 0
+WAKEUP
+Text GLabel 2150 5600 2    60   Input ~ 0
+ENC_1_SW
+Text GLabel 4150 5600 2    60   Input ~ 0
+ENC_2_SW
+Text GLabel 1500 5950 3    60   Input ~ 0
+ENC_1_A
+Text GLabel 2000 5950 3    60   Input ~ 0
+ENC_1_B
+Text GLabel 3500 5950 3    60   Input ~ 0
+ENC_2_A
+Text GLabel 4000 5950 3    60   Input ~ 0
+ENC_2_B
+$Comp
+L GND #PWR02
+U 1 1 586532D8
+P 3750 5950
+F 0 "#PWR02" H 3750 5950 30  0001 C CNN
+F 1 "GND" H 3750 5880 30  0001 C CNN
+F 2 "" H 3750 5950 60  0001 C CNN
+F 3 "" H 3750 5950 60  0001 C CNN
+	1    3750 5950
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR03
+U 1 1 58653337
+P 1750 5950
+F 0 "#PWR03" H 1750 5950 30  0001 C CNN
+F 1 "GND" H 1750 5880 30  0001 C CNN
+F 2 "" H 1750 5950 60  0001 C CNN
+F 3 "" H 1750 5950 60  0001 C CNN
+	1    1750 5950
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
 	7400 750  7400 3750
 Connection ~ 7400 3150
@@ -618,14 +667,11 @@ Connection ~ 8650 2100
 Connection ~ 8650 1800
 Connection ~ 8650 1450
 Connection ~ 8650 1100
-Wire Wire Line
-	9950 3750 9950 1450
 Connection ~ 9950 3150
 Connection ~ 9950 2800
 Connection ~ 9950 2450
 Connection ~ 9950 2100
 Connection ~ 9950 1800
-Connection ~ 9950 1450
 Connection ~ 9950 3500
 Connection ~ 8650 3500
 Connection ~ 7400 3500
@@ -638,51 +684,9 @@ Wire Notes Line
 Wire Notes Line
 	8850 4100 8850 6450
 Wire Wire Line
-	6800 3750 9950 3750
+	9950 3750 6800 3750
 Connection ~ 8650 3750
 Connection ~ 7400 3750
-Text GLabel 6800 3750 0    60   Input ~ 0
-WAKEUP
-$Comp
-L encoder_and_switch U6
-U 1 1 585F9C7A
-P 1750 5250
-F 0 "U6" H 1500 5050 60  0000 C CNN
-F 1 "encoder_and_switch" H 2100 5100 60  0000 C CNN
-F 2 "" H 1750 5250 60  0001 C CNN
-F 3 "" H 1750 5250 60  0001 C CNN
-	1    1750 5250
-	1    0    0    -1  
-$EndComp
-$Comp
-L encoder_and_switch U7
-U 1 1 585FA833
-P 3750 5250
-F 0 "U7" H 3500 5050 60  0000 C CNN
-F 1 "encoder_and_switch" H 4100 5100 60  0000 C CNN
-F 2 "" H 3750 5250 60  0001 C CNN
-F 3 "" H 3750 5250 60  0001 C CNN
-	1    3750 5250
-	1    0    0    -1  
-$EndComp
-Text GLabel 2150 5600 2    60   Input ~ 0
-WAKEUP
-Text GLabel 4150 5600 2    60   Input ~ 0
-WAKEUP
-Text GLabel 1350 5600 0    60   Input ~ 0
-ENC_1_SW
-Text GLabel 3350 5600 0    60   Input ~ 0
-ENC_2_SW
-Text GLabel 1500 5950 3    60   Input ~ 0
-ENC_1_A
-Text GLabel 1750 5950 3    60   Input ~ 0
-WAKEUP
-Text GLabel 2000 5950 3    60   Input ~ 0
-ENC_1_B
-Text GLabel 3500 5950 3    60   Input ~ 0
-ENC_2_A
-Text GLabel 3750 5950 3    60   Input ~ 0
-WAKEUP
-Text GLabel 4000 5950 3    60   Input ~ 0
-ENC_2_B
+Wire Wire Line
+	9950 1800 9950 3750
 $EndSCHEMATC
