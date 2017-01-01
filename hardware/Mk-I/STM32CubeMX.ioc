@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-#Sun Jan 01 22:14:50 CET 2017
+#Sun Jan 01 22:14:59 CET 2017
 ADC1.AutoInjectedConv-ADC_Injected_ConversionMode=DISABLE
 ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_VBAT
 ADC1.Channel-IN-Vbat=ADC_CHANNEL_VBAT

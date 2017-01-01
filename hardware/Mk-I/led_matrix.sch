@@ -1,0 +1,658 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:74xgxx
+LIBS:ac-dc
+LIBS:brooktre
+LIBS:cmos_ieee
+LIBS:dc-dc
+LIBS:elec-unifil
+LIBS:ftdi
+LIBS:gennum
+LIBS:graphic
+LIBS:logo
+LIBS:microchip_pic10mcu
+LIBS:microchip_pic12mcu
+LIBS:microchip_pic16mcu
+LIBS:microchip1
+LIBS:msp430
+LIBS:nxp_armmcu
+LIBS:powerint
+LIBS:pspice
+LIBS:references
+LIBS:relays
+LIBS:sensors
+LIBS:special
+LIBS:stm8
+LIBS:stm32
+LIBS:supertex
+LIBS:transf
+LIBS:ttl_ieee
+LIBS:video
+LIBS:POSS
+LIBS:poss_mk_1-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 4 5
+Title "Pocket Open Source Syntesizer - Mk-I"
+Date ""
+Rev "A"
+Comp "Fabien Chouteau"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L LED D10
+U 1 1 585D8A6E
+P 4800 2550
+F 0 "D10" H 4800 2650 50  0000 C CNN
+F 1 "LED" H 4800 2450 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 2550 50  0001 C CNN
+F 3 "" H 4800 2550 50  0000 C CNN
+	1    4800 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D11
+U 1 1 585D8A75
+P 4800 2900
+F 0 "D11" H 4800 3000 50  0000 C CNN
+F 1 "LED" H 4800 2800 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 2900 50  0001 C CNN
+F 3 "" H 4800 2900 50  0000 C CNN
+	1    4800 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D12
+U 1 1 585D8A7C
+P 4800 3250
+F 0 "D12" H 4800 3350 50  0000 C CNN
+F 1 "LED" H 4800 3150 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 3250 50  0001 C CNN
+F 3 "" H 4800 3250 50  0000 C CNN
+	1    4800 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D13
+U 1 1 585D8A83
+P 4800 3600
+F 0 "D13" H 4800 3700 50  0000 C CNN
+F 1 "LED" H 4800 3500 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 3600 50  0001 C CNN
+F 3 "" H 4800 3600 50  0000 C CNN
+	1    4800 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D14
+U 1 1 585D8A8A
+P 4800 3950
+F 0 "D14" H 4800 4050 50  0000 C CNN
+F 1 "LED" H 4800 3850 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 3950 50  0001 C CNN
+F 3 "" H 4800 3950 50  0000 C CNN
+	1    4800 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D1
+U 1 1 585D8A91
+P 4150 2550
+F 0 "D1" H 4150 2650 50  0000 C CNN
+F 1 "LED" H 4150 2450 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 2550 50  0001 C CNN
+F 3 "" H 4150 2550 50  0000 C CNN
+	1    4150 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D2
+U 1 1 585D8A98
+P 4150 2900
+F 0 "D2" H 4150 3000 50  0000 C CNN
+F 1 "LED" H 4150 2800 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 2900 50  0001 C CNN
+F 3 "" H 4150 2900 50  0000 C CNN
+	1    4150 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D3
+U 1 1 585D8A9F
+P 4150 3250
+F 0 "D3" H 4150 3350 50  0000 C CNN
+F 1 "LED" H 4150 3150 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 3250 50  0001 C CNN
+F 3 "" H 4150 3250 50  0000 C CNN
+	1    4150 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D4
+U 1 1 585D8AA6
+P 4150 3600
+F 0 "D4" H 4150 3700 50  0000 C CNN
+F 1 "LED" H 4150 3500 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 3600 50  0001 C CNN
+F 3 "" H 4150 3600 50  0000 C CNN
+	1    4150 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D5
+U 1 1 585D8AAD
+P 4150 3950
+F 0 "D5" H 4150 4050 50  0000 C CNN
+F 1 "LED" H 4150 3850 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 3950 50  0001 C CNN
+F 3 "" H 4150 3950 50  0000 C CNN
+	1    4150 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D6
+U 1 1 585D8AB4
+P 4150 4300
+F 0 "D6" H 4150 4400 50  0000 C CNN
+F 1 "LED" H 4150 4200 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 4300 50  0001 C CNN
+F 3 "" H 4150 4300 50  0000 C CNN
+	1    4150 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D7
+U 1 1 585D8ABB
+P 4150 4650
+F 0 "D7" H 4150 4750 50  0000 C CNN
+F 1 "LED" H 4150 4550 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 4650 50  0001 C CNN
+F 3 "" H 4150 4650 50  0000 C CNN
+	1    4150 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D8
+U 1 1 585D8AC2
+P 4150 5000
+F 0 "D8" H 4150 5100 50  0000 C CNN
+F 1 "LED" H 4150 4900 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 5000 50  0001 C CNN
+F 3 "" H 4150 5000 50  0000 C CNN
+	1    4150 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D9
+U 1 1 585D8AC9
+P 4150 5350
+F 0 "D9" H 4150 5450 50  0000 C CNN
+F 1 "LED" H 4150 5250 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4150 5350 50  0001 C CNN
+F 3 "" H 4150 5350 50  0000 C CNN
+	1    4150 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D25
+U 1 1 585D8AD0
+P 5450 5350
+F 0 "D25" H 5450 5450 50  0000 C CNN
+F 1 "LED" H 5450 5250 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 5350 50  0001 C CNN
+F 3 "" H 5450 5350 50  0000 C CNN
+	1    5450 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D20
+U 1 1 585D8ADE
+P 5450 3600
+F 0 "D20" H 5450 3700 50  0000 C CNN
+F 1 "LED" H 5450 3500 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 3600 50  0001 C CNN
+F 3 "" H 5450 3600 50  0000 C CNN
+	1    5450 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D21
+U 1 1 585D8AE5
+P 5450 3950
+F 0 "D21" H 5450 4050 50  0000 C CNN
+F 1 "LED" H 5450 3850 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 3950 50  0001 C CNN
+F 3 "" H 5450 3950 50  0000 C CNN
+	1    5450 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D22
+U 1 1 585D8AEC
+P 5450 4300
+F 0 "D22" H 5450 4400 50  0000 C CNN
+F 1 "LED" H 5450 4200 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 4300 50  0001 C CNN
+F 3 "" H 5450 4300 50  0000 C CNN
+	1    5450 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D23
+U 1 1 585D8AF3
+P 5450 4650
+F 0 "D23" H 5450 4750 50  0000 C CNN
+F 1 "LED" H 5450 4550 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 4650 50  0001 C CNN
+F 3 "" H 5450 4650 50  0000 C CNN
+	1    5450 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D15
+U 1 1 585D8AFA
+P 4800 4300
+F 0 "D15" H 4800 4400 50  0000 C CNN
+F 1 "LED" H 4800 4200 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 4300 50  0001 C CNN
+F 3 "" H 4800 4300 50  0000 C CNN
+	1    4800 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D16
+U 1 1 585D8B01
+P 4800 4650
+F 0 "D16" H 4800 4750 50  0000 C CNN
+F 1 "LED" H 4800 4550 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 4650 50  0001 C CNN
+F 3 "" H 4800 4650 50  0000 C CNN
+	1    4800 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D17
+U 1 1 585D8B08
+P 4800 5000
+F 0 "D17" H 4800 5100 50  0000 C CNN
+F 1 "LED" H 4800 4900 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 5000 50  0001 C CNN
+F 3 "" H 4800 5000 50  0000 C CNN
+	1    4800 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D18
+U 1 1 585D8B0F
+P 4800 5350
+F 0 "D18" H 4800 5450 50  0000 C CNN
+F 1 "LED" H 4800 5250 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 4800 5350 50  0001 C CNN
+F 3 "" H 4800 5350 50  0000 C CNN
+	1    4800 5350
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D24
+U 1 1 585D8B16
+P 5450 5000
+F 0 "D24" H 5450 5100 50  0000 C CNN
+F 1 "LED" H 5450 4900 50  0000 C CNN
+F 2 "LEDs:LED_0805" H 5450 5000 50  0001 C CNN
+F 3 "" H 5450 5000 50  0000 C CNN
+	1    5450 5000
+	1    0    0    -1  
+$EndComp
+Text GLabel 4350 1750 2    60   Input ~ 0
+ROW1
+Text GLabel 5000 1750 2    60   Input ~ 0
+ROW2
+Text GLabel 5650 1750 2    60   Input ~ 0
+ROW3
+Text GLabel 3600 2750 0    60   Input ~ 0
+COL1
+Text GLabel 3600 3100 0    60   Input ~ 0
+COL2
+Text GLabel 3600 3450 0    60   Input ~ 0
+COL3
+Text GLabel 3600 3800 0    60   Input ~ 0
+COL4
+Text GLabel 3600 4150 0    60   Input ~ 0
+COL5
+Text GLabel 3600 4500 0    60   Input ~ 0
+COL6
+Text GLabel 3600 4850 0    60   Input ~ 0
+COL7
+Text GLabel 3600 5200 0    60   Input ~ 0
+COL8
+Text GLabel 3600 5550 0    60   Input ~ 0
+COL9
+Text Notes 3150 1750 0    60   ~ 0
+With 24 LEDs we could do a 5x5 (10 GPIOs) matrix but having the LED logic matrix \nfollowing the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
+$Comp
+L R R7
+U 1 1 5862A3A6
+P 4350 2000
+F 0 "R7" V 4430 2000 40  0000 C CNN
+F 1 "R" V 4357 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4280 2000 30  0001 C CNN
+F 3 "" H 4350 2000 30  0000 C CNN
+	1    4350 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R8
+U 1 1 5862A65F
+P 5000 2000
+F 0 "R8" V 5080 2000 40  0000 C CNN
+F 1 "R" V 5007 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 4930 2000 30  0001 C CNN
+F 3 "" H 5000 2000 30  0000 C CNN
+	1    5000 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R9
+U 1 1 5862A6DA
+P 5650 2000
+F 0 "R9" V 5730 2000 40  0000 C CNN
+F 1 "R" V 5657 2001 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 5580 2000 30  0001 C CNN
+F 3 "" H 5650 2000 30  0000 C CNN
+	1    5650 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L SSD1306 U9
+U 1 1 58642D78
+P 9200 2375
+F 0 "U9" H 9200 2375 60  0000 C CNN
+F 1 "SSD1306" H 9850 2175 60  0000 C CNN
+F 2 "POSS:MIDAS_MCOT096016AV_OLED" H 9200 2375 60  0001 C CNN
+F 3 "" H 9200 2375 60  0001 C CNN
+	1    9200 2375
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C28
+U 1 1 586433AA
+P 8675 2575
+F 0 "C28" V 8725 2650 40  0000 L CNN
+F 1 "1uF" V 8725 2425 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 8713 2425 30  0001 C CNN
+F 3 "" H 8675 2575 60  0000 C CNN
+	1    8675 2575
+	0    1    1    0   
+$EndComp
+$Comp
+L C C29
+U 1 1 58643880
+P 8675 2975
+F 0 "C29" V 8725 3050 40  0000 L CNN
+F 1 "1uF" V 8725 2825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 8713 2825 30  0001 C CNN
+F 3 "" H 8675 2975 60  0000 C CNN
+	1    8675 2975
+	0    1    1    0   
+$EndComp
+Text GLabel 7950 3025 0    60   Input ~ 0
+3V3
+Text GLabel 9000 4175 0    60   Input ~ 0
+Screen_NReset
+Text GLabel 9000 4375 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 9000 4575 0    60   Input ~ 0
+Audio_SDA
+Connection ~ 4350 2900
+Connection ~ 4350 3250
+Connection ~ 4350 3600
+Connection ~ 5000 2900
+Connection ~ 5000 3250
+Connection ~ 5000 3600
+Connection ~ 5650 3600
+Connection ~ 5650 3950
+Connection ~ 5650 4300
+Connection ~ 4350 4650
+Connection ~ 4350 5000
+Connection ~ 4350 5350
+Connection ~ 5000 4650
+Connection ~ 5000 5000
+Connection ~ 5000 5350
+Wire Wire Line
+	4600 4500 4600 4300
+Wire Wire Line
+	3950 2750 3950 2550
+Wire Wire Line
+	4600 2750 4600 2550
+Connection ~ 4600 2750
+Wire Wire Line
+	4600 4850 4600 4650
+Wire Wire Line
+	3950 3100 3950 2900
+Wire Wire Line
+	4600 3100 4600 2900
+Connection ~ 4600 3100
+Wire Wire Line
+	5250 3600 5250 3800
+Connection ~ 5250 3800
+Wire Wire Line
+	3950 4650 3950 4850
+Connection ~ 3950 4850
+Wire Wire Line
+	4600 5200 4600 5000
+Wire Wire Line
+	3950 3450 3950 3250
+Wire Wire Line
+	4600 3450 4600 3250
+Connection ~ 4600 3450
+Wire Wire Line
+	5250 4150 5250 3950
+Connection ~ 5250 4150
+Wire Wire Line
+	3950 5000 3950 5200
+Connection ~ 3950 5200
+Wire Wire Line
+	4600 5550 4600 5350
+Wire Wire Line
+	3950 3800 3950 3600
+Wire Wire Line
+	4600 3800 4600 3600
+Connection ~ 4600 3800
+Wire Wire Line
+	5250 4500 5250 4300
+Connection ~ 5250 4500
+Wire Wire Line
+	3950 5350 3950 5550
+Connection ~ 3950 5550
+Wire Wire Line
+	3950 4150 3950 3950
+Wire Wire Line
+	4600 4150 4600 3950
+Connection ~ 4600 4150
+Wire Wire Line
+	5250 4850 5250 4650
+Connection ~ 5250 4850
+Connection ~ 3950 2750
+Connection ~ 3950 3100
+Connection ~ 3950 3450
+Connection ~ 3950 3800
+Connection ~ 3950 4150
+Connection ~ 4350 4300
+Connection ~ 5000 4300
+Connection ~ 5000 2550
+Connection ~ 4350 2550
+Wire Wire Line
+	3950 4500 3950 4300
+Connection ~ 3950 4500
+Wire Wire Line
+	4350 2250 4350 5350
+Connection ~ 4350 3950
+Wire Wire Line
+	5000 2250 5000 5350
+Connection ~ 5000 3950
+Wire Wire Line
+	5650 2250 5650 5350
+Connection ~ 5650 4650
+Connection ~ 5650 5000
+Connection ~ 5250 5200
+Connection ~ 4600 4500
+Wire Wire Line
+	5250 5200 5250 5000
+Connection ~ 4600 4850
+Wire Wire Line
+	3600 5200 5250 5200
+Wire Wire Line
+	3600 5550 5250 5550
+Wire Wire Line
+	5250 5550 5250 5350
+Wire Wire Line
+	5250 3800 3600 3800
+Wire Wire Line
+	3600 4150 5250 4150
+Wire Wire Line
+	3600 4500 5250 4500
+Wire Wire Line
+	3600 4850 5250 4850
+Connection ~ 4600 5200
+Connection ~ 4600 5550
+Wire Wire Line
+	4600 2750 3600 2750
+Wire Wire Line
+	3600 3100 4600 3100
+Wire Wire Line
+	9000 2575 8875 2575
+Wire Wire Line
+	8475 2575 8400 2575
+Wire Wire Line
+	8400 2575 8400 2775
+Wire Wire Line
+	8400 2775 9000 2775
+Wire Wire Line
+	9000 2975 8875 2975
+Wire Wire Line
+	8475 2975 8400 2975
+Wire Wire Line
+	8400 2975 8400 3175
+Wire Wire Line
+	8400 3175 9000 3175
+Wire Wire Line
+	9000 3375 7950 3375
+Wire Wire Line
+	7950 3025 7950 3975
+Connection ~ 7950 3375
+Wire Wire Line
+	7775 3975 9000 3975
+Wire Wire Line
+	9000 3775 7125 3775
+Wire Wire Line
+	7125 3775 7125 5500
+$Comp
+L C C25
+U 1 1 586463AC
+P 7575 3975
+F 0 "C25" V 7625 4050 40  0000 L CNN
+F 1 "10uF" V 7625 3825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7613 3825 30  0001 C CNN
+F 3 "" H 7575 3975 60  0000 C CNN
+	1    7575 3975
+	0    1    1    0   
+$EndComp
+Connection ~ 7950 3975
+Wire Wire Line
+	7375 3975 7125 3975
+Connection ~ 7125 3975
+$Comp
+L GND #PWR031
+U 1 1 586468A3
+P 7125 5500
+F 0 "#PWR031" H 7125 5500 30  0001 C CNN
+F 1 "GND" H 7125 5430 30  0001 C CNN
+F 2 "" H 7125 5500 60  0001 C CNN
+F 3 "" H 7125 5500 60  0001 C CNN
+	1    7125 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R15
+U 1 1 58646E77
+P 7950 4775
+F 0 "R15" V 8030 4775 40  0000 C CNN
+F 1 "R" V 7957 4776 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 7880 4775 30  0001 C CNN
+F 3 "" H 7950 4775 30  0000 C CNN
+	1    7950 4775
+	0    1    1    0   
+$EndComp
+$Comp
+L C C26
+U 1 1 58646F61
+P 7950 4975
+F 0 "C26" V 8000 5050 40  0000 L CNN
+F 1 "10uF" V 8000 4825 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7988 4825 30  0001 C CNN
+F 3 "" H 7950 4975 60  0000 C CNN
+	1    7950 4975
+	0    1    1    0   
+$EndComp
+$Comp
+L C C27
+U 1 1 58647031
+P 7950 5175
+F 0 "C27" V 8000 5250 40  0000 L CNN
+F 1 "10uF" V 8000 5025 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 7988 5025 30  0001 C CNN
+F 3 "" H 7950 5175 60  0000 C CNN
+	1    7950 5175
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9000 4775 8200 4775
+Wire Wire Line
+	7700 4775 7125 4775
+Connection ~ 7125 4775
+Wire Wire Line
+	9000 4975 8150 4975
+Wire Wire Line
+	7750 4975 7125 4975
+Connection ~ 7125 4975
+Wire Wire Line
+	9000 5175 8150 5175
+Wire Wire Line
+	7750 5175 7125 5175
+Connection ~ 7125 5175
+Wire Wire Line
+	3600 3450 4600 3450
+$EndSCHEMATC
