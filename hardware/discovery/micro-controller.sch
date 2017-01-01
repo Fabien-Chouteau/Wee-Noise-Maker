@@ -326,7 +326,7 @@ F 3 "" H 6100 1500 60  0000 C CNN
 	1    6100 1500
 	1    0    0    -1  
 $EndComp
-Text GLabel 9100 1750 2    60   Input ~ 0
+Text GLabel 8600 1750 2    60   Input ~ 0
 3V3
 $Comp
 L C C14
@@ -733,8 +733,6 @@ Wire Wire Line
 	8300 1300 8300 1150
 Connection ~ 8300 1150
 Wire Wire Line
-	9100 1750 6800 1750
-Wire Wire Line
 	5450 1150 8600 1150
 Wire Wire Line
 	5600 1150 5600 1300
@@ -843,4 +841,8 @@ Text GLabel 2000 2500 1    60   Input ~ 0
 NRST
 Text GLabel 10300 10000 0    60   Input ~ 0
 NRST
+Wire Wire Line
+	6800 1750 8600 1750
+Text GLabel 9100 1750 1    60   Input ~ 0
+VBAT
 $EndSCHEMATC
