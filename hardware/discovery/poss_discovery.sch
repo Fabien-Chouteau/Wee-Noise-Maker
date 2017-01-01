@@ -585,8 +585,8 @@ U 585E4C2D
 F0 "Audio" 60
 F1 "audio.sch" 60
 $EndSheet
-Text Notes 8950 5850 0    157  ~ 0
-TODO:\n - Debug port\n - Encoders capa\n - VBAT sensing\n - BOOT line \n    and DFU mode
+Text Notes 8950 4900 0    157  ~ 0
+TODO:\n - BOOT line \n    and DFU mode
 Text GLabel 6800 3750 0    60   Input ~ 0
 WAKEUP
 $Comp
