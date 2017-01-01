@@ -1,7 +1,7 @@
 (kicad_pcb (version 4) (host pcbnew 4.0.4-stable)
 
   (general
-    (links 172)
+    (links 0)
     (no_connects 1)
     (area 79.934999 78.664999 176.605001 144.855001)
     (thickness 1.6)
@@ -32,7 +32,7 @@
     (45 Margin user)
     (46 B.CrtYd user)
     (47 F.CrtYd user)
-    (48 B.Fab user)
+    (48 B.Fab user hide)
     (49 F.Fab user hide)
   )
 
@@ -63,7 +63,7 @@
     (pad_to_mask_clearance 0.2)
     (aux_axis_origin 80.01 144.78)
     (grid_origin 80.01 144.78)
-    (visible_elements 7FFFFFFF)
+    (visible_elements 7FFCFFFF)
     (pcbplotparams
       (layerselection 0x010f0_80000001)
       (usegerberextensions true)
