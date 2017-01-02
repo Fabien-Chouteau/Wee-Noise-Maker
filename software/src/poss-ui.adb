@@ -31,7 +31,6 @@ with POSS.Sequencer; use POSS.Sequencer;
 package body POSS.UI is
 
    UI_Task_Start   : Suspension_Object;
-   Beat_Task_Start : Suspension_Object;
 
    procedure Turn_On (LED_Addr : LED_Address);
    procedure Turn_Off (LED_Addr : LED_Address);
@@ -234,9 +233,7 @@ package body POSS.UI is
          Turn_Off (B);
       end loop;
 
-      Set_True (Beat_Task_Start);
       Set_True (UI_Task_Start);
-
 
       --  LED Timer --
 
