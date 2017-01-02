@@ -2,7 +2,7 @@
 --                                                                           --
 --                       Pocket Open Source Synthesizer                      --
 --                                                                           --
---                     Copyright (C) 2016 Fabien Chouteau                    --
+--                   Copyright (C) 2016-2017 Fabien Chouteau                 --
 --                                                                           --
 --    POSS is free software: you can redistribute it and/or modify it        --
 --    under the terms of the GNU General Public License as published by      --
@@ -19,8 +19,12 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Interrupts.Names;
+
 with STM32.Device; use STM32.Device;
 with STM32.GPIO;   use STM32.GPIO;
+with STM32.Timers; use STM32.Timers;
+with STM32.PWM;    use STM32.PWM;
 
 package POSS.UI is
 
@@ -150,5 +154,19 @@ private
       Chan_C  => True,
       Chan_D  => True,
       Chan_E  => True);
+
+   LED_Timer : STM32.Timers.Timer renames Timer_7;
+   LED_Timer_Control : PWM_Modulator;
+
+   protected LED_Timer_Handler is
+      pragma Interrupt_Priority;
+
+   private
+
+      Current_LED : Buttons := Buttons'First;
+      procedure IRQ_Handler;
+      pragma Attach_Handler (IRQ_Handler, Ada.Interrupts.Names.TIM7_Interrupt);
+
+   end LED_Timer_Handler;
 
 end POSS.UI;

@@ -2,7 +2,7 @@
 --                                                                           --
 --                       Pocket Open Source Synthesizer                      --
 --                                                                           --
---                     Copyright (C) 2016 Fabien Chouteau                    --
+--                   Copyright (C) 2016-2017 Fabien Chouteau                 --
 --                                                                           --
 --    POSS is free software: you can redistribute it and/or modify it        --
 --    under the terms of the GNU General Public License as published by      --
@@ -30,8 +30,7 @@ with POSS.Sequencer; use POSS.Sequencer;
 
 package body POSS.UI is
 
-   UI_Task_Start  : Suspension_Object;
-   LED_Task_Start : Suspension_Object;
+   UI_Task_Start   : Suspension_Object;
    Beat_Task_Start : Suspension_Object;
 
    procedure Turn_On (LED_Addr : LED_Address);
@@ -200,7 +199,7 @@ package body POSS.UI is
       Config : GPIO_Port_Configuration;
    begin
 
-      Config.Speed := Speed_100MHz;
+      Config.Speed := Speed_2MHz;
 
       -- Buttons --
 
@@ -235,9 +234,21 @@ package body POSS.UI is
          Turn_Off (B);
       end loop;
 
-      Set_True (LED_Task_Start);
       Set_True (Beat_Task_Start);
       Set_True (UI_Task_Start);
+
+
+      --  LED Timer --
+
+      Enable_Clock (LED_Timer);
+
+      Reset (LED_Timer);
+
+      Configure (LED_Timer, Prescaler => 100, Period => 800);
+
+      Enable_Interrupt (LED_Timer, Timer_Update_Interrupt);
+
+      Enable (LED_Timer);
    end Start;
 
    ----------------
@@ -286,32 +297,6 @@ package body POSS.UI is
       Row_To_Point (LED_Addr.Row).Clear;
       Col_To_Point (LED_Addr.Col).Set;
    end Turn_Off;
-
-   task LED_Display is
-      pragma Priority (LED_Task_Priority);
-      pragma Storage_Size (512);
-   end LED_Display;
-
-   task body LED_Display is
-      Next_Start : Time;
-      Period : Time_Span renames LED_Task_Period;
-   begin
-      Suspend_Until_True (LED_Task_Start);
-
-      Next_Start := Clock;
-      loop
-         for B in Buttons loop
-            Next_Start := Next_Start + Period;
-            delay until Next_Start;
-
-            if LED_State (B) then
-               Turn_On (Key_To_LED (B));
-               delay until Clock + Microseconds (10);
-               Turn_Off (Key_To_LED (B));
-            end if;
-         end loop;
-      end loop;
-   end LED_Display;
 
    -------------
    -- UI_Task --
@@ -457,4 +442,39 @@ package body POSS.UI is
 
       end loop;
    end UI_Task;
+
+
+   -----------------------
+   -- LED_Timer_Handler --
+   -----------------------
+
+   protected body LED_Timer_Handler is
+
+      -----------------
+      -- IRQ_Handler --
+      -----------------
+
+      procedure IRQ_Handler is
+      begin
+         if Status (LED_Timer, Timer_Update_Indicated) then
+            if Interrupt_Enabled (LED_Timer, Timer_Update_Interrupt) then
+               Clear_Pending_Interrupt (LED_Timer, Timer_Update_Interrupt);
+            end if;
+
+            Turn_Off (Key_To_LED (Current_LED));
+
+            if Current_LED = Buttons'Last then
+               Current_LED := Buttons'First;
+            else
+               Current_LED := Buttons'Succ (Current_LED);
+            end if;
+
+            if LED_State (Current_LED) then
+               Turn_On (Key_To_LED (Current_LED));
+            end if;
+         end if;
+      end IRQ_Handler;
+
+   end LED_Timer_Handler;
+
 end POSS.UI;
