@@ -1,4 +1,4 @@
-update=01/01/2017 21:53:19
+update=07/01/2017 23:26:04
 version=1
 last_client=kicad
 [pcbnew]
@@ -96,4 +96,4 @@ LibName54=supertex
 LibName55=transf
 LibName56=ttl_ieee
 LibName57=video
-LibName58=C:/Users/chouteau/Documents/GitHub/Pocket_Open_Source_Synthesizer/hardware/components/POSS
+LibName58=wee_noise_maker

@@ -1,2 +1,3 @@
-# Pocket_Open_Source_Synthesizer
-POSS?
+# Wee Noise Maker
+
+Pocket open source synthesizer
