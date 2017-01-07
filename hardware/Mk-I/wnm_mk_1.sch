@@ -56,14 +56,14 @@ LIBS:supertex
 LIBS:transf
 LIBS:ttl_ieee
 LIBS:video
-LIBS:POSS
-LIBS:poss_mk_1-cache
+LIBS:wee_noise_maker
+LIBS:wnm_mk_1-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 5
-Title "Pocket Open Source Syntesizer - Mk-I"
+Title "Wee Noise Maker - Mk-I"
 Date ""
 Rev "A"
 Comp "Fabien Chouteau"

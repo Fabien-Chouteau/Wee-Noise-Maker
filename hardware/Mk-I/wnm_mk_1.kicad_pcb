@@ -3,7 +3,7 @@
   (general
     (links 331)
     (no_connects 0)
-    (area 79.934999 78.664999 176.605001 144.855001)
+    (area 66.572002 67.150001 180.16941 144.855001)
     (thickness 1.6)
     (drawings 95)
     (tracks 1927)
@@ -13,6 +13,12 @@
   )
 
   (page A4)
+  (title_block
+    (title "Wee Noise Maker - Mk-I")
+    (rev A)
+    (company "Fabien Chouteau")
+  )
+
   (layers
     (0 F.Cu signal)
     (31 B.Cu signal)
@@ -37,7 +43,7 @@
   )
 
   (setup
-    (last_trace_width 0.6)
+    (last_trace_width 0.25)
     (user_trace_width 0.16)
     (user_trace_width 0.2)
     (user_trace_width 0.25)
