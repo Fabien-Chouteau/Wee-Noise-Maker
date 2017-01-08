@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---                       Pocket Open Source Synthesizer                      --
+--                              Wee Noise Maker                              --
 --                                                                           --
---                     Copyright (C) 2016 Fabien Chouteau                    --
+--                  Copyright (C) 2016-2017 Fabien Chouteau                  --
 --                                                                           --
---    POSS is free software: you can redistribute it and/or modify it        --
---    under the terms of the GNU General Public License as published by      --
---    the Free Software Foundation, either version 3 of the License, or      --
---    (at your option) any later version.                                    --
+--    Wee Noise Maker is free software: you can redistribute it and/or       --
+--    modify it under the terms of the GNU General Public License as         --
+--    published by the Free Software Foundation, either version 3 of the     --
+--    License, or (at your option) any later version.                        --
 --                                                                           --
---    POSS is distributed in the hope that it will be useful, but WITHOUT    --
---    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY     --
---    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public        --
---    License for more details.                                              --
+--    Wee Noise Maker is distributed in the hope that it will be useful,     --
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of         --
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU       --
+--    General Public License for more details.                               --
 --                                                                           --
 --    You should have received a copy of the GNU General Public License      --
---    along with POSS. If not, see <http://www.gnu.org/licenses/>.           --
+--    along with We Noise Maker. If not, see <http://www.gnu.org/licenses/>. --
 --                                                                           --
 -------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ with Ravenscar_Time; use Ravenscar_Time;
 with STM32.DMA.Interrupts;  use STM32.DMA.Interrupts;
 with HAL;           use HAL;
 with STM32.DMA;  use STM32.DMA;
-with POSS; use POSS;
+with WNM; use WNM;
 with Interfaces; use Interfaces;
 with STM32.GPIO; use STM32.GPIO;
 with STM32.Device; use STM32.Device;
@@ -43,7 +43,7 @@ with BLIT; use BLIT;
 package body Test_I2S is
 
    My_Note : Float := 440.0;
-   My_Chan : POSS.Channels := POSS.Chan_A;
+   My_Chan : WNM.Channels := WNM.Chan_A;
    My_FX_Enabled : Boolean := False;
 
    procedure Initialize_I2C_GPIO;
@@ -57,7 +57,7 @@ package body Test_I2S is
       delay until Clock + Milliseconds (Milli);
    end My_Delay;
 
-   function Key_To_Freq (B : POSS.Buttons) return Float is
+   function Key_To_Freq (B : WNM.Buttons) return Float is
       (case B is
           when B9  => 261.63,
           when B2  => 277.00,
@@ -98,13 +98,13 @@ package body Test_I2S is
          end if;
 
          case My_Chan is
-            when POSS.Chan_A =>
+            when WNM.Chan_A =>
                --  Sine
 
                New_Sample := Sin ((2.0 * Pi * Freq) *
                                   (Float (Sample_Nb) / Rate_F));
                null;
-            when POSS.Chan_B =>
+            when WNM.Chan_B =>
                --  Saw
 
                New_Sample := Last_Sample + (2.0 * Freq) / Rate_F;
@@ -112,7 +112,7 @@ package body Test_I2S is
                   New_Sample := -1.0;
                end if;
 
-            when POSS.Chan_C =>
+            when WNM.Chan_C =>
                --  Triangle
 
                if Trig_Going_Up and then Last_Sample > 1.0 then
@@ -128,7 +128,7 @@ package body Test_I2S is
                   New_Sample := Last_Sample - New_Sample;
                end if;
 
-            when POSS.Chan_D =>
+            when WNM.Chan_D =>
                --  Square
 
                if Sin ((2.0 * Pi * Freq) *
@@ -536,7 +536,7 @@ package body Test_I2S is
    -- Set_Current_Channel --
    -------------------------
 
-   procedure Set_Current_Channel (Chan : POSS.Channels) is
+   procedure Set_Current_Channel (Chan : WNM.Channels) is
    begin
       My_Chan := Chan;
    end Set_Current_Channel;

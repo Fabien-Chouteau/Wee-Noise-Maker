@@ -1,27 +1,27 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---                       Pocket Open Source Synthesizer                      --
+--                              Wee Noise Maker                              --
 --                                                                           --
---                     Copyright (C) 2016 Fabien Chouteau                    --
+--                  Copyright (C) 2016-2017 Fabien Chouteau                  --
 --                                                                           --
---    POSS is free software: you can redistribute it and/or modify it        --
---    under the terms of the GNU General Public License as published by      --
---    the Free Software Foundation, either version 3 of the License, or      --
---    (at your option) any later version.                                    --
+--    Wee Noise Maker is free software: you can redistribute it and/or       --
+--    modify it under the terms of the GNU General Public License as         --
+--    published by the Free Software Foundation, either version 3 of the     --
+--    License, or (at your option) any later version.                        --
 --                                                                           --
---    POSS is distributed in the hope that it will be useful, but WITHOUT    --
---    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY     --
---    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public        --
---    License for more details.                                              --
+--    Wee Noise Maker is distributed in the hope that it will be useful,     --
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of         --
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU       --
+--    General Public License for more details.                               --
 --                                                                           --
 --    You should have received a copy of the GNU General Public License      --
---    along with POSS. If not, see <http://www.gnu.org/licenses/>.           --
+--    along with We Noise Maker. If not, see <http://www.gnu.org/licenses/>. --
 --                                                                           --
 -------------------------------------------------------------------------------
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 
-package body POSS.Sequencer is
+package body WNM.Sequencer is
 
    Start_Sequencer_Task : Suspension_Object;
    Sequencer_Task_Period : Time_Span := Seconds (1);
@@ -166,4 +166,4 @@ package body POSS.Sequencer is
       end loop;
    end Sequencer_Task;
 
-end POSS.Sequencer;
+end WNM.Sequencer;

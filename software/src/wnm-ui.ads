@@ -1,21 +1,21 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---                       Pocket Open Source Synthesizer                      --
+--                              Wee Noise Maker                              --
 --                                                                           --
---                   Copyright (C) 2016-2017 Fabien Chouteau                 --
+--                  Copyright (C) 2016-2017 Fabien Chouteau                  --
 --                                                                           --
---    POSS is free software: you can redistribute it and/or modify it        --
---    under the terms of the GNU General Public License as published by      --
---    the Free Software Foundation, either version 3 of the License, or      --
---    (at your option) any later version.                                    --
+--    Wee Noise Maker is free software: you can redistribute it and/or       --
+--    modify it under the terms of the GNU General Public License as         --
+--    published by the Free Software Foundation, either version 3 of the     --
+--    License, or (at your option) any later version.                        --
 --                                                                           --
---    POSS is distributed in the hope that it will be useful, but WITHOUT    --
---    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY     --
---    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public        --
---    License for more details.                                              --
+--    Wee Noise Maker is distributed in the hope that it will be useful,     --
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of         --
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU       --
+--    General Public License for more details.                               --
 --                                                                           --
 --    You should have received a copy of the GNU General Public License      --
---    along with POSS. If not, see <http://www.gnu.org/licenses/>.           --
+--    along with We Noise Maker. If not, see <http://www.gnu.org/licenses/>. --
 --                                                                           --
 -------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ with STM32.GPIO;   use STM32.GPIO;
 with STM32.Timers; use STM32.Timers;
 with STM32.PWM;    use STM32.PWM;
 
-package POSS.UI is
+package WNM.UI is
 
    procedure Start;
 
@@ -169,4 +169,4 @@ private
 
    end LED_Timer_Handler;
 
-end POSS.UI;
+end WNM.UI;

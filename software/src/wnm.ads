@@ -1,28 +1,28 @@
 -------------------------------------------------------------------------------
 --                                                                           --
---                       Pocket Open Source Synthesizer                      --
+--                              Wee Noise Maker                              --
 --                                                                           --
---                     Copyright (C) 2016 Fabien Chouteau                    --
+--                  Copyright (C) 2016-2017 Fabien Chouteau                  --
 --                                                                           --
---    POSS is free software: you can redistribute it and/or modify it        --
---    under the terms of the GNU General Public License as published by      --
---    the Free Software Foundation, either version 3 of the License, or      --
---    (at your option) any later version.                                    --
+--    Wee Noise Maker is free software: you can redistribute it and/or       --
+--    modify it under the terms of the GNU General Public License as         --
+--    published by the Free Software Foundation, either version 3 of the     --
+--    License, or (at your option) any later version.                        --
 --                                                                           --
---    POSS is distributed in the hope that it will be useful, but WITHOUT    --
---    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY     --
---    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public        --
---    License for more details.                                              --
+--    Wee Noise Maker is distributed in the hope that it will be useful,     --
+--    but WITHOUT ANY WARRANTY; without even the implied warranty of         --
+--    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU       --
+--    General Public License for more details.                               --
 --                                                                           --
 --    You should have received a copy of the GNU General Public License      --
---    along with POSS. If not, see <http://www.gnu.org/licenses/>.           --
+--    along with We Noise Maker. If not, see <http://www.gnu.org/licenses/>. --
 --                                                                           --
 -------------------------------------------------------------------------------
 
 with Ada.Real_Time; use Ada.Real_Time;
 with System;
 
-package POSS is
+package WNM is
 
    type Buttons is (B1, B2, B3, B4, B5, B6, B7, B8,
                     B9, B10, B11, B12, B13, B14, B15, B16,
@@ -60,4 +60,4 @@ package POSS is
    --  How much 2time users have to press a button to get the alternative
    --  function.
 
-end POSS;
+end WNM;
