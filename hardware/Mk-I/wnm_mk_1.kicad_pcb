@@ -5022,7 +5022,7 @@
       (net 125 "Net-(R16-Pad1)"))
     (pad 6 thru_hole circle (at -5.55 0) (size 3 3) (drill 2.05) (layers *.Cu *.Mask))
     (pad 6 thru_hole circle (at 5.55 0) (size 3 3) (drill 2.05) (layers *.Cu *.Mask))
-    (model ../../../../../../Users/chouteau/Documents/GitHub/Pocket_Open_Source_Synthesizer/hardware/3D_models/EC12D.wrl
+    (model ../3D_models/EC12D.wrl
       (at (xyz 0 0 0))
       (scale (xyz 0.4 0.4 0.4))
       (rotate (xyz 0 0 0))
@@ -5058,7 +5058,7 @@
       (net 127 "Net-(R18-Pad1)"))
     (pad 6 thru_hole circle (at -5.55 0) (size 3 3) (drill 2.05) (layers *.Cu *.Mask))
     (pad 6 thru_hole circle (at 5.55 0) (size 3 3) (drill 2.05) (layers *.Cu *.Mask))
-    (model ../../../../../../Users/chouteau/Documents/GitHub/Pocket_Open_Source_Synthesizer/hardware/3D_models/EC12D.wrl
+    (model ../3D_models/EC12D.wrl
       (at (xyz 0 0 0))
       (scale (xyz 0.4 0.4 0.4))
       (rotate (xyz 0 0 0))
