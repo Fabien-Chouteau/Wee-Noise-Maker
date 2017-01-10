@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:wnm_mk_1-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,7 +42,6 @@ LIBS:logo
 LIBS:microchip_pic10mcu
 LIBS:microchip_pic12mcu
 LIBS:microchip_pic16mcu
-LIBS:microchip1
 LIBS:msp430
 LIBS:nxp_armmcu
 LIBS:powerint
@@ -49,7 +49,6 @@ LIBS:pspice
 LIBS:references
 LIBS:relays
 LIBS:sensors
-LIBS:special
 LIBS:stm8
 LIBS:stm32
 LIBS:supertex
@@ -93,9 +92,11 @@ Wire Wire Line
 Wire Wire Line
 	4450 4650 4450 4850
 $Comp
-L GND #PWR032
+L GND-RESCUE-wnm_mk_1 #PWR032
 U 1 1 585E79AD
 P 4450 4850
+AR Path="/585E79AD" Ref="#PWR032"  Part="1" 
+AR Path="/585E4C2D/585E79AD" Ref="#PWR032"  Part="1" 
 F 0 "#PWR032" H 4450 4850 30  0001 C CNN
 F 1 "GND" H 4450 4780 30  0001 C CNN
 F 2 "" H 4450 4850 60  0001 C CNN
@@ -104,9 +105,11 @@ F 3 "" H 4450 4850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C6
+L C-RESCUE-wnm_mk_1 C6
 U 1 1 585E7B78
 P 4100 4700
+AR Path="/585E7B78" Ref="C6"  Part="1" 
+AR Path="/585E4C2D/585E7B78" Ref="C6"  Part="1" 
 F 0 "C6" H 4100 4800 40  0000 L CNN
 F 1 "0.1uF" H 4106 4615 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 4138 4550 30  0001 C CNN
@@ -115,9 +118,11 @@ F 3 "" H 4100 4700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR033
+L GND-RESCUE-wnm_mk_1 #PWR033
 U 1 1 585E7BA3
 P 4100 4900
+AR Path="/585E7BA3" Ref="#PWR033"  Part="1" 
+AR Path="/585E4C2D/585E7BA3" Ref="#PWR033"  Part="1" 
 F 0 "#PWR033" H 4100 4900 30  0001 C CNN
 F 1 "GND" H 4100 4830 30  0001 C CNN
 F 2 "" H 4100 4900 60  0001 C CNN
@@ -132,9 +137,11 @@ Wire Wire Line
 Wire Wire Line
 	5750 4050 6725 4050
 $Comp
-L C C7
+L C-RESCUE-wnm_mk_1 C7
 U 1 1 585E8504
 P 4900 2700
+AR Path="/585E8504" Ref="C7"  Part="1" 
+AR Path="/585E4C2D/585E8504" Ref="C7"  Part="1" 
 F 0 "C7" H 4900 2800 40  0000 L CNN
 F 1 "0.1uF" H 4906 2615 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 4938 2550 30  0001 C CNN
@@ -143,9 +150,11 @@ F 3 "" H 4900 2700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C8
+L C-RESCUE-wnm_mk_1 C8
 U 1 1 585E857A
 P 5150 2700
+AR Path="/585E857A" Ref="C8"  Part="1" 
+AR Path="/585E4C2D/585E857A" Ref="C8"  Part="1" 
 F 0 "C8" H 5150 2800 40  0000 L CNN
 F 1 "0.1uF" H 5156 2615 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 5188 2550 30  0001 C CNN
@@ -154,9 +163,11 @@ F 3 "" H 5150 2700 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C9
+L C-RESCUE-wnm_mk_1 C9
 U 1 1 585E859F
 P 5400 2700
+AR Path="/585E859F" Ref="C9"  Part="1" 
+AR Path="/585E4C2D/585E859F" Ref="C9"  Part="1" 
 F 0 "C9" H 5400 2800 40  0000 L CNN
 F 1 "0.1uF" H 5406 2615 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 5438 2550 30  0001 C CNN
@@ -240,9 +251,11 @@ F 3 "" H 7100 3825 60  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR034
+L GND-RESCUE-wnm_mk_1 #PWR034
 U 1 1 5863B3F7
 P 6675 3675
+AR Path="/5863B3F7" Ref="#PWR034"  Part="1" 
+AR Path="/585E4C2D/5863B3F7" Ref="#PWR034"  Part="1" 
 F 0 "#PWR034" H 6675 3675 30  0001 C CNN
 F 1 "GND" H 6675 3605 30  0001 C CNN
 F 2 "" H 6675 3675 60  0001 C CNN

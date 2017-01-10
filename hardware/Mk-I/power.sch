@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:wnm_mk_1-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,7 +42,6 @@ LIBS:logo
 LIBS:microchip_pic10mcu
 LIBS:microchip_pic12mcu
 LIBS:microchip_pic16mcu
-LIBS:microchip1
 LIBS:msp430
 LIBS:nxp_armmcu
 LIBS:powerint
@@ -49,7 +49,6 @@ LIBS:pspice
 LIBS:references
 LIBS:relays
 LIBS:sensors
-LIBS:special
 LIBS:stm8
 LIBS:stm32
 LIBS:supertex
@@ -84,9 +83,11 @@ F 3 "" H 3000 2850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR07
+L GND-RESCUE-wnm_mk_1 #PWR07
 U 1 1 585D2F29
 P 4400 2900
+AR Path="/585D2F29" Ref="#PWR07"  Part="1" 
+AR Path="/585D2CBE/585D2F29" Ref="#PWR07"  Part="1" 
 F 0 "#PWR07" H 4400 2900 30  0001 C CNN
 F 1 "GND" H 4400 2830 30  0001 C CNN
 F 2 "" H 4400 2900 60  0001 C CNN
@@ -97,9 +98,11 @@ $EndComp
 Wire Wire Line
 	3750 2700 4700 2700
 $Comp
-L R R2
+L R-RESCUE-wnm_mk_1 R2
 U 1 1 585D2F62
 P 4050 2500
+AR Path="/585D2F62" Ref="R2"  Part="1" 
+AR Path="/585D2CBE/585D2F62" Ref="R2"  Part="1" 
 F 0 "R2" V 4130 2500 40  0000 C CNN
 F 1 "10K" V 4057 2501 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 3980 2500 30  0001 C CNN
@@ -113,9 +116,11 @@ Wire Wire Line
 	4400 2500 4400 2900
 Connection ~ 4400 2700
 $Comp
-L C C1
+L C-RESCUE-wnm_mk_1 C1
 U 1 1 585D3088
 P 4700 2500
+AR Path="/585D3088" Ref="C1"  Part="1" 
+AR Path="/585D2CBE/585D3088" Ref="C1"  Part="1" 
 F 0 "C1" H 4700 2600 40  0000 L CNN
 F 1 "10uF" H 4706 2415 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 4738 2350 30  0001 C CNN
@@ -131,17 +136,21 @@ $Comp
 L LED BAT1
 U 1 1 585D348C
 P 1950 2700
+AR Path="/585D348C" Ref="BAT1"  Part="1" 
+AR Path="/585D2CBE/585D348C" Ref="BAT1"  Part="1" 
 F 0 "BAT1" H 1950 2800 50  0000 C CNN
 F 1 "LED" H 1950 2600 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 1950 2700 60  0001 C CNN
 F 3 "" H 1950 2700 60  0000 C CNN
 	1    1950 2700
-	1    0    0    -1  
+	-1   0    0    1   
 $EndComp
 $Comp
-L R R1
+L R-RESCUE-wnm_mk_1 R1
 U 1 1 585D34C3
 P 2400 2700
+AR Path="/585D34C3" Ref="R1"  Part="1" 
+AR Path="/585D2CBE/585D34C3" Ref="R1"  Part="1" 
 F 0 "R1" V 2480 2700 40  0000 C CNN
 F 1 "1K" V 2407 2701 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 2330 2700 30  0001 C CNN
@@ -212,9 +221,11 @@ Wire Wire Line
 Text GLabel 7400 1700 0    60   Input ~ 0
 VIN
 $Comp
-L GND #PWR010
+L GND-RESCUE-wnm_mk_1 #PWR010
 U 1 1 585D49CE
 P 7750 2500
+AR Path="/585D49CE" Ref="#PWR010"  Part="1" 
+AR Path="/585D2CBE/585D49CE" Ref="#PWR010"  Part="1" 
 F 0 "#PWR010" H 7750 2500 30  0001 C CNN
 F 1 "GND" H 7750 2430 30  0001 C CNN
 F 2 "" H 7750 2500 60  0001 C CNN
@@ -245,9 +256,11 @@ $EndComp
 Text GLabel 4300 7000 0    60   Input ~ 0
 VIN
 $Comp
-L C C3
+L C-RESCUE-wnm_mk_1 C3
 U 1 1 585D5B09
 P 9600 2100
+AR Path="/585D5B09" Ref="C3"  Part="1" 
+AR Path="/585D2CBE/585D5B09" Ref="C3"  Part="1" 
 F 0 "C3" H 9600 2200 40  0000 L CNN
 F 1 "47uF" H 9606 2015 40  0000 L CNN
 F 2 "Capacitors_SMD:C_1206" H 9638 1950 30  0001 C CNN
@@ -256,9 +269,11 @@ F 3 "" H 9600 2100 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR012
+L GND-RESCUE-wnm_mk_1 #PWR012
 U 1 1 585D5C16
 P 9600 2300
+AR Path="/585D5C16" Ref="#PWR012"  Part="1" 
+AR Path="/585D2CBE/585D5C16" Ref="#PWR012"  Part="1" 
 F 0 "#PWR012" H 9600 2300 30  0001 C CNN
 F 1 "GND" H 9600 2230 30  0001 C CNN
 F 2 "" H 9600 2300 60  0001 C CNN
@@ -267,9 +282,11 @@ F 3 "" H 9600 2300 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C2
+L C-RESCUE-wnm_mk_1 C2
 U 1 1 585D5D4C
 P 7750 2100
+AR Path="/585D5D4C" Ref="C2"  Part="1" 
+AR Path="/585D2CBE/585D5D4C" Ref="C2"  Part="1" 
 F 0 "C2" H 7750 2200 40  0000 L CNN
 F 1 "4.7uF" H 7756 2015 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 7788 1950 30  0001 C CNN
@@ -321,9 +338,11 @@ Wire Wire Line
 	5000 4800 5200 4800
 Connection ~ 5200 4800
 $Comp
-L GND #PWR013
+L GND-RESCUE-wnm_mk_1 #PWR013
 U 1 1 585CFC1E
 P 5200 5000
+AR Path="/585CFC1E" Ref="#PWR013"  Part="1" 
+AR Path="/585D2CBE/585CFC1E" Ref="#PWR013"  Part="1" 
 F 0 "#PWR013" H 5200 5000 30  0001 C CNN
 F 1 "GND" H 5200 4930 30  0001 C CNN
 F 2 "" H 5200 5000 60  0001 C CNN
@@ -338,9 +357,11 @@ Wire Wire Line
 Wire Wire Line
 	3700 4800 3700 5000
 $Comp
-L GND #PWR014
+L GND-RESCUE-wnm_mk_1 #PWR014
 U 1 1 585CFC9F
 P 3700 5000
+AR Path="/585CFC9F" Ref="#PWR014"  Part="1" 
+AR Path="/585D2CBE/585CFC9F" Ref="#PWR014"  Part="1" 
 F 0 "#PWR014" H 3700 5000 30  0001 C CNN
 F 1 "GND" H 3700 4930 30  0001 C CNN
 F 2 "" H 3700 5000 60  0001 C CNN
@@ -379,9 +400,11 @@ $EndComp
 Text GLabel 2150 4200 1    60   Input ~ 0
 VBAT
 $Comp
-L GND #PWR015
+L GND-RESCUE-wnm_mk_1 #PWR015
 U 1 1 585D1BAC
 P 2150 4800
+AR Path="/585D1BAC" Ref="#PWR015"  Part="1" 
+AR Path="/585D2CBE/585D1BAC" Ref="#PWR015"  Part="1" 
 F 0 "#PWR015" H 2150 4800 30  0001 C CNN
 F 1 "GND" H 2150 4730 30  0001 C CNN
 F 2 "" H 2150 4800 60  0001 C CNN
@@ -400,4 +423,8 @@ F 3 "" H 3650 4200 60  0000 C CNN
 	1    3650 4200
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	1800 2700 1750 2700
+Wire Wire Line
+	2100 2700 2150 2700
 $EndSCHEMATC
