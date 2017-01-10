@@ -1,7 +1,7 @@
-(kicad_pcb (version 4) (host pcbnew 4.0.4-stable)
+(kicad_pcb (version 4) (host pcbnew 4.0.5-e0-6337~52~ubuntu16.10.1)
 
   (general
-    (links 0)
+    (links 331)
     (no_connects 0)
     (area 79.934999 78.664999 176.605001 144.855001)
     (thickness 1.6)
@@ -5662,11 +5662,11 @@
       (xy -1.320674 -1.516944) (xy -1.277246 -1.586181) (xy -1.222944 -1.612473) (xy -1.172001 -1.594423)) (layer F.Mask) (width 0.01))
   )
 
-  (module Mounting_Holes:MountingHole_4.3mm_M4 (layer F.Cu) (tedit 56D1B4CB) (tstamp 587185CD)
+  (module Mounting_Holes:MountingHole_4.3mm_M4 (layer F.Cu) (tedit 58754701) (tstamp 587185CD)
     (at 172.25 140.5)
     (descr "Mounting Hole 4.3mm, no annular, M4")
     (tags "mounting hole 4.3mm no annular m4")
-    (fp_text reference REF** (at 0 -5.3) (layer F.SilkS)
+    (fp_text reference REF** (at 0 -5.3) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value MountingHole_4.3mm_M4 (at 0 5.3) (layer F.Fab)
