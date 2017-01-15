@@ -62,9 +62,9 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 3
-Title "Wee Noise Maker - Mk-I"
+Title "Wee Noise Maker - Discovery"
 Date ""
-Rev "A"
+Rev "B"
 Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""

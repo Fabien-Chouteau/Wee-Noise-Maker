@@ -62,9 +62,9 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 3
-Title "Wee Noise Maker - Mk-I"
+Title "Wee Noise Maker - Discovery"
 Date ""
-Rev "A"
+Rev "B"
 Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
@@ -390,7 +390,7 @@ F0 "Micro-Controller" 60
 F1 "micro-controller.sch" 60
 $EndSheet
 $Sheet
-S 4750 800  1450 1050
+S 4000 650  1450 1050
 U 585D6FEE
 F0 "LED_Matrix" 60
 F1 "led_matrix.sch" 60

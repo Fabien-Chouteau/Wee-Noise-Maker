@@ -2,7 +2,7 @@
 
   (general
     (links 199)
-    (no_connects 1)
+    (no_connects 0)
     (area 79.934999 78.664999 176.605001 144.855001)
     (thickness 1.6)
     (drawings 89)
@@ -423,10 +423,10 @@
     )
   )
 
-  (module POSS:STM32F4-DISCO-HEADERS-TH (layer B.Cu) (tedit 5859BECF) (tstamp 5872F117)
+  (module POSS:STM32F4-DISCO-HEADERS-TH (layer B.Cu) (tedit 587BAFCD) (tstamp 5872F117)
     (at 80 94.75 270)
     (path /585DBE08/5872D50A)
-    (fp_text reference U1 (at 0 -0.5 270) (layer B.SilkS)
+    (fp_text reference U1 (at 0 -0.5 270) (layer B.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
     )
     (fp_text value STM32F4_DISCO_Header (at 0 0.5 270) (layer B.Fab)
@@ -3882,7 +3882,10 @@
       (xy -0.436719 -0.819846) (xy -0.381897 -0.886333) (xy -0.312891 -0.899472) (xy -0.228417 -0.859165)) (layer F.SilkS) (width 0.01))
   )
 
-  (gr_text "Discovery\n" (at 92.2 89.4) (layer F.SilkS)
+  (gr_text Rev-B (at 169.7482 141.5034) (layer B.SilkS)
+    (effects (font (size 1.5 1.5) (thickness 0.3)) (justify mirror))
+  )
+  (gr_text "Discovery\n" (at 92.2274 89.408) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
   (gr_line (start 81.28 80.01) (end 175.26 80.01) (angle 90) (layer Margin) (width 0.2))
@@ -3925,9 +3928,6 @@
     (arrow1b (pts (xy 176.53 73.66) (xy 175.403496 73.073579)))
     (arrow2a (pts (xy 80.01 73.66) (xy 81.136504 74.246421)))
     (arrow2b (pts (xy 80.01 73.66) (xy 81.136504 73.073579)))
-  )
-  (gr_text OUT (at 170.25 99.75) (layer B.SilkS)
-    (effects (font (size 1.5 1.5) (thickness 0.3)) (justify mirror))
   )
   (gr_line (start 81.28 143.51) (end 81.28 80.01) (angle 90) (layer Margin) (width 0.2))
   (gr_line (start 175.26 143.51) (end 81.28 143.51) (angle 90) (layer Margin) (width 0.2))
