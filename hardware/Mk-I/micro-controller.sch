@@ -954,4 +954,6 @@ Text GLabel 2100 1800 0    60   Input ~ 0
 BOOT0
 Text GLabel 2300 1800 2    60   Input ~ 0
 3V3
+Text GLabel 12850 7200 2    60   Input ~ 0
+Screen_Nreset
 $EndSCHEMATC
