@@ -407,8 +407,6 @@ U 585E4C2D
 F0 "Audio" 60
 F1 "audio.sch" 60
 $EndSheet
-Text Notes 8950 4950 0    157  ~ 0
-TODO:\n - BOOT line \n    and DFU mode
 Text GLabel 4850 5700 0    60   Input ~ 0
 WAKEUP
 $Comp
@@ -639,4 +637,6 @@ F 3 "" H 4200 7450 60  0001 C CNN
 	1    4200 7450
 	1    0    0    -1  
 $EndComp
+Text Notes 8950 4400 0    157  ~ 0
+TODO:
 $EndSCHEMATC
