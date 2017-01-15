@@ -3326,10 +3326,10 @@
     )
   )
 
-  (module POSS:MIDAS_MCOT096016AV_OLED (layer F.Cu) (tedit 5868F39E) (tstamp 58697729)
+  (module POSS:MIDAS_MCOT096016AV_OLED (layer F.Cu) (tedit 587BB459) (tstamp 58697729)
     (at 135.5 98.75 180)
     (path /585D6FEE/58642D78)
-    (fp_text reference U9 (at -3.556 -3.048 180) (layer F.SilkS)
+    (fp_text reference U9 (at -3.556 -3.048 180) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value SSD1306 (at 1.016 -1.524 180) (layer F.Fab)
