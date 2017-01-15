@@ -1,4 +1,4 @@
-update=12/12/2016 00:34:58
+update=dim. 15 janv. 2017 14:30:40 CET
 version=1
 last_client=kicad
 [pcbnew]
@@ -73,3 +73,13 @@ LibName41=OLIME_KICAD/KiCAD_Components/OLIMEX_Regulators
 LibName42=OLIME_KICAD/KiCAD_Components/OLIMEX_Switches
 LibName43=OLIME_KICAD/KiCAD_Components/OLIMEX_THERES
 LibName44=OLIME_KICAD/KiCAD_Components/OLIMEX_Transistors
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60

@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:wnm_discovery-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,7 +42,6 @@ LIBS:logo
 LIBS:microchip_pic10mcu
 LIBS:microchip_pic12mcu
 LIBS:microchip_pic16mcu
-LIBS:microchip1
 LIBS:msp430
 LIBS:nxp_armmcu
 LIBS:powerint
@@ -49,7 +49,6 @@ LIBS:pspice
 LIBS:references
 LIBS:relays
 LIBS:sensors
-LIBS:special
 LIBS:stm8
 LIBS:stm32
 LIBS:supertex
@@ -73,9 +72,11 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L LED D10
+L LED-RESCUE-wnm_discovery D10
 U 1 1 585D8A6E
 P 2650 2450
+AR Path="/585D8A6E" Ref="D10"  Part="1" 
+AR Path="/585D6FEE/585D8A6E" Ref="D10"  Part="1" 
 F 0 "D10" H 2650 2550 50  0000 C CNN
 F 1 "LED" H 2650 2350 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 2450 50  0001 C CNN
@@ -84,9 +85,11 @@ F 3 "" H 2650 2450 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D11
+L LED-RESCUE-wnm_discovery D11
 U 1 1 585D8A75
 P 2650 2800
+AR Path="/585D8A75" Ref="D11"  Part="1" 
+AR Path="/585D6FEE/585D8A75" Ref="D11"  Part="1" 
 F 0 "D11" H 2650 2900 50  0000 C CNN
 F 1 "LED" H 2650 2700 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 2800 50  0001 C CNN
@@ -95,9 +98,11 @@ F 3 "" H 2650 2800 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D12
+L LED-RESCUE-wnm_discovery D12
 U 1 1 585D8A7C
 P 2650 3150
+AR Path="/585D8A7C" Ref="D12"  Part="1" 
+AR Path="/585D6FEE/585D8A7C" Ref="D12"  Part="1" 
 F 0 "D12" H 2650 3250 50  0000 C CNN
 F 1 "LED" H 2650 3050 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 3150 50  0001 C CNN
@@ -106,9 +111,11 @@ F 3 "" H 2650 3150 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D13
+L LED-RESCUE-wnm_discovery D13
 U 1 1 585D8A83
 P 2650 3500
+AR Path="/585D8A83" Ref="D13"  Part="1" 
+AR Path="/585D6FEE/585D8A83" Ref="D13"  Part="1" 
 F 0 "D13" H 2650 3600 50  0000 C CNN
 F 1 "LED" H 2650 3400 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 3500 50  0001 C CNN
@@ -117,9 +124,11 @@ F 3 "" H 2650 3500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D14
+L LED-RESCUE-wnm_discovery D14
 U 1 1 585D8A8A
 P 2650 3850
+AR Path="/585D8A8A" Ref="D14"  Part="1" 
+AR Path="/585D6FEE/585D8A8A" Ref="D14"  Part="1" 
 F 0 "D14" H 2650 3950 50  0000 C CNN
 F 1 "LED" H 2650 3750 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 3850 50  0001 C CNN
@@ -128,9 +137,11 @@ F 3 "" H 2650 3850 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D1
+L LED-RESCUE-wnm_discovery D1
 U 1 1 585D8A91
 P 2000 2450
+AR Path="/585D8A91" Ref="D1"  Part="1" 
+AR Path="/585D6FEE/585D8A91" Ref="D1"  Part="1" 
 F 0 "D1" H 2000 2550 50  0000 C CNN
 F 1 "LED" H 2000 2350 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 2450 50  0001 C CNN
@@ -139,9 +150,11 @@ F 3 "" H 2000 2450 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D2
+L LED-RESCUE-wnm_discovery D2
 U 1 1 585D8A98
 P 2000 2800
+AR Path="/585D8A98" Ref="D2"  Part="1" 
+AR Path="/585D6FEE/585D8A98" Ref="D2"  Part="1" 
 F 0 "D2" H 2000 2900 50  0000 C CNN
 F 1 "LED" H 2000 2700 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 2800 50  0001 C CNN
@@ -150,9 +163,11 @@ F 3 "" H 2000 2800 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D3
+L LED-RESCUE-wnm_discovery D3
 U 1 1 585D8A9F
 P 2000 3150
+AR Path="/585D8A9F" Ref="D3"  Part="1" 
+AR Path="/585D6FEE/585D8A9F" Ref="D3"  Part="1" 
 F 0 "D3" H 2000 3250 50  0000 C CNN
 F 1 "LED" H 2000 3050 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 3150 50  0001 C CNN
@@ -161,9 +176,11 @@ F 3 "" H 2000 3150 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D4
+L LED-RESCUE-wnm_discovery D4
 U 1 1 585D8AA6
 P 2000 3500
+AR Path="/585D8AA6" Ref="D4"  Part="1" 
+AR Path="/585D6FEE/585D8AA6" Ref="D4"  Part="1" 
 F 0 "D4" H 2000 3600 50  0000 C CNN
 F 1 "LED" H 2000 3400 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 3500 50  0001 C CNN
@@ -172,9 +189,11 @@ F 3 "" H 2000 3500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D5
+L LED-RESCUE-wnm_discovery D5
 U 1 1 585D8AAD
 P 2000 3850
+AR Path="/585D8AAD" Ref="D5"  Part="1" 
+AR Path="/585D6FEE/585D8AAD" Ref="D5"  Part="1" 
 F 0 "D5" H 2000 3950 50  0000 C CNN
 F 1 "LED" H 2000 3750 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 3850 50  0001 C CNN
@@ -183,9 +202,11 @@ F 3 "" H 2000 3850 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D6
+L LED-RESCUE-wnm_discovery D6
 U 1 1 585D8AB4
 P 2000 4200
+AR Path="/585D8AB4" Ref="D6"  Part="1" 
+AR Path="/585D6FEE/585D8AB4" Ref="D6"  Part="1" 
 F 0 "D6" H 2000 4300 50  0000 C CNN
 F 1 "LED" H 2000 4100 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 4200 50  0001 C CNN
@@ -194,9 +215,11 @@ F 3 "" H 2000 4200 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D7
+L LED-RESCUE-wnm_discovery D7
 U 1 1 585D8ABB
 P 2000 4550
+AR Path="/585D8ABB" Ref="D7"  Part="1" 
+AR Path="/585D6FEE/585D8ABB" Ref="D7"  Part="1" 
 F 0 "D7" H 2000 4650 50  0000 C CNN
 F 1 "LED" H 2000 4450 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 4550 50  0001 C CNN
@@ -205,9 +228,11 @@ F 3 "" H 2000 4550 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D8
+L LED-RESCUE-wnm_discovery D8
 U 1 1 585D8AC2
 P 2000 4900
+AR Path="/585D8AC2" Ref="D8"  Part="1" 
+AR Path="/585D6FEE/585D8AC2" Ref="D8"  Part="1" 
 F 0 "D8" H 2000 5000 50  0000 C CNN
 F 1 "LED" H 2000 4800 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 4900 50  0001 C CNN
@@ -216,9 +241,11 @@ F 3 "" H 2000 4900 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D9
+L LED-RESCUE-wnm_discovery D9
 U 1 1 585D8AC9
 P 2000 5250
+AR Path="/585D8AC9" Ref="D9"  Part="1" 
+AR Path="/585D6FEE/585D8AC9" Ref="D9"  Part="1" 
 F 0 "D9" H 2000 5350 50  0000 C CNN
 F 1 "LED" H 2000 5150 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2000 5250 50  0001 C CNN
@@ -227,9 +254,11 @@ F 3 "" H 2000 5250 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D25
+L LED-RESCUE-wnm_discovery D25
 U 1 1 585D8AD0
 P 3300 5250
+AR Path="/585D8AD0" Ref="D25"  Part="1" 
+AR Path="/585D6FEE/585D8AD0" Ref="D25"  Part="1" 
 F 0 "D25" H 3300 5350 50  0000 C CNN
 F 1 "LED" H 3300 5150 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 5250 50  0001 C CNN
@@ -238,9 +267,11 @@ F 3 "" H 3300 5250 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D20
+L LED-RESCUE-wnm_discovery D20
 U 1 1 585D8ADE
 P 3300 3500
+AR Path="/585D8ADE" Ref="D20"  Part="1" 
+AR Path="/585D6FEE/585D8ADE" Ref="D20"  Part="1" 
 F 0 "D20" H 3300 3600 50  0000 C CNN
 F 1 "LED" H 3300 3400 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 3500 50  0001 C CNN
@@ -249,9 +280,11 @@ F 3 "" H 3300 3500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D21
+L LED-RESCUE-wnm_discovery D21
 U 1 1 585D8AE5
 P 3300 3850
+AR Path="/585D8AE5" Ref="D21"  Part="1" 
+AR Path="/585D6FEE/585D8AE5" Ref="D21"  Part="1" 
 F 0 "D21" H 3300 3950 50  0000 C CNN
 F 1 "LED" H 3300 3750 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 3850 50  0001 C CNN
@@ -260,9 +293,11 @@ F 3 "" H 3300 3850 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D22
+L LED-RESCUE-wnm_discovery D22
 U 1 1 585D8AEC
 P 3300 4200
+AR Path="/585D8AEC" Ref="D22"  Part="1" 
+AR Path="/585D6FEE/585D8AEC" Ref="D22"  Part="1" 
 F 0 "D22" H 3300 4300 50  0000 C CNN
 F 1 "LED" H 3300 4100 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 4200 50  0001 C CNN
@@ -271,9 +306,11 @@ F 3 "" H 3300 4200 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D23
+L LED-RESCUE-wnm_discovery D23
 U 1 1 585D8AF3
 P 3300 4550
+AR Path="/585D8AF3" Ref="D23"  Part="1" 
+AR Path="/585D6FEE/585D8AF3" Ref="D23"  Part="1" 
 F 0 "D23" H 3300 4650 50  0000 C CNN
 F 1 "LED" H 3300 4450 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 4550 50  0001 C CNN
@@ -282,9 +319,11 @@ F 3 "" H 3300 4550 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D15
+L LED-RESCUE-wnm_discovery D15
 U 1 1 585D8AFA
 P 2650 4200
+AR Path="/585D8AFA" Ref="D15"  Part="1" 
+AR Path="/585D6FEE/585D8AFA" Ref="D15"  Part="1" 
 F 0 "D15" H 2650 4300 50  0000 C CNN
 F 1 "LED" H 2650 4100 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 4200 50  0001 C CNN
@@ -293,9 +332,11 @@ F 3 "" H 2650 4200 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D16
+L LED-RESCUE-wnm_discovery D16
 U 1 1 585D8B01
 P 2650 4550
+AR Path="/585D8B01" Ref="D16"  Part="1" 
+AR Path="/585D6FEE/585D8B01" Ref="D16"  Part="1" 
 F 0 "D16" H 2650 4650 50  0000 C CNN
 F 1 "LED" H 2650 4450 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 4550 50  0001 C CNN
@@ -304,9 +345,11 @@ F 3 "" H 2650 4550 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D17
+L LED-RESCUE-wnm_discovery D17
 U 1 1 585D8B08
 P 2650 4900
+AR Path="/585D8B08" Ref="D17"  Part="1" 
+AR Path="/585D6FEE/585D8B08" Ref="D17"  Part="1" 
 F 0 "D17" H 2650 5000 50  0000 C CNN
 F 1 "LED" H 2650 4800 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 4900 50  0001 C CNN
@@ -315,9 +358,11 @@ F 3 "" H 2650 4900 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D18
+L LED-RESCUE-wnm_discovery D18
 U 1 1 585D8B0F
 P 2650 5250
+AR Path="/585D8B0F" Ref="D18"  Part="1" 
+AR Path="/585D6FEE/585D8B0F" Ref="D18"  Part="1" 
 F 0 "D18" H 2650 5350 50  0000 C CNN
 F 1 "LED" H 2650 5150 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 2650 5250 50  0001 C CNN
@@ -326,9 +371,11 @@ F 3 "" H 2650 5250 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D24
+L LED-RESCUE-wnm_discovery D24
 U 1 1 585D8B16
 P 3300 4900
+AR Path="/585D8B16" Ref="D24"  Part="1" 
+AR Path="/585D6FEE/585D8B16" Ref="D24"  Part="1" 
 F 0 "D24" H 3300 5000 50  0000 C CNN
 F 1 "LED" H 3300 4800 50  0000 C CNN
 F 2 "LEDs:LED_0805" H 3300 4900 50  0001 C CNN
@@ -363,9 +410,11 @@ COL9
 Text Notes 1000 1500 0    60   ~ 0
 With 24 LEDs we could do a 5x5 (10 GPIOs) matrix, but having the LED logic\nmatrix following the placement layout produces a cleaner PCB. The trade-off is that we\nuse 2 more GPIOs.
 $Comp
-L R R7
+L R-RESCUE-wnm_discovery R7
 U 1 1 5862A3A6
 P 2200 1900
+AR Path="/5862A3A6" Ref="R7"  Part="1" 
+AR Path="/585D6FEE/5862A3A6" Ref="R7"  Part="1" 
 F 0 "R7" V 2280 1900 40  0000 C CNN
 F 1 "R" V 2207 1901 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 2130 1900 30  0001 C CNN
@@ -374,9 +423,11 @@ F 3 "" H 2200 1900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R8
+L R-RESCUE-wnm_discovery R8
 U 1 1 5862A65F
 P 2850 1900
+AR Path="/5862A65F" Ref="R8"  Part="1" 
+AR Path="/585D6FEE/5862A65F" Ref="R8"  Part="1" 
 F 0 "R8" V 2930 1900 40  0000 C CNN
 F 1 "R" V 2857 1901 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 2780 1900 30  0001 C CNN
@@ -385,9 +436,11 @@ F 3 "" H 2850 1900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R9
+L R-RESCUE-wnm_discovery R9
 U 1 1 5862A6DA
 P 3500 1900
+AR Path="/5862A6DA" Ref="R9"  Part="1" 
+AR Path="/585D6FEE/5862A6DA" Ref="R9"  Part="1" 
 F 0 "R9" V 3580 1900 40  0000 C CNN
 F 1 "R" V 3507 1901 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 3430 1900 30  0001 C CNN
@@ -407,9 +460,11 @@ F 3 "" H 9050 2025 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C28
+L C-RESCUE-wnm_discovery C28
 U 1 1 586433AA
 P 8525 2225
+AR Path="/586433AA" Ref="C28"  Part="1" 
+AR Path="/585D6FEE/586433AA" Ref="C28"  Part="1" 
 F 0 "C28" V 8575 2300 40  0000 L CNN
 F 1 "1uF" V 8575 2075 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 8563 2075 30  0001 C CNN
@@ -418,9 +473,11 @@ F 3 "" H 8525 2225 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C29
+L C-RESCUE-wnm_discovery C29
 U 1 1 58643880
 P 8525 2625
+AR Path="/58643880" Ref="C29"  Part="1" 
+AR Path="/585D6FEE/58643880" Ref="C29"  Part="1" 
 F 0 "C29" V 8575 2700 40  0000 L CNN
 F 1 "1uF" V 8575 2475 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 8563 2475 30  0001 C CNN
@@ -580,9 +637,11 @@ Wire Wire Line
 Wire Wire Line
 	6975 3425 6975 5150
 $Comp
-L C C25
+L C-RESCUE-wnm_discovery C25
 U 1 1 586463AC
 P 7425 3625
+AR Path="/586463AC" Ref="C25"  Part="1" 
+AR Path="/585D6FEE/586463AC" Ref="C25"  Part="1" 
 F 0 "C25" V 7475 3700 40  0000 L CNN
 F 1 "10uF" V 7475 3475 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 7463 3475 30  0001 C CNN
@@ -595,10 +654,12 @@ Wire Wire Line
 	7225 3625 6975 3625
 Connection ~ 6975 3625
 $Comp
-L GND #PWR022
+L GND-RESCUE-wnm_discovery #PWR022
 U 1 1 586468A3
 P 6975 5150
-F 0 "#PWR022" H 6975 5150 30  0001 C CNN
+AR Path="/586468A3" Ref="#PWR022"  Part="1" 
+AR Path="/585D6FEE/586468A3" Ref="#PWR019"  Part="1" 
+F 0 "#PWR019" H 6975 5150 30  0001 C CNN
 F 1 "GND" H 6975 5080 30  0001 C CNN
 F 2 "" H 6975 5150 60  0001 C CNN
 F 3 "" H 6975 5150 60  0001 C CNN
@@ -606,9 +667,11 @@ F 3 "" H 6975 5150 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R15
+L R-RESCUE-wnm_discovery R15
 U 1 1 58646E77
 P 7800 4425
+AR Path="/58646E77" Ref="R15"  Part="1" 
+AR Path="/585D6FEE/58646E77" Ref="R15"  Part="1" 
 F 0 "R15" V 7880 4425 40  0000 C CNN
 F 1 "R" V 7807 4426 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 7730 4425 30  0001 C CNN
@@ -617,9 +680,11 @@ F 3 "" H 7800 4425 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C26
+L C-RESCUE-wnm_discovery C26
 U 1 1 58646F61
 P 7800 4625
+AR Path="/58646F61" Ref="C26"  Part="1" 
+AR Path="/585D6FEE/58646F61" Ref="C26"  Part="1" 
 F 0 "C26" V 7850 4700 40  0000 L CNN
 F 1 "10uF" V 7850 4475 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 7838 4475 30  0001 C CNN
@@ -628,9 +693,11 @@ F 3 "" H 7800 4625 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C27
+L C-RESCUE-wnm_discovery C27
 U 1 1 58647031
 P 7800 4825
+AR Path="/58647031" Ref="C27"  Part="1" 
+AR Path="/585D6FEE/58647031" Ref="C27"  Part="1" 
 F 0 "C27" V 7850 4900 40  0000 L CNN
 F 1 "10uF" V 7850 4675 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 7838 4675 30  0001 C CNN
@@ -661,4 +728,6 @@ Text Notes 1650 1000 0    315  ~ 0
 LED matrix
 Text Notes 7050 1100 0    315  ~ 0
 OLED screen
+Text GLabel 5000 -1400 0    60   Input ~ 0
+Screen_NReset
 $EndSCHEMATC

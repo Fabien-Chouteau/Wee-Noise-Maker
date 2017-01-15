@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:wnm_discovery-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,7 +42,6 @@ LIBS:logo
 LIBS:microchip_pic10mcu
 LIBS:microchip_pic12mcu
 LIBS:microchip_pic16mcu
-LIBS:microchip1
 LIBS:msp430
 LIBS:nxp_armmcu
 LIBS:powerint
@@ -49,7 +49,6 @@ LIBS:pspice
 LIBS:references
 LIBS:relays
 LIBS:sensors
-LIBS:special
 LIBS:stm8
 LIBS:stm32
 LIBS:supertex
@@ -385,13 +384,13 @@ B15
 Text GLabel 6100 5100 0    60   Input ~ 0
 B16
 $Sheet
-S 2400 650  1400 1100
+S 2550 650  1400 1100
 U 585DBE08
 F0 "Micro-Controller" 60
 F1 "micro-controller.sch" 60
 $EndSheet
 $Sheet
-S 4050 650  1450 1050
+S 4750 800  1450 1050
 U 585D6FEE
 F0 "LED_Matrix" 60
 F1 "led_matrix.sch" 60
@@ -433,7 +432,7 @@ ENC_1_A
 Text GLabel 2950 7050 2    60   Input ~ 0
 ENC_1_B
 $Comp
-L GND #PWR01
+L GND-RESCUE-wnm_discovery #PWR01
 U 1 1 586532D8
 P 4950 7050
 F 0 "#PWR01" H 4950 7050 30  0001 C CNN
@@ -444,7 +443,7 @@ F 3 "" H 4950 7050 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR02
+L GND-RESCUE-wnm_discovery #PWR02
 U 1 1 58653337
 P 2200 7050
 F 0 "#PWR02" H 2200 7050 30  0001 C CNN
@@ -491,7 +490,7 @@ Connection ~ 5450 5700
 Wire Wire Line
 	8000 3750 8000 5700
 $Comp
-L R R16
+L R-RESCUE-wnm_discovery R16
 U 1 1 58664AEC
 P 1700 7050
 F 0 "R16" V 1780 7050 40  0000 C CNN
@@ -502,7 +501,7 @@ F 3 "" H 1700 7050 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C30
+L C-RESCUE-wnm_discovery C30
 U 1 1 58664DFD
 P 1450 7250
 F 0 "C30" H 1450 7350 40  0000 L CNN
@@ -513,7 +512,7 @@ F 3 "" H 1450 7250 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR03
+L GND-RESCUE-wnm_discovery #PWR03
 U 1 1 58664E6F
 P 1450 7450
 F 0 "#PWR03" H 1450 7450 30  0001 C CNN
@@ -524,7 +523,7 @@ F 3 "" H 1450 7450 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R17
+L R-RESCUE-wnm_discovery R17
 U 1 1 586652D6
 P 2700 7050
 F 0 "R17" V 2780 7050 40  0000 C CNN
@@ -535,7 +534,7 @@ F 3 "" H 2700 7050 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C31
+L C-RESCUE-wnm_discovery C31
 U 1 1 586655E8
 P 2950 7250
 F 0 "C31" H 2950 7350 40  0000 L CNN
@@ -546,7 +545,7 @@ F 3 "" H 2950 7250 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR04
+L GND-RESCUE-wnm_discovery #PWR04
 U 1 1 5866566D
 P 2950 7450
 F 0 "#PWR04" H 2950 7450 30  0001 C CNN
@@ -559,7 +558,7 @@ $EndComp
 Text GLabel 5700 7050 2    60   Input ~ 0
 ENC_2_B
 $Comp
-L R R19
+L R-RESCUE-wnm_discovery R19
 U 1 1 58665F22
 P 5450 7050
 F 0 "R19" V 5530 7050 40  0000 C CNN
@@ -570,7 +569,7 @@ F 3 "" H 5450 7050 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C33
+L C-RESCUE-wnm_discovery C33
 U 1 1 58665F28
 P 5700 7250
 F 0 "C33" H 5700 7350 40  0000 L CNN
@@ -581,7 +580,7 @@ F 3 "" H 5700 7250 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR05
+L GND-RESCUE-wnm_discovery #PWR05
 U 1 1 58665F2E
 P 5700 7450
 F 0 "#PWR05" H 5700 7450 30  0001 C CNN
@@ -594,7 +593,7 @@ $EndComp
 Text GLabel 4200 7050 0    60   Input ~ 0
 ENC_2_A
 $Comp
-L R R18
+L R-RESCUE-wnm_discovery R18
 U 1 1 58666537
 P 4450 7050
 F 0 "R18" V 4530 7050 40  0000 C CNN
@@ -605,7 +604,7 @@ F 3 "" H 4450 7050 30  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L C C32
+L C-RESCUE-wnm_discovery C32
 U 1 1 5866653D
 P 4200 7250
 F 0 "C32" H 4200 7350 40  0000 L CNN
@@ -616,7 +615,7 @@ F 3 "" H 4200 7250 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L GND-RESCUE-wnm_discovery #PWR06
 U 1 1 58666543
 P 4200 7450
 F 0 "#PWR06" H 4200 7450 30  0001 C CNN
