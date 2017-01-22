@@ -1,3 +1,5 @@
+![logo](../media/logo/logo_500x170.png)
+ 
 # Blog
 
 ## 01: Quick! Make a PCB!
