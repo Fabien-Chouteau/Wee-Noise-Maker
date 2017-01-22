@@ -13,8 +13,8 @@ like you would find on a Game & Watch.
 src="http://www.cheapmonday.com/Content/ProductContent/0402009001/0402009001_0_2.jpg"
 width="200">
 
-Here's a short video that demonstrates the features of the PO-20:
-www.youtube.com/watch?v=W5PvXQq3DVQ
+Here's a short video that demonstrates the
+[features of the PO-20](www.youtube.com/watch?v=W5PvXQq3DVQ).
 
 After playing a [little bit with
 it](https://www.youtube.com/watch?v=CN5plqgpwa4), I had a feeling you may know
