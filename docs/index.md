@@ -1,4 +1,4 @@
-![logo](../media/logo/logo_500x170.png)
+![logo](media/logo/logo_500x170.png)
  
 # Blog
 
@@ -31,7 +31,7 @@ output, so the "only" thing left to do is the user interface
 (buttons and LEDs).
 
 ![Wee Noise Make Discovery
- rev-A](../media/pictures/discovery/discovery_rev_A_1.JPG)
+ rev-A](media/pictures/discovery/discovery_rev_A_1.JPG)
 
 With this board I was able to start working on the software, play with
 multiplexed LED and buttons, start a first version of the state machine and get
