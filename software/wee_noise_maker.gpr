@@ -1,7 +1,7 @@
 with "Ada_Drivers_Library/boards/stm32f407_discovery.gpr";
 with "Ada_Drivers_Library/boards/common_config";
 
-project POSS is
+project Wee_Noise_Maker is
 
   for Runtime ("Ada") use STM32F407_Discovery'Runtime ("Ada");
   for Target use "arm-eabi";
@@ -28,4 +28,4 @@ project POSS is
      for Connection_Tool use "st-util";
   end Ide;
 
-end POSS;
+end Wee_Noise_Maker;
