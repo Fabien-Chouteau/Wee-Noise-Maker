@@ -2,7 +2,7 @@
  
 # Blog
 
-## 02: Switchin to Kicad
+## 02: Switching to Kicad
 
 I designed 4 PCBs before this project, two iterations of a guitar amplifier and
 two ATtiny boards for PCB design introduction lessons and also a demo at work.
