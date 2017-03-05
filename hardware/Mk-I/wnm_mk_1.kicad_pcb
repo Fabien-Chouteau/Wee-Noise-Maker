@@ -5,7 +5,7 @@
     (no_connects 0)
     (area 79.934999 78.664999 176.605001 144.855001)
     (thickness 1.6)
-    (drawings 96)
+    (drawings 97)
     (tracks 1942)
     (zones 0)
     (modules 122)
@@ -5668,6 +5668,9 @@
     (pad 6 thru_hole circle (at 6.2 0) (size 3 3) (drill 2.5) (layers *.Cu *.Mask))
   )
 
+  (gr_text Rev-B (at 137 80.6) (layer B.SilkS)
+    (effects (font (size 1 1) (thickness 0.25)) (justify mirror))
+  )
   (gr_text DFU (at 151.2062 79.9338) (layer F.SilkS) (tstamp 587A1229)
     (effects (font (size 1 1) (thickness 0.2)))
   )
