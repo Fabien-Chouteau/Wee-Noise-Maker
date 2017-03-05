@@ -635,12 +635,12 @@ F 3 "" H 4250 3050 60  0001 C CNN
 	1    4250 3050
 	1    0    0    -1  
 $EndComp
-Text Notes 4450 5700 0    157  ~ 0
-TODO:
+Text Notes 4450 5750 0    79   ~ 0
+TODO:\n - Extension port? (gpio. I2C, SPI)
 Wire Notes Line
 	500  5400 6950 5400
 Wire Notes Line
 	6950 5400 6950 6500
-Text Notes 600  5950 0    79   ~ 0
-Known problems:\n - Encoders footprints and hole size\n - DAC couplings caps are in series with the chip \n   instead of going to GND
+Text Notes 650  6100 0    79   ~ 0
+Known problems:\n - Encoders footprints and hole size\n - DAC couplings caps are in series with the chip \n   instead of going to GND\n - Volatage regulator footprint
 $EndSCHEMATC
