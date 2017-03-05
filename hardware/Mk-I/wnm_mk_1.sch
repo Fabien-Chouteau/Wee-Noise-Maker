@@ -642,5 +642,5 @@ Wire Notes Line
 Wire Notes Line
 	6950 5400 6950 6500
 Text Notes 600  6400 0    79   ~ 0
-Known problems:\n - Encoders footprints and hole size\n - Volatage regulator footprint\n\nFixed:\n - DAC couplings caps are in series with the chip \n   instead of going to GND\n
+Known problems:\n - Encoders footprints and hole size\n\nFixed:\n - DAC couplings caps are in series with the chip \n   instead of going to GND\n - Volatage regulator footprint\n
 $EndSCHEMATC
