@@ -3,9 +3,9 @@
   (general
     (links 336)
     (no_connects 0)
-    (area 66.572002 67.150001 181.907143 146.975)
+    (area 79.934999 78.664999 176.605001 144.855001)
     (thickness 1.6)
-    (drawings 97)
+    (drawings 82)
     (tracks 1995)
     (zones 0)
     (modules 122)
@@ -4591,7 +4591,7 @@
     (tags "capacitor 0805")
     (path /5866653D)
     (attr smd)
-    (fp_text reference C32 (at -3.1938 -0.0462 360) (layer F.SilkS)
+    (fp_text reference C32 (at -2.794 0 360) (layer F.SilkS)
       (effects (font (size 0.8 0.8) (thickness 0.125)))
     )
     (fp_text value 0.1uF (at 0 2.1 180) (layer F.Fab)
@@ -5758,16 +5758,6 @@
   (gr_line (start 161.9504 104.14) (end 161.9504 105.41) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 123.8504 104.14) (end 113.0554 104.14) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 161.9504 104.14) (end 123.8504 104.14) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 145.288 127.762) (end 145.288 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 151.892 127.762) (end 151.892 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 135.128 127.762) (end 135.128 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 141.732 127.762) (end 141.732 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 131.572 127.762) (end 131.572 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 124.968 127.762) (end 124.968 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 111.252 127.762) (end 111.252 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 104.648 127.762) (end 104.648 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 101.092 127.762) (end 101.092 126.238) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 94.488 127.762) (end 94.488 126.238) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 113.0554 104.14) (end 113.0554 105.664) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 82.55 116.332) (end 163.83 116.332) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 82.55 140.208) (end 82.55 116.332) (angle 90) (layer F.SilkS) (width 0.2))
@@ -5787,11 +5777,6 @@
   (gr_line (start 90.932 119.126) (end 90.424 118.618) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 90.932 119.126) (end 91.44 118.618) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_line (start 90.932 117.094) (end 90.932 119.126) (angle 90) (layer F.SilkS) (width 0.2))
-  (gr_line (start 141.732 127.762) (end 135.128 127.762) (angle 90) (layer F.SilkS) (width 0.2) (tstamp 583F1F3C))
-  (gr_line (start 131.572 127.762) (end 124.968 127.762) (angle 90) (layer F.SilkS) (width 0.2) (tstamp 583F1F34))
-  (gr_line (start 111.252 127.762) (end 104.648 127.762) (angle 90) (layer F.SilkS) (width 0.2) (tstamp 583F1F2F))
-  (gr_line (start 101.092 127.762) (end 94.488 127.762) (angle 90) (layer F.SilkS) (width 0.2) (tstamp 583F1EA7))
-  (gr_line (start 151.892 127.762) (end 145.288 127.762) (angle 90) (layer F.SilkS) (width 0.2))
   (gr_text E (at 155.2194 105.918) (layer F.SilkS)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
@@ -9620,6 +9605,81 @@
         (xy 135.8482 86.023124) (xy 135.973 85.999641) (xy 135.973 87.773) (xy 133.544971 87.773) (xy 133.43807 87.665912)
         (xy 133.426976 87.661305) (xy 133.426912 87.042717) (xy 133.500688 86.96907) (xy 133.626856 86.665222) (xy 133.627143 86.336221)
         (xy 133.501505 86.032154) (xy 133.426802 85.95732) (xy 133.426213 80.1878) (xy 134.595681 80.1878)
+      )
+    )
+  )
+  (zone (net 0) (net_name "") (layer F.SilkS) (tstamp 58BC795E) (hatch full 0.508)
+    (connect_pads (clearance 0.508))
+    (min_thickness 0.254)
+    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (polygon
+      (pts
+        (xy 101.083499 127.9652) (xy 94.479499 127.9652) (xy 94.479499 125.9332) (xy 101.083499 125.9332)
+      )
+    )
+    (filled_polygon
+      (pts
+        (xy 100.956499 127.8382) (xy 94.606499 127.8382) (xy 94.606499 126.0602) (xy 100.956499 126.0602)
+      )
+    )
+  )
+  (zone (net 0) (net_name "") (layer F.SilkS) (tstamp 58BC797E) (hatch full 0.508)
+    (connect_pads (clearance 0.508))
+    (min_thickness 0.254)
+    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (polygon
+      (pts
+        (xy 111.244818 127.9652) (xy 104.640818 127.9652) (xy 104.640818 125.9332) (xy 111.244818 125.9332)
+      )
+    )
+    (filled_polygon
+      (pts
+        (xy 111.117818 127.8382) (xy 104.767818 127.8382) (xy 104.767818 126.0602) (xy 111.117818 126.0602)
+      )
+    )
+  )
+  (zone (net 0) (net_name "") (layer F.SilkS) (tstamp 58BC79A2) (hatch full 0.508)
+    (connect_pads (clearance 0.508))
+    (min_thickness 0.254)
+    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (polygon
+      (pts
+        (xy 131.572 127.912777) (xy 124.968 127.912777) (xy 124.968 125.880777) (xy 131.572 125.880777)
+      )
+    )
+    (filled_polygon
+      (pts
+        (xy 131.445 127.785777) (xy 125.095 127.785777) (xy 125.095 126.007777) (xy 131.445 126.007777)
+      )
+    )
+  )
+  (zone (net 0) (net_name "") (layer F.SilkS) (tstamp 58BC79F0) (hatch full 0.508)
+    (connect_pads (clearance 0.508))
+    (min_thickness 0.254)
+    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (polygon
+      (pts
+        (xy 141.7066 127.889) (xy 135.1026 127.889) (xy 135.1026 125.857) (xy 141.7066 125.857)
+      )
+    )
+    (filled_polygon
+      (pts
+        (xy 141.5796 127.762) (xy 135.2296 127.762) (xy 135.2296 125.984) (xy 141.5796 125.984)
+      )
+    )
+  )
+  (zone (net 0) (net_name "") (layer F.SilkS) (tstamp 58BC7A1A) (hatch full 0.508)
+    (connect_pads (clearance 0.508))
+    (min_thickness 0.254)
+    (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
+    (polygon
+      (pts
+        (xy 151.9174 127.889) (xy 145.3134 127.889) (xy 145.3134 125.857) (xy 151.9174 125.857)
+      )
+    )
+    (filled_polygon
+      (pts
+        (xy 151.7904 127.762) (xy 145.4404 127.762) (xy 145.4404 125.984) (xy 151.7904 125.984)
       )
     )
   )
