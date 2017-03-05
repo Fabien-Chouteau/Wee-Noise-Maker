@@ -64,7 +64,7 @@ encoding utf-8
 Sheet 4 5
 Title "Wee Noise Maker - Mk-I"
 Date ""
-Rev "A"
+Rev "B"
 Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
