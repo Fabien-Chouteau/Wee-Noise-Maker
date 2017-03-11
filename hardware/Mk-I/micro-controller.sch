@@ -470,37 +470,37 @@ F 3 "" H 7850 4850 60  0001 C CNN
 	1    7850 4850
 	1    0    0    -1  
 $EndComp
-Text GLabel 1800 9300 1    60   Input ~ 0
+Text GLabel 1150 9300 1    60   Input ~ 0
 3V3
 $Comp
 L R-RESCUE-wnm_mk_1 R3
 U 1 1 586150DA
-P 1600 9900
+P 950 9900
 AR Path="/586150DA" Ref="R3"  Part="1" 
 AR Path="/585DBE08/586150DA" Ref="R3"  Part="1" 
-F 0 "R3" V 1680 9900 40  0000 C CNN
-F 1 "10K" V 1607 9901 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 1530 9900 30  0001 C CNN
-F 3 "" H 1600 9900 30  0000 C CNN
-	1    1600 9900
+F 0 "R3" V 1030 9900 40  0000 C CNN
+F 1 "10K" V 957 9901 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 880 9900 30  0001 C CNN
+F 3 "" H 950 9900 30  0000 C CNN
+	1    950  9900
 	1    0    0    -1  
 $EndComp
 $Comp
 L R-RESCUE-wnm_mk_1 R4
 U 1 1 58615169
-P 2000 9900
+P 1350 9900
 AR Path="/58615169" Ref="R4"  Part="1" 
 AR Path="/585DBE08/58615169" Ref="R4"  Part="1" 
-F 0 "R4" V 2080 9900 40  0000 C CNN
-F 1 "10K" V 2007 9901 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 1930 9900 30  0001 C CNN
-F 3 "" H 2000 9900 30  0000 C CNN
-	1    2000 9900
+F 0 "R4" V 1430 9900 40  0000 C CNN
+F 1 "10K" V 1357 9901 40  0000 C CNN
+F 2 "Resistors_SMD:R_0805" V 1280 9900 30  0001 C CNN
+F 3 "" H 1350 9900 30  0000 C CNN
+	1    1350 9900
 	1    0    0    -1  
 $EndComp
-Text GLabel 1600 10150 3    60   Input ~ 0
+Text GLabel 950  10150 3    60   Input ~ 0
 Audio_SDA
-Text GLabel 2000 10150 3    60   Input ~ 0
+Text GLabel 1350 10150 3    60   Input ~ 0
 Audio_SCL
 Text GLabel 2850 5600 0    60   Input ~ 0
 I2S_LRCLK
@@ -823,14 +823,14 @@ Wire Wire Line
 Wire Wire Line
 	1900 6100 1900 6300
 Wire Wire Line
-	1800 9300 1800 9500
-Connection ~ 1800 9500
+	1150 9300 1150 9500
+Connection ~ 1150 9500
 Wire Wire Line
-	2000 9500 2000 9650
+	1350 9500 1350 9650
 Wire Wire Line
-	2000 9500 1600 9500
+	1350 9500 950  9500
 Wire Wire Line
-	1600 9500 1600 9650
+	950  9500 950  9650
 Wire Wire Line
 	7250 9900 6300 9900
 Wire Wire Line
@@ -956,4 +956,34 @@ Text GLabel 2300 1800 2    60   Input ~ 0
 3V3
 Text GLabel 12850 7200 2    60   Input ~ 0
 Screen_Nreset
+$Comp
+L CONN_01X04 ext1
+U 1 1 58C40226
+P 2800 10050
+F 0 "ext1" H 2800 10300 50  0000 C CNN
+F 1 "CONN_01X04" V 2900 10050 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x04" H 2800 10050 50  0001 C CNN
+F 3 "" H 2800 10050 50  0000 C CNN
+	1    2800 10050
+	1    0    0    -1  
+$EndComp
+Text GLabel 2600 10200 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 2600 10100 0    60   Input ~ 0
+Audio_SDA
+Text GLabel 2600 10000 0    60   Input ~ 0
+3V3
+$Comp
+L GND #PWR031
+U 1 1 58C40EDF
+P 1900 9900
+F 0 "#PWR031" H 1900 9650 50  0001 C CNN
+F 1 "GND" H 1900 9750 50  0000 C CNN
+F 2 "" H 1900 9900 50  0000 C CNN
+F 3 "" H 1900 9900 50  0000 C CNN
+	1    1900 9900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2600 9900 1900 9900
 $EndSCHEMATC
