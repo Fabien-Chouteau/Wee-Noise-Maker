@@ -228,7 +228,7 @@ P 1750 2700
 AR Path="/585F8833" Ref="C12"  Part="1" 
 AR Path="/585DBE08/585F8833" Ref="C12"  Part="1" 
 F 0 "C12" H 1750 2800 40  0000 L CNN
-F 1 "22pF" H 1756 2615 40  0000 L CNN
+F 1 "20pF" H 1756 2615 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 1788 2550 30  0001 C CNN
 F 3 "" H 1750 2700 60  0000 C CNN
 	1    1750 2700
@@ -241,7 +241,7 @@ P 1750 3300
 AR Path="/585F888D" Ref="C13"  Part="1" 
 AR Path="/585DBE08/585F888D" Ref="C13"  Part="1" 
 F 0 "C13" H 1750 3400 40  0000 L CNN
-F 1 "22pF" H 1756 3215 40  0000 L CNN
+F 1 "20pF" H 1756 3215 40  0000 L CNN
 F 2 "Capacitors_SMD:C_0805" H 1788 3150 30  0001 C CNN
 F 3 "" H 1750 3300 60  0000 C CNN
 	1    1750 3300
@@ -744,6 +744,120 @@ F 3 "" H 5450 10725 60  0001 C CNN
 	1    5450 10725
 	1    0    0    -1  
 $EndComp
+$Comp
+L C-RESCUE-wnm_mk_1 C24
+U 1 1 58640860
+P 6900 9525
+AR Path="/58640860" Ref="C24"  Part="1" 
+AR Path="/585DBE08/58640860" Ref="C24"  Part="1" 
+F 0 "C24" H 6900 9625 40  0000 L CNN
+F 1 "22uF" H 6906 9440 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 6938 9375 30  0001 C CNN
+F 3 "" H 6900 9525 60  0000 C CNN
+	1    6900 9525
+	1    0    0    -1  
+$EndComp
+Text GLabel 2850 4600 0    60   Input ~ 0
+ENC_1_A
+Text GLabel 2850 4200 0    60   Input ~ 0
+ENC_1_B
+Text GLabel 2850 4700 0    60   Input ~ 0
+ENC_2_A
+Text GLabel 2850 4800 0    60   Input ~ 0
+ENC_2_B
+Text GLabel 12850 7300 2    60   Input ~ 0
+ENC_1_SW
+Text GLabel 12850 7400 2    60   Input ~ 0
+ENC_2_SW
+$Comp
+L STM32_SWD_Connector U10
+U 1 1 58664887
+P 10250 9250
+F 0 "U10" H 10250 9250 60  0000 C CNN
+F 1 "STM32_SWD_Connector" V 10600 8600 60  0000 C CNN
+F 2 "stm32f4-disco:STM32_SWD_Connector_SMD" H 10250 9250 60  0001 C CNN
+F 3 "" H 10250 9250 60  0001 C CNN
+	1    10250 9250
+	1    0    0    -1  
+$EndComp
+Text GLabel 10000 9400 0    60   Input ~ 0
+3V3
+$Comp
+L GND-RESCUE-wnm_mk_1 #PWR030
+U 1 1 586649ED
+P 9900 9850
+AR Path="/586649ED" Ref="#PWR030"  Part="1" 
+AR Path="/585DBE08/586649ED" Ref="#PWR030"  Part="1" 
+F 0 "#PWR030" H 9900 9850 30  0001 C CNN
+F 1 "GND" H 9900 9780 30  0001 C CNN
+F 2 "" H 9900 9850 60  0001 C CNN
+F 3 "" H 9900 9850 60  0001 C CNN
+	1    9900 9850
+	1    0    0    -1  
+$EndComp
+Text GLabel 10000 9600 0    60   Input ~ 0
+SWCLK
+Text GLabel 10000 10000 0    60   Input ~ 0
+SWDIO
+Text GLabel 2000 2500 1    60   Input ~ 0
+NRST
+Text GLabel 10000 10200 0    60   Input ~ 0
+NRST
+Text GLabel 9100 1750 1    60   Input ~ 0
+VBAT
+Text Notes 1100 8800 0    157  ~ 0
+I2C pull-ups
+Text Notes 5700 8700 0    157  ~ 0
+SD card
+Text Notes 9750 8750 0    157  ~ 0
+Debug port
+Text GLabel 2750 2300 1    60   Input ~ 0
+BOOT0
+$Comp
+L Jumper_NO_Small DFU_MODE1
+U 1 1 587582D9
+P 2200 1800
+F 0 "DFU_MODE1" H 2200 1950 50  0000 C CNN
+F 1 "Jumper_NO_Small" H 2250 1650 50  0000 C CNN
+F 2 "Buttons_Switches_SMD:SW_SPST_EVQP7A" H 2200 1800 50  0001 C CNN
+F 3 "" H 2200 1800 50  0000 C CNN
+	1    2200 1800
+	-1   0    0    1   
+$EndComp
+Text GLabel 2100 1800 0    60   Input ~ 0
+BOOT0
+Text GLabel 2300 1800 2    60   Input ~ 0
+3V3
+Text GLabel 12850 7200 2    60   Input ~ 0
+Screen_Nreset
+$Comp
+L CONN_01X04 ext1
+U 1 1 58C40226
+P 2800 10050
+F 0 "ext1" H 2800 10300 50  0000 C CNN
+F 1 "CONN_01X04" V 2900 10050 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x04" H 2800 10050 50  0001 C CNN
+F 3 "" H 2800 10050 50  0000 C CNN
+	1    2800 10050
+	1    0    0    -1  
+$EndComp
+Text GLabel 2600 10200 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 2600 10100 0    60   Input ~ 0
+Audio_SDA
+Text GLabel 2600 10000 0    60   Input ~ 0
+3V3
+$Comp
+L GND #PWR031
+U 1 1 58C40EDF
+P 1900 9900
+F 0 "#PWR031" H 1900 9650 50  0001 C CNN
+F 1 "GND" H 1900 9750 50  0000 C CNN
+F 2 "" H 1900 9900 50  0000 C CNN
+F 3 "" H 1900 9900 50  0000 C CNN
+	1    1900 9900
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
 	1950 2700 2850 2700
 Wire Wire Line
@@ -842,19 +956,6 @@ Connection ~ 5450 10100
 Connection ~ 5450 9800
 Connection ~ 5450 9500
 Connection ~ 5450 10250
-$Comp
-L C-RESCUE-wnm_mk_1 C24
-U 1 1 58640860
-P 6900 9525
-AR Path="/58640860" Ref="C24"  Part="1" 
-AR Path="/585DBE08/58640860" Ref="C24"  Part="1" 
-F 0 "C24" H 6900 9625 40  0000 L CNN
-F 1 "22uF" H 6906 9440 40  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 6938 9375 30  0001 C CNN
-F 3 "" H 6900 9525 60  0000 C CNN
-	1    6900 9525
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6900 9725 6900 9900
 Connection ~ 6900 9900
@@ -865,62 +966,14 @@ Wire Wire Line
 Wire Wire Line
 	7350 9200 7350 9325
 Connection ~ 7350 9325
-Text GLabel 2850 4600 0    60   Input ~ 0
-ENC_1_A
-Text GLabel 2850 4200 0    60   Input ~ 0
-ENC_1_B
-Text GLabel 2850 4700 0    60   Input ~ 0
-ENC_2_A
-Text GLabel 2850 4800 0    60   Input ~ 0
-ENC_2_B
-Text GLabel 12850 7300 2    60   Input ~ 0
-ENC_1_SW
-Text GLabel 12850 7400 2    60   Input ~ 0
-ENC_2_SW
-$Comp
-L STM32_SWD_Connector U10
-U 1 1 58664887
-P 10250 9250
-F 0 "U10" H 10250 9250 60  0000 C CNN
-F 1 "STM32_SWD_Connector" V 10600 8600 60  0000 C CNN
-F 2 "stm32f4-disco:STM32_SWD_Connector_SMD" H 10250 9250 60  0001 C CNN
-F 3 "" H 10250 9250 60  0001 C CNN
-	1    10250 9250
-	1    0    0    -1  
-$EndComp
-Text GLabel 10000 9400 0    60   Input ~ 0
-3V3
-$Comp
-L GND-RESCUE-wnm_mk_1 #PWR030
-U 1 1 586649ED
-P 9900 9850
-AR Path="/586649ED" Ref="#PWR030"  Part="1" 
-AR Path="/585DBE08/586649ED" Ref="#PWR030"  Part="1" 
-F 0 "#PWR030" H 9900 9850 30  0001 C CNN
-F 1 "GND" H 9900 9780 30  0001 C CNN
-F 2 "" H 9900 9850 60  0001 C CNN
-F 3 "" H 9900 9850 60  0001 C CNN
-	1    9900 9850
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	9900 9850 9900 9800
 Wire Wire Line
 	9900 9800 10000 9800
-Text GLabel 10000 9600 0    60   Input ~ 0
-SWCLK
-Text GLabel 10000 10000 0    60   Input ~ 0
-SWDIO
 Wire Wire Line
 	2000 2500 2850 2500
-Text GLabel 2000 2500 1    60   Input ~ 0
-NRST
-Text GLabel 10000 10200 0    60   Input ~ 0
-NRST
 Wire Wire Line
 	6800 1750 8600 1750
-Text GLabel 9100 1750 1    60   Input ~ 0
-VBAT
 Wire Notes Line
 	500  8450 11700 8450
 Wire Notes Line
@@ -929,61 +982,8 @@ Wire Notes Line
 	9000 8450 9000 11200
 Wire Notes Line
 	11700 8450 11700 11200
-Text Notes 1100 8800 0    157  ~ 0
-I2C pull-ups
-Text Notes 5700 8700 0    157  ~ 0
-SD card
-Text Notes 9750 8750 0    157  ~ 0
-Debug port
 Wire Wire Line
 	2850 2300 2750 2300
-Text GLabel 2750 2300 1    60   Input ~ 0
-BOOT0
-$Comp
-L Jumper_NO_Small DFU_MODE1
-U 1 1 587582D9
-P 2200 1800
-F 0 "DFU_MODE1" H 2200 1950 50  0000 C CNN
-F 1 "Jumper_NO_Small" H 2250 1650 50  0000 C CNN
-F 2 "Buttons_Switches_SMD:SW_SPST_EVQP7A" H 2200 1800 50  0001 C CNN
-F 3 "" H 2200 1800 50  0000 C CNN
-	1    2200 1800
-	-1   0    0    1   
-$EndComp
-Text GLabel 2100 1800 0    60   Input ~ 0
-BOOT0
-Text GLabel 2300 1800 2    60   Input ~ 0
-3V3
-Text GLabel 12850 7200 2    60   Input ~ 0
-Screen_Nreset
-$Comp
-L CONN_01X04 ext1
-U 1 1 58C40226
-P 2800 10050
-F 0 "ext1" H 2800 10300 50  0000 C CNN
-F 1 "CONN_01X04" V 2900 10050 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x04" H 2800 10050 50  0001 C CNN
-F 3 "" H 2800 10050 50  0000 C CNN
-	1    2800 10050
-	1    0    0    -1  
-$EndComp
-Text GLabel 2600 10200 0    60   Input ~ 0
-Audio_SCL
-Text GLabel 2600 10100 0    60   Input ~ 0
-Audio_SDA
-Text GLabel 2600 10000 0    60   Input ~ 0
-3V3
-$Comp
-L GND #PWR031
-U 1 1 58C40EDF
-P 1900 9900
-F 0 "#PWR031" H 1900 9650 50  0001 C CNN
-F 1 "GND" H 1900 9750 50  0000 C CNN
-F 2 "" H 1900 9900 50  0000 C CNN
-F 3 "" H 1900 9900 50  0000 C CNN
-	1    1900 9900
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	2600 9900 1900 9900
 $EndSCHEMATC
