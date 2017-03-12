@@ -804,7 +804,7 @@ NRST
 Text GLabel 10000 10200 0    60   Input ~ 0
 NRST
 Text GLabel 9100 1750 1    60   Input ~ 0
-VBAT
+VBAT_SENSE
 Text Notes 1100 8800 0    157  ~ 0
 I2C pull-ups
 Text Notes 5700 8700 0    157  ~ 0
