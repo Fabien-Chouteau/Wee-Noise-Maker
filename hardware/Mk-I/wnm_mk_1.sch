@@ -635,8 +635,8 @@ F 3 "" H 4250 3050 60  0001 C CNN
 	1    4250 3050
 	1    0    0    -1  
 $EndComp
-Text Notes 4450 5750 0    79   ~ 0
-TODO:\n - Extension port? (gpio. I2C, SPI)
+Text Notes 4450 6100 0    79   ~ 0
+TODO:\n \nDONE:\n\n - I2C extension port
 Wire Notes Line
 	500  5400 6950 5400
 Wire Notes Line
