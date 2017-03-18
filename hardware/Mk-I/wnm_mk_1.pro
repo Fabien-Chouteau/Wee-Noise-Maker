@@ -1,4 +1,4 @@
-update=dim. 15 janv. 2017 16:58:14 CET
+update=dim. 12 mars 2017 18:56:01 CET
 version=1
 last_client=kicad
 [cvpcb]
@@ -6,16 +6,6 @@ version=1
 NetIExt=net
 [general]
 version=1
-[schematic_editor]
-version=1
-PageLayoutDescrFile=../components/WNM_page_layout.kicad_wks
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=Pcbnew
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
 [pcbnew]
 version=1
 PageLayoutDescrFile=../components/WNM_page_layout.kicad_wks
@@ -96,3 +86,13 @@ LibName54=transf
 LibName55=ttl_ieee
 LibName56=video
 LibName57=wee_noise_maker
+[schematic_editor]
+version=1
+PageLayoutDescrFile=../components/WNM_page_layout.kicad_wks
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
