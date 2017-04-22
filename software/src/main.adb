@@ -21,20 +21,24 @@
 
 with Ada.Real_Time; use Ada.Real_Time;
 
-with Test_I2S;
-with WNM.Sequencer;
+--  with WNM.Sequencer;
 with WNM.UI;
+with WNM.Encoders;
+with WNM.Screen;
+with WNM.I2C;
 
 procedure Main is
    pragma Priority (WNM.Synth_Task_Priority);
 begin
 
-   WNM.Sequencer.Start;
+   WNM.I2C.Initialize;
+   WNM.Screen.Initialize;
+   WNM.Encoders.Initialize;
+
+--     WNM.Sequencer.Start;
    WNM.UI.Start;
 
-   Test_I2S.Init;
-   Test_I2S.Play;
-
+   --  Wait forever...
    delay until Time_Last;
 
 end Main;

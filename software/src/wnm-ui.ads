@@ -30,7 +30,6 @@ package WNM.UI is
 
    procedure Start;
 
-
    function Is_Pressed (B : Buttons) return Boolean;
 
    procedure Turn_On (B : LEDs);
@@ -39,80 +38,84 @@ package WNM.UI is
 private
 
    Key_To_Point : constant array (Buttons) of GPIO_Point :=
-     (B1      => PC15,
-      B2      => PC13,
-      B3      => PE4,
-      B4      => PB8,
-      B5      => PB5,
-      B6      => PD7,
-      B7      => PD6,
-      B8      => PD1,
-      B9      => PB7,
-      B10     => PC14,
-      B11     => PE6,
-      B12     => PE5,
-      B13     => PE2,
-      B14     => PB4,
-      B15     => PB3,
-      B16     => PD3,
-      Rec     => PD2,
-      Play    => PD0,
-      FX      => PD11,
-      BPM_Vol => PD9,
-      Chan_A  => PC1,
-      Chan_B  => PC2,
-      Chan_C  => PD8,
-      Chan_D  => PB15,
-      Chan_E  => PD10);
+     (B1        => PC1,
+      B2        => PA2,
+      B3        => PC4,
+      B4        => PE7,
+      B5        => PE11,
+      B6        => PE15,
+      B7        => PB13,
+      B8        => PD9,
+      B9        => PC3,
+      B10       => PA3,
+      B11       => PC5,
+      B12       => PE8,
+      B13       => PE12,
+      B14       => PB10,
+      B15       => PB12,
+      B16       => PD10,
+      Rec       => PA10,
+      Play      => PC6,
+      FX        => PD15,
+      Chan_A    => PB1,
+      Chan_B    => PE10,
+      Chan_C    => PE14,
+      Chan_D    => PB14,
+      Chan_E    => PD8,
+      Encoder_L => PC14,
+      Encoder_R => PC15);
 
-   type Row_Index is range 1 .. 5;
-   type Col_Index is range 1 .. 5;
+   Wakeup : GPIO_Point renames PA0;
+
+   type Row_Index is range 1 .. 3;
+   type Col_Index is range 1 .. 9;
 
    Row_To_Point : array (Row_Index) of GPIO_Point :=
-     (1 => PC9,
-      2 => PC8, --  PA13 in RevA, conflict with debugger...
-      3 => PA15,
-      4 => PC11,
-      5 => PA8);
+     (1 => PD13,
+      2 => PD12,
+      3 => PD11);
 
    Col_To_Point : array (Col_Index) of GPIO_Point :=
-     (1 => PC6, --  PA14 in RevA, conflict with debugger...
-      2 => PA10,
-      3 => PA2,
-      4 => PC3,
-      5 => PC0);
+     (1 => PC0,
+      2 => PC2,
+      3 => PA4,
+      4 => PB0,
+      5 => PE9,
+      6 => PE13,
+      7 => PB11,
+      8 => PB15,
+      9 => PD14);
 
    type LED_Address is record
       Row : Row_Index;
       Col : Col_Index;
    end record;
 
-   Key_To_LED : constant array (Buttons) of LED_Address :=
-     (B1      => (Row => 5, Col => 4),
-      B2      => (Row => 4, Col => 4),
-      B3      => (Row => 3, Col => 4),
+   Key_To_LED : constant array (LEDs) of LED_Address :=
+     (B1      => (Row => 2, Col => 1),
+      B2      => (Row => 2, Col => 2),
+      B3      => (Row => 2, Col => 3),
       B4      => (Row => 2, Col => 4),
-      B5      => (Row => 1, Col => 2),
-      B6      => (Row => 2, Col => 2),
-      B7      => (Row => 3, Col => 2),
-      B8      => (Row => 4, Col => 2),
-      B9      => (Row => 5, Col => 5),
-      B10     => (Row => 4, Col => 5),
-      B11     => (Row => 3, Col => 5),
-      B12     => (Row => 2, Col => 5),
-      B13     => (Row => 1, Col => 1),
-      B14     => (Row => 2, Col => 1),
-      B15     => (Row => 3, Col => 1),
-      B16     => (Row => 4, Col => 1),
-      Rec     => (Row => 5, Col => 1),
-      Play    => (Row => 5, Col => 2),
-      FX      => (Row => 5, Col => 3),
-      BPM_Vol => (Row => 4, Col => 3),
-      Chan_A  => (Row => 1, Col => 4),
-      Chan_B  => (Row => 1, Col => 5),
-      Chan_C  => (Row => 1, Col => 3),
-      Chan_D  => (Row => 2, Col => 3),
-      Chan_E  => (Row => 3, Col => 3));
+      B5      => (Row => 2, Col => 5),
+      B6      => (Row => 2, Col => 6),
+      B7      => (Row => 2, Col => 7),
+      B8      => (Row => 2, Col => 8),
+      B9      => (Row => 1, Col => 1),
+      B10     => (Row => 1, Col => 2),
+      B11     => (Row => 1, Col => 3),
+      B12     => (Row => 1, Col => 4),
+      B13     => (Row => 1, Col => 5),
+      B14     => (Row => 1, Col => 6),
+      B15     => (Row => 1, Col => 7),
+      B16     => (Row => 1, Col => 8),
+      Rec     => (Row => 1, Col => 9),
+      Play    => (Row => 2, Col => 9),
+      FX      => (Row => 3, Col => 9),
+      Chan_A  => (Row => 3, Col => 4),
+      Chan_B  => (Row => 3, Col => 5),
+      Chan_C  => (Row => 3, Col => 6),
+      Chan_D  => (Row => 3, Col => 7),
+      Chan_E  => (Row => 3, Col => 8));
 
    LED_State : array (Buttons) of Boolean := (others => False);
 
@@ -129,31 +132,32 @@ private
 
    Has_Long_Press : constant array (Buttons) of Boolean :=
    --  Can this button trigger a On_Long_Press event?
-     (B1      => False,
-      B2      => False,
-      B3      => False,
-      B4      => False,
-      B5      => False,
-      B6      => False,
-      B7      => False,
-      B8      => False,
-      B9      => False,
-      B10     => False,
-      B11     => False,
-      B12     => False,
-      B13     => False,
-      B14     => False,
-      B15     => False,
-      B16     => False,
-      Rec     => True,
-      Play    => False,
-      FX      => False,
-      BPM_Vol => True,
-      Chan_A  => True,
-      Chan_B  => True,
-      Chan_C  => True,
-      Chan_D  => True,
-      Chan_E  => True);
+     (B1        => False,
+      B2        => False,
+      B3        => False,
+      B4        => False,
+      B5        => False,
+      B6        => False,
+      B7        => False,
+      B8        => False,
+      B9        => False,
+      B10       => False,
+      B11       => False,
+      B12       => False,
+      B13       => False,
+      B14       => False,
+      B15       => False,
+      B16       => False,
+      Rec       => True,
+      Play      => False,
+      FX        => False,
+      Chan_A    => True,
+      Chan_B    => True,
+      Chan_C    => True,
+      Chan_D    => True,
+      Chan_E    => True,
+      Encoder_L => True,
+      Encoder_R => True);
 
    LED_Timer : STM32.Timers.Timer renames Timer_7;
    LED_Timer_Control : PWM_Modulator;
@@ -163,7 +167,7 @@ private
 
    private
 
-      Current_LED : Buttons := Buttons'First;
+      Current_LED : LEDs := Buttons'First;
       procedure IRQ_Handler;
       pragma Attach_Handler (IRQ_Handler, Ada.Interrupts.Names.TIM7_Interrupt);
 

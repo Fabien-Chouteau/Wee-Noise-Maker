@@ -26,15 +26,16 @@ package WNM is
 
    type Buttons is (B1, B2, B3, B4, B5, B6, B7, B8,
                     B9, B10, B11, B12, B13, B14, B15, B16,
-                    Rec, Play, FX, BPM_Vol,
-                    Chan_A, Chan_B, Chan_C, Chan_D, Chan_E);
+                    Rec, Play, FX,
+                    Chan_A, Chan_B, Chan_C, Chan_D, Chan_E,
+                    Encoder_L, Encoder_R);
 
    subtype Channel_Buttons is Buttons range Chan_A .. Chan_E;
    subtype Keyboard_Buttons is Buttons range B1 .. B16;
 
    type Keyboard_Value is range 1 .. 16;
 
-   subtype LEDs is Buttons;
+   subtype LEDs is Buttons range B1 .. Chan_E;
 
    function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
 

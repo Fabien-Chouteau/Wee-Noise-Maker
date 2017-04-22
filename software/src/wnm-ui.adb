@@ -25,7 +25,7 @@
 --  LEDs. Press the current chan to erase the squence.
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
-with Test_I2S;
+--  with Test_I2S;
 with WNM.Sequencer; use WNM.Sequencer;
 
 package body WNM.UI is
@@ -59,21 +59,21 @@ package body WNM.UI is
    -- Signal_Event --
    ------------------
 
-   Last_BPM_Press : Time := Time_First;
+--     Last_BPM_Press : Time := Time_First;
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event) is
-      Now : constant Time := Clock;
+--        Now : constant Time := Clock;
    begin
       case Current_Input_Mode is
          when Note =>
             case Evt is
                when On_Press =>
                   case B is
-                     when  BPM_Vol =>
-                        --  Tap tempo
-                        if Now - Last_BPM_Press < Seconds (2) then
-                           Sequencer.Set_Beat_Period (Now - Last_BPM_Press);
-                        end if;
-                        Last_BPM_Press := Now;
+--                       when  BPM_Vol =>
+--                          --  Tap tempo
+--                          if Now - Last_BPM_Press < Seconds (2) then
+--                             Sequencer.Set_Beat_Period (Now - Last_BPM_Press);
+--                          end if;
+--                          Last_BPM_Press := Now;
                      when FX =>
                         --  Switch to FX mode
                         Current_Input_Mode := FX_Select;
@@ -92,14 +92,15 @@ package body WNM.UI is
                         null;
                      when B9 .. B16 | B2 .. B3 | B5 .. B7 =>
                         --  Play note...
-                        Test_I2S.Set_Current_Note (B);
+                        null;
+--                          Test_I2S.Set_Current_Note (B);
                      when others => null;
                   end case;
                when On_Long_Press =>
                   case B is
-                     when BPM_Vol =>
-                        --  Switch to volume select mode
-                        Current_Input_Mode := Volume_Select;
+--                       when BPM_Vol =>
+--                          --  Switch to volume select mode
+--                          Current_Input_Mode := Volume_Select;
                      when Rec =>
                         --  Switch to squence edition mode
                         Current_Input_Mode := Sequence_Edit;
@@ -120,8 +121,8 @@ package body WNM.UI is
          when Volume_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Set_Volume (B);
-            elsif B = BPM_Vol and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
+--              elsif B = BPM_Vol and then Evt = On_Release then
+--                 Current_Input_Mode := Default_Input_Mode;
             end if;
 
          when FX_Select =>
@@ -152,7 +153,7 @@ package body WNM.UI is
       Turn_Off (Chan_D);
       Turn_Off (Chan_E);
       Turn_On (To_Button (Chan));
-      Test_I2S.Set_Current_Channel (Chan);
+--        Test_I2S.Set_Current_Channel (Chan);
       Current_Chan := Chan;
    end Select_Channel;
 
@@ -171,13 +172,13 @@ package body WNM.UI is
 
    procedure Set_FX (B : Buttons) is
    begin
-      if B = B1 then
-         if FX_Is_On (B) then
-            Test_I2S.Disable_FX;
-         else
-            Test_I2S.Enable_FX;
-         end if;
-      end if;
+--        if B = B1 then
+--           if FX_Is_On (B) then
+--              Test_I2S.Disable_FX;
+--           else
+--              Test_I2S.Enable_FX;
+--           end if;
+--        end if;
       FX_Is_On (B) := not FX_Is_On (B);
    end Set_FX;
 
@@ -211,25 +212,32 @@ package body WNM.UI is
          Pt.Configure_IO (Config);
       end loop;
 
+      Enable_Clock (Wakeup);
+      Config.Mode := Mode_Out;
+      Config.Output_Type := Push_Pull;
+      Config.Resistors := Floating;
+      Wakeup.Configure_IO (Config);
+      Wakeup.Clear;
+
       -- LEDs --
 
       Config.Mode := Mode_Out;
       Config.Output_Type := Push_Pull;
-      Config.Resistors := Pull_Up;
+      Config.Resistors := Floating;
 
       for Pt of Row_To_Point loop
-         Enable_Clock (Pt);
-         Pt.Configure_IO (Config);
-         Pt.Clear;
-      end loop;
-
-      for Pt of Col_To_Point loop
          Enable_Clock (Pt);
          Pt.Configure_IO (Config);
          Pt.Set;
       end loop;
 
-      for B in Buttons loop
+      for Pt of Col_To_Point loop
+         Enable_Clock (Pt);
+         Pt.Configure_IO (Config);
+         Pt.Clear;
+      end loop;
+
+      for B in LEDs loop
          Turn_Off (B);
       end loop;
 
@@ -280,8 +288,8 @@ package body WNM.UI is
    procedure Turn_On (LED_Addr : LED_Address)
    is
    begin
-      Row_To_Point (LED_Addr.Row).Set;
-      Col_To_Point (LED_Addr.Col).Clear;
+      Row_To_Point (LED_Addr.Row).Clear;
+      Col_To_Point (LED_Addr.Col).Set;
    end Turn_On;
 
    --------------
@@ -291,8 +299,8 @@ package body WNM.UI is
    procedure Turn_Off (LED_Addr : LED_Address)
    is
    begin
-      Row_To_Point (LED_Addr.Row).Clear;
-      Col_To_Point (LED_Addr.Col).Set;
+      Row_To_Point (LED_Addr.Row).Set;
+      Col_To_Point (LED_Addr.Col).Clear;
    end Turn_Off;
 
    -------------
@@ -390,12 +398,12 @@ package body WNM.UI is
 
          case Sequencer.Step is
             when 1 | 5 | 9 | 13 =>
-               Turn_On (BPM_Vol);
+--                 Turn_On (BPM_Vol);
                if Sequencer.State = Rec or else Sequencer.State = Play_And_Rec then
                   Turn_On (Rec);
                end if;
             when others =>
-               Turn_Off (BPM_Vol);
+--                 Turn_Off (BPM_Vol);
                if Sequencer.State = Rec then
                   Turn_Off (Rec);
                end if;
@@ -460,10 +468,10 @@ package body WNM.UI is
 
             Turn_Off (Key_To_LED (Current_LED));
 
-            if Current_LED = Buttons'Last then
-               Current_LED := Buttons'First;
+            if Current_LED = LEDs'Last then
+               Current_LED := LEDs'First;
             else
-               Current_LED := Buttons'Succ (Current_LED);
+               Current_LED := LEDs'Succ (Current_LED);
             end if;
 
             if LED_State (Current_LED) then
