@@ -19,16 +19,19 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-limited with WNM;
+with WNM.I2C;
+with HAL.Audio;
 
-package Test_I2S is
-   procedure Init;
-   procedure Play;
+package WNM.Audio_DAC is
 
-   procedure Play_ASL;
+   function Initialized return Boolean;
 
-   procedure Set_Current_Note (B : WNM.Buttons);
-   procedure Set_Current_Channel (Chan : WNM.Channels);
-   procedure Enable_FX;
-   procedure Disable_FX;
-end Test_I2S;
+   procedure Initialize
+     with Pre  => WNM.I2C.Initialized,
+          Post => Initialized;
+
+   type Audio_Buffer_Access is access all HAL.Audio.Audio_Buffer;
+
+   procedure Give_Buffer (Buf : not null Audio_Buffer_Access);
+
+end WNM.Audio_DAC;
