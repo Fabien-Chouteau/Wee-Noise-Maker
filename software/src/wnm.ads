@@ -49,14 +49,16 @@ package WNM is
    Max_Events_Per_Step : constant := 4;
 
    UI_Task_Period   : constant Time_Span := Milliseconds (10);
-   UI_Task_Priority : constant System.Priority := System.Default_Priority;
+   UI_Task_Priority : constant System.Priority := System.Default_Priority + 1;
 
    LED_Task_Period   : constant Time_Span := Microseconds (1000);
    LED_Task_Priority : constant System.Priority := System.Default_Priority;
 
    Sequencer_Task_Priority : constant System.Priority := System.Default_Priority;
 
-   Synth_Task_Priority : constant System.Priority := System.Default_Priority + 1;
+   Synth_Task_Priority : constant System.Priority := System.Default_Priority + 2;
+   DAC_Task_Priority : constant System.Priority := System.Default_Priority + 3;
+
    Long_Press_Time_Span : constant Time_Span := Milliseconds (300);
    --  How much 2time users have to press a button to get the alternative
    --  function.
