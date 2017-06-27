@@ -124,7 +124,7 @@ package body WNM.Screen is
                                           Stop      => (89, 10),
                                           Thickness => 1);
 
-      for I in 1 .. 15 loop
+      for I in 1 .. 5 loop
          Copy_Bitmap ((case (I mod 4) is
                          when 0 => wnm_logo_wave_1.Data,
                          when 1 => wnm_logo_wave_2.Data,
@@ -141,12 +141,16 @@ package body WNM.Screen is
    ------------
 
    procedure Update is
-      Buffer : HAL.Bitmap.Any_Bitmap_Buffer renames Screen.Hidden_Buffer (1);
    begin
-      Buffer.Set_Source (Black);
-      Buffer.Fill;
       Screen.Update_Layers;
    end Update;
+
+   ------------
+   -- Buffer --
+   ------------
+
+   function Buffer return not null HAL.Bitmap.Any_Bitmap_Buffer
+   is (Screen.Hidden_Buffer (1));
 
    ----------
    -- Text --

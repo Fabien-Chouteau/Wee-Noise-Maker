@@ -27,6 +27,8 @@ package WNM.Screen is
 
    procedure Update;
 
+   function Buffer return not null HAL.Bitmap.Any_Bitmap_Buffer;
+
    procedure Sleep;
    procedure Wakeup;
 
