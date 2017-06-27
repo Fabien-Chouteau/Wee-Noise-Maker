@@ -189,4 +189,78 @@ package body console is
       end loop;
 
    end Copy_Bitmap;
+
+
+   ----------------
+   -- Set_Source --
+   ----------------
+
+   procedure Set_Source (Buffer : in out Bitmap_Buffer;
+                         ARGB   : Bitmap_Color)
+   is
+   begin
+      Buffer.Native_Color := Bitmap_Color_Conversion.Bitmap_Color_To_Word
+        (Buffer.Color_Mode, ARGB);
+   end Set_Source;
+
+   ----------------
+   -- Set_Source --
+   ----------------
+
+   procedure Set_Source (Buffer : in out Bitmap_Buffer;
+                         Native : UInt32)
+   is
+   begin
+      Buffer.Native_Color := Native;
+   end Set_Source;
+
+   ------------
+   -- Source --
+   ------------
+
+   function Source
+     (Buffer : Bitmap_Buffer)
+      return Bitmap_Color
+   is
+   begin
+      return Bitmap_Color_Conversion.Word_To_Bitmap_Color (Buffer.Color_Mode, Buffer.Native_Color);
+   end Source;
+
+   ------------
+   -- Source --
+   ------------
+
+   function Source
+     (Buffer : Bitmap_Buffer)
+      return UInt32
+   is
+   begin
+      return Buffer.Native_Color;
+   end Source;
+
+   ---------------------
+   -- Set_Pixel_Blend --
+   ---------------------
+
+   procedure Set_Pixel_Blend
+     (Buffer : in out Bitmap_Buffer;
+      Pt     : Point)
+   is
+   begin
+      raise Program_Error;
+   end Set_Pixel_Blend;
+
+   ---------------
+   -- Set_Pixel --
+   ---------------
+
+   overriding
+   procedure Set_Pixel
+     (Buffer  : in out Bitmap_Buffer;
+      Pt      : HAL.Bitmap.Point)
+   is
+   begin
+      Buffer.Set_Pixel (Pt, Buffer.Native_Color);
+   end Set_Pixel;
+
 end Console;

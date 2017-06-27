@@ -21,12 +21,12 @@
 
 --  This package provide emulation of a monochrome screen on a text console.
 
-with HAL.Bitmap;
+with HAL.Bitmap; use HAL.Bitmap;
 with Giza.Bitmaps.Indexed_1bit;
 
 private with Soft_Drawing_Bitmap;
 with System; use System;
-with HAL;
+with HAL;    use HAL;
 
 package Console is
 
@@ -44,8 +44,26 @@ private
    type Bitmap_Buffer is new Soft_Drawing_Bitmap.Soft_Drawing_Bitmap_Buffer
      with record
       Screen : Screen_Array := (others => (others => False));
+      Native_Color : UInt32;
    end record;
 
+   overriding
+   procedure Set_Source (Buffer : in out Bitmap_Buffer;
+                         ARGB   : Bitmap_Color);
+
+   overriding
+   procedure Set_Source (Buffer : in out Bitmap_Buffer;
+                         Native : UInt32);
+
+   overriding
+   function Source
+     (Buffer : Bitmap_Buffer)
+      return Bitmap_Color;
+
+   overriding
+   function Source
+     (Buffer : Bitmap_Buffer)
+      return UInt32;
 
    function Width (Buffer : Bitmap_Buffer) return Natural is (96);
 
@@ -62,6 +80,11 @@ private
    function Memory_Address (Buffer : Bitmap_Buffer) return System.Address is
      (System.Null_Address);
 
+   overriding
+   procedure Set_Pixel
+     (Buffer  : in out Bitmap_Buffer;
+      Pt      : HAL.Bitmap.Point);
+
    procedure Set_Pixel
      (Buffer  : in out Bitmap_Buffer;
       Pt      : HAL.Bitmap.Point;
@@ -76,6 +99,10 @@ private
      (Buffer : in out Bitmap_Buffer;
       Pt     : HAL.Bitmap.Point;
       Value  : HAL.Bitmap.Bitmap_Color);
+
+   procedure Set_Pixel_Blend
+     (Buffer : in out Bitmap_Buffer;
+      Pt     : Point);
 
    function Pixel
      (Buffer : Bitmap_Buffer;
