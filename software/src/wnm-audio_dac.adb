@@ -19,22 +19,21 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with STM32.Device;   use STM32.Device;
-with STM32.GPIO;     use STM32.GPIO;
-with HAL;            use HAL;
-with STM32.I2S;      use STM32.I2S;
-with STM32.I2S.DMA;  use STM32.I2S.DMA;
-with STM32.Timers;   use STM32.Timers;
-with STM32.PWM;      use STM32.PWM;
-with SGTL5000;       use SGTL5000;
-with Ravenscar_Time; use Ravenscar_Time;
-with HAL.Audio;      use HAL.Audio;
-with HAL.I2C;        use HAL.I2C;
-with STM32.DMA;      use STM32.DMA;
-with STM32.DMA.Interrupts;
-with Ada.Synchronous_Task_Control;
+with STM32.Device;                 use STM32.Device;
+with STM32.GPIO;                   use STM32.GPIO;
+with HAL;                          use HAL;
+with STM32.I2S;                    use STM32.I2S;
+with STM32.Timers;                 use STM32.Timers;
+with STM32.PWM;                    use STM32.PWM;
+with SGTL5000;                     use SGTL5000;
+with Ravenscar_Time;               use Ravenscar_Time;
+with HAL.Audio;                    use HAL.Audio;
+with STM32.DMA;                    use STM32.DMA;
+with Double_Buffers_Interrupts;    use Double_Buffers_Interrupts;
 
-with Semihosting;
+with Ada.Synchronous_Task_Control;
+with Ada.Interrupts.Names;
+with Sound_Gen_Interfaces;         use Sound_Gen_Interfaces;
 
 package body WNM.Audio_DAC is
 
@@ -51,7 +50,7 @@ package body WNM.Audio_DAC is
 
    Audio_I2S_Points : constant GPIO_Points (1 .. 4) := (PA15, PB3, PB5, PC7);
    Audio_I2S_Points_Ext : GPIO_Point renames PB4;
-   Audio_I2S : I2S_Port_DMA renames I2S_3_DMA;
+   Audio_I2S : I2S_Port renames I2S_3;
 
    ---------------
    -- Audio DMA --
@@ -60,7 +59,9 @@ package body WNM.Audio_DAC is
    Audio_TX_DMA        : STM32.DMA.DMA_Controller renames DMA_1;
    Audio_TX_DMA_Chan   : STM32.DMA.DMA_Channel_Selector renames STM32.DMA.Channel_0;
    Audio_TX_DMA_Stream : STM32.DMA.DMA_Stream_Selector renames STM32.DMA.Stream_5;
-   Audio_TX_DMA_Int    : STM32.DMA.Interrupts.DMA_Interrupt_Controller renames DMA1_Stream5;
+   Audio_TX_DMA_Int    : DMA_Interrupt_Controller (Audio_TX_DMA'Access,
+                                                   Audio_TX_DMA_Stream,
+                                                   Ada.Interrupts.Names.DMA1_Stream5_Interrupt);
 
    ----------
    -- MCLK --
@@ -91,33 +92,6 @@ package body WNM.Audio_DAC is
    procedure Initialize_I2S;
    procedure Initialize_MCLK with Unreferenced;
 
-   --------------
-   -- Prot_Buf --
-   --------------
-
-   protected body  Prot_Buf is
-
-      ---------
-      -- Put --
-      ---------
-
-      entry Put (Buf : not null Audio_Buffer_Access) when Empty is
-      begin
-         Saved_Buf := Buf;
-         Empty := False;
-      end Put;
-
-      ----------
-      -- Take --
-      ----------
-
-      procedure Take (Buf : out Audio_Buffer_Access) is
-      begin
-         Buf := Saved_Buf;
-         Empty := True;
-      end Take;
-   end Prot_Buf;
-
    --------------------
    -- Initialize_I2S --
    --------------------
@@ -143,7 +117,7 @@ package body WNM.Audio_DAC is
                         Output_Type => Push_Pull,
                         Resistors   => Floating));
 
-         Configure_Alternate_Function (Audio_I2S_Points, STM32.Device.GPIO_AF_SPI3_6);
+         Configure_Alternate_Function (Audio_I2S_Points, STM32.Device.GPIO_AF_I2S3_6);
 
          Enable_Clock (Audio_I2S_Points_Ext);
 
@@ -162,15 +136,23 @@ package body WNM.Audio_DAC is
    begin
       Initialize_GPIO;
 
-      Set_PLLI2S_Factors (Pll_N => 258,
-                          Pll_R => 3);
+      --  | Sample Freq | PLL N | PLL R |
+      --  |     8000    |  256  |   5   |
+      --  |    16000    |  213  |   2   |
+      --  |    32000    |  213  |   2   |
+      --  |    48000    |  258  |   3   |
+      --  |    96000    |  344  |   2   |
+      --  |    22050    |  429  |   4   |
+      --  |    44100    |  271  |   2   |
+      Set_PLLI2S_Factors (Pll_N => 213,
+                          Pll_R => 2);
       Enable_PLLI2S;
 
       Enable_Clock (Audio_I2S);
 
       Conf.Mode                     := Master_Transmit;
       Conf.Standard                 := I2S_Philips_Standard;
-      Conf.Clock_Polarity           := Steady_State_High;
+      Conf.Clock_Polarity           := Steady_State_Low;
       Conf.Data_Length              := Data_16bits;
       Conf.Chan_Length              := Channel_16bits;
       Conf.Master_Clock_Out_Enabled := True;
@@ -178,7 +160,7 @@ package body WNM.Audio_DAC is
       Conf.Receive_DMA_Enabled      := False;
 
       Audio_I2S.Configure (Conf);
-      Audio_I2S.Set_Frequency (Audio_Freq_48kHz);
+      Audio_I2S.Set_Frequency (Audio_Freq_32kHz);
       Audio_I2S.Enable;
 
    end Initialize_I2S;
@@ -199,15 +181,13 @@ package body WNM.Audio_DAC is
       Config.Increment_Memory_Address := True;
       Config.Peripheral_Data_Format := HalfWords;
       Config.Memory_Data_Format := HalfWords;
-      Config.Operation_Mode := Normal_Mode;
+      Config.Operation_Mode := Circular_Mode;
       Config.Priority := Priority_High;
-      Config.FIFO_Enabled := True;
+      Config.FIFO_Enabled := False;
       Config.FIFO_Threshold := FIFO_Threshold_Full_Configuration;
-      Config.Memory_Burst_Size := Memory_Burst_Inc4;
+      Config.Memory_Burst_Size := Memory_Burst_Single;
       Config.Peripheral_Burst_Size := Peripheral_Burst_Single;
       Configure (Audio_TX_DMA, Audio_TX_DMA_Stream, Config);
-
-      Audio_I2S.Set_TX_DMA_Handler (Audio_TX_DMA_Int'Access);
    end Initialize_DMA;
 
    ---------------------
@@ -245,29 +225,6 @@ package body WNM.Audio_DAC is
    ----------------
 
    procedure Initialize is
-      procedure Probe;
-
-      -----------
-      -- Probe --
-      -----------
-
-      procedure Probe is
-         Status : HAL.I2C.I2C_Status;
-      begin
-         Semihosting.Log_Line ("Probing...");
-         for Addr in UInt10 range 0 .. 255 loop
-            WNM.I2C.Port.Master_Transmit (Addr    => Addr,
-                                          Data    => (0 => 0),
-                                          Status  => Status,
-                                          Timeout => 10_000);
-            if Status = HAL.I2C.Ok then
-               Semihosting.Log_Line ("Device at :" & Addr'Img);
-            end if;
-
-            delay until Clock + Milliseconds (1);
-         end loop;
-      end Probe;
-
    begin
       Initialize_DMA;
       --  Initialize_MCLK;
@@ -277,15 +234,11 @@ package body WNM.Audio_DAC is
 
       delay until Clock + Milliseconds (500);
 
-      Probe;
-
       if not DAC_Dev.Valid_Id then
          raise Program_Error with "Cannot get DAC chip ID";
       end if;
 
-      DAC_Dev.Set_Analog_Power (DAC_Mono                  => True,
-                                ADC_Mono                  => True,
-                                Reftop_PowerUp            => True);
+      DAC_Dev.Set_Analog_Power (Reftop_PowerUp => True);
 
       DAC_Dev.Set_Linereg_Control (Charge_Pump_Src_Override => True,
                                    Charge_Pump_Src          => VDDIO,
@@ -301,9 +254,7 @@ package body WNM.Audio_DAC is
                                    Mode_LR   => 1,
                                    Mode_CM   => 2);
 
-      DAC_Dev.Set_Analog_Power (DAC_Mono                  => True,
-                                VAG_PowerUp               => True,
-                                ADC_Mono                  => True,
+      DAC_Dev.Set_Analog_Power (VAG_PowerUp               => True,
                                 Reftop_PowerUp            => True,
                                 Headphone_PowerUp         => True,
                                 DAC_PowerUp               => True,
@@ -319,16 +270,17 @@ package body WNM.Audio_DAC is
       DAC_Dev.Time.Delay_Microseconds (400);
 
       DAC_Dev.Set_Clock_Control (Rate => SYS_FS,
-                                 FS   => SYS_FS_44kHz,
+                                 FS   => SYS_FS_32kHz,
                                  MCLK => MCLK_256FS);
 
-      DAC_Dev.Set_I2S_Control (SCLKFREQ    => SCLKFREQ_64FS,
+      DAC_Dev.Set_I2S_Control (SCLKFREQ    => SCLKFREQ_32FS,
                                Invert_SCLK => False,
                                Master_Mode => False,
                                Data_Len    => Data_16b,
-                               I2S         => I2S_Left_Justified,
-                               LR_Align    => True,
+                               I2S         => I2S_Or_Left_Justified,
+                               LR_Align    => False,
                                LR_Polarity => False);
+
 
 
       --  DAC Routing
@@ -339,6 +291,11 @@ package body WNM.Audio_DAC is
       DAC_Dev.Select_ADC_Source (Line_In, True);
       DAC_Dev.Select_I2S_Out_Source (ADC);
 
+      --  +0db
+      DAC_Dev.Set_DAC_Volume (16#3C#, 16#3C#);
+
+      DAC_Dev.Set_Headphones_Volume (16#70#, 16#70#);
+
       --  Unmute
       DAC_Dev.Mute_DAC (False);
       DAC_Dev.Mute_Headphones (False);
@@ -346,11 +303,6 @@ package body WNM.Audio_DAC is
 
       --  Mute
       DAC_Dev.Mute_Line_Out (True);
-
-      DAC_Dev.Set_Headphones_Volume (16#70#, 16#70#);
-
-      --  +0db
-      DAC_Dev.Set_DAC_Volume (16#3C#, 16#3C#);
 
       Init_Done := True;
    end Initialize;
@@ -365,25 +317,71 @@ package body WNM.Audio_DAC is
       Prot_Buf.Put (Buf);
    end Give_Buffer;
 
+   --------------
+   -- Prot_Buf --
+   --------------
+
+   protected body  Prot_Buf is
+
+      ---------
+      -- Put --
+      ---------
+
+      entry Put (Buf : not null Audio_Buffer_Access) when Empty is
+      begin
+         Saved_Buf := Buf;
+         Empty := False;
+      end Put;
+
+      ----------
+      -- Take --
+      ----------
+
+      procedure Take (Buf : out Audio_Buffer_Access) is
+      begin
+         Buf       := Saved_Buf;
+         Saved_Buf := null;
+         Empty := True;
+      end Take;
+   end Prot_Buf;
+
    task I2S_Stream is
       pragma Priority (DAC_Task_Priority);
    end I2S_Stream;
 
    task body I2S_Stream is
-      Audio_Data : constant Audio_Buffer (1 .. 1024) := (others => 0);
-      Buf_Acc    : Audio_Buffer_Access;
+      Silence : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Generator_Buffer_Length * 2);
+      Buf_Acc : Audio_Buffer_Access;
    begin
       Ada.Synchronous_Task_Control.Suspend_Until_True (Task_Start);
 
+      Silence.all := (others => 0);
+
+      Audio_TX_DMA_Int.Start (Audio_I2S.Data_Register_Address,
+                              Silence'Address,
+                              Silence'Length);
+
       loop
          Prot_Buf.Take (Buf_Acc);
-
          if Buf_Acc = null then
-            Audio_I2S.Transmit (Audio_Data);
-         else
-            Audio_I2S.Transmit (Buf_Acc.all);
+            Buf_Acc := Silence;
          end if;
+
+         Audio_TX_DMA_Int.Set_Next_Buffer (Buf_Acc.all'Address,
+                                           Buf_Acc.all'Length);
       end loop;
    end I2S_Stream;
+
+   ----------------
+   -- Set_Volume --
+   ----------------
+
+   procedure Set_Volume (Volume : DAC_Volume) is
+      HP_Vol : HP_Volume;
+
+   begin
+      HP_Vol := HP_Volume'Last - UInt7 (Volume);
+      DAC_Dev.Set_Headphones_Volume (HP_Vol, HP_Vol);
+   end Set_Volume;
 
 end WNM.Audio_DAC;

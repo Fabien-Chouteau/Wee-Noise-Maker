@@ -34,4 +34,7 @@ package WNM.Audio_DAC is
 
    procedure Give_Buffer (Buf : not null Audio_Buffer_Access);
 
+   type DAC_Volume is range 0 .. 100;
+   procedure Set_Volume (Volume : DAC_Volume);
+
 end WNM.Audio_DAC;
