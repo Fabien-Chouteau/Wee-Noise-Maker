@@ -2,6 +2,26 @@
  
 # Blog
 
+## 03: Standalone board?
+
+For the second version of the board, my first intent was to do another STM32F4
+DISCO daughter board. But then I thought, why not design a standalone board?
+
+Routing and soldering a LQFN100 package seems quite a challenge for me because
+I never designed such a complex board and I basically didn't have any
+experience with surface mount components. There's also a lot more
+components: power supply, audio DAC, decoupling, oscillator, etc.
+
+But who doesn't like a good challenge? So I decided to do the standalone board
+and I also to add a battery charging circuit, an SD card and a small OLED
+screen for good measure :)
+
+For the audio DAC, I tried to find a component with a friendly package that
+doesn't require hot air soldering (like TSOP, LQFN). I found a couple
+of those but they don't have headphone amplifier or input ADC so In the
+end I went for the SGTL5000 (QFN16), also because it's used on the
+Teensy audio board so I have a reference design to start from.
+
 ## 02: Switching to Kicad
 
 I designed 4 PCBs before this project, two iterations of a guitar amplifier and
