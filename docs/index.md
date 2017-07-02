@@ -2,6 +2,71 @@
  
 # Blog
 
+## 04: From the first board to Wee Noise Maker Mk-I rev-C
+
+### Wee Noise Maker Discovery rev-A
+
+As I said in the first post, I rushed to produce a first PCB to try 
+my new idea as fast as possible. The first board was just a matrix 
+of buttons and LED, it worked OK and gave me the motivation to continue
+this project.
+
+### Wee Noise Maker Mk-I rev-A
+
+For the second board - named Wee Noise Make Mk-I - I decided to make 
+a stand alone project with the MCU, audio codec, OLED screen, power 
+supply, battery charging, SD card, etc..
+
+When the Mk-I rev-A PCB arrived from SeeedStudio, the first thing I
+noticed is that I completely screwed up two footprints, the encoders
+and the voltage regulator… To be honest this is really unacceptable.
+I should always print the PCB to scale on a piece of paper and check
+the footprints before sending the design for production. The encoders
+I could still plug them in by bending the pins but the voltage 
+regulator was completely off (TSOP vs HTSOP).
+
+Anyway, I started by soldering my first LQFP-100 package the STM32F4 - 
+it is not as bad as it seems - and all the passives around it, then 
+I tried to program and run it. It worked! That was great. The battery 
+charging and OLED screen were also working as expected.
+
+The last main component to solder was the SGTL5000 audio DAC, a QFN package.
+I watched a few tutorial to learn how to solder this kind of package but it
+seemed difficult so I wasn’t very confident.
+
+Once it was soldered, I tried to make the MCU talk with the DAC over I2C but
+got no answer. At some point I realized that my circuit was really bad. A dumb
+error again, this time with decoupling capacitors… This was the second major
+failure on this board, time to make a new revision.
+
+### Wee Noise Maker Mk-I rev-B
+
+For rev-B I got all the footprints right \o/ But the DAC was still silent :(
+
+After a few hours debugging, inspecting the schematic and reading the 
+documentation, I realized that one of the three power supply pins has to be 
+at 1.8V (vs 3.3V for the others), it meant I had to add an extra voltage 
+regulator. Let’s go for rev-C...
+
+### Wee Noise Maker Mk-I rev-C
+
+I received the rev-C board early June and soldered all the components right
+away. Once again everything was working except the audio DAC. The chip wasn’t
+responding to I2C messages.
+
+This time the error was not really in the hardware design. I found in the 
+documentation that the SGTL5000 needs an external clock to start working. 
+This external clock is actually the master clock (MCLK) of the I2S protocol, 
+so I have to send I2S data before being able to talk with the DAC. Once I 
+figured this, it took no time to have Wee Noise Maker produce its first sounds!
+
+[![](http://img.youtube.com/vi/8gJqkfrgtxo/0.jpg)](
+http://www.youtube.com/watch?v=8gJqkfrgtxo "Wee Noise Maker: First sound ")
+
+Now that I can play sound, there’s still two features I need to check: sound
+input and SD card. Once I validate the hardware for those to I will start to
+focus on the software. 
+
 ## 03: Standalone board?
 
 For the second version of the board, my first intent was to do another STM32F4
