@@ -27,13 +27,14 @@ package body Double_Buffers_Interrupts is
 
    protected body DMA_Interrupt_Controller is
 
-      -----------
-      -- Start --
-      -----------
+      -------------------------
+      -- Start_Mem_To_Periph --
+      -------------------------
 
-      procedure Start
+      procedure Start_Mem_To_Periph
         (Destination : Address;
-         Source      : Address;
+         Source_0    : Address;
+         Source_1    : Address;
          Data_Count  : UInt16)
       is
       begin
@@ -41,7 +42,7 @@ package body Double_Buffers_Interrupts is
          Configure_Data_Flow
            (Controller.all,
             Stream,
-            Source      => Source,
+            Source      => Source_0,
             Destination => Destination,
             Data_Count  => Data_Count);
 
@@ -52,58 +53,82 @@ package body Double_Buffers_Interrupts is
 
          Configure_Double_Buffered_Mode (This              => Controller.all,
                                          Stream            => Stream,
-                                         Buffer_0_Value    => Source,
-                                         Buffer_1_Value    => Source,
+                                         Buffer_0_Value    => Source_0,
+                                         Buffer_1_Value    => Source_1,
                                          First_Buffer_Used => Memory_Buffer_0);
 
-         Not_Fully_Loaded := True;
-         In_Use := Buffer_0;
-         State (Memory_Buffer_0) := Loaded;
-         State (Memory_Buffer_1) := Empty;
+         Buffer_0 := Source_0;
+         Buffer_1 := Source_1;
+
+         Enable_Double_Buffered_Mode (Controller.all, Stream);
+
+         Clear_All_Status (Controller.all, Stream);
+
+         Enable (Controller.all, Stream);
+      end Start_Mem_To_Periph;
+
+      -------------------------
+      -- Start_Periph_To_Mem --
+      -------------------------
+
+      procedure Start_Periph_To_Mem
+        (Source        : Address;
+         Destination_0 : Address;
+         Destination_1 : Address;
+         Data_Count    : UInt16)
+      is
+      begin
+
+         Configure_Data_Flow
+           (Controller.all,
+            Stream,
+            Source      => Source,
+            Destination => Destination_0,
+            Data_Count  => Data_Count);
+
+         for Selected_Interrupt in DMA_Interrupt loop
+            Enable_Interrupt (Controller.all, Stream, Selected_Interrupt);
+         end loop;
+
+
+         Configure_Double_Buffered_Mode (This              => Controller.all,
+                                         Stream            => Stream,
+                                         Buffer_0_Value    => Destination_0,
+                                         Buffer_1_Value    => Destination_1,
+                                         First_Buffer_Used => Memory_Buffer_0);
+
+         Buffer_0 := Destination_0;
+         Buffer_1 := Destination_1;
 
          Clear_All_Status (Controller.all, Stream);
 
          Enable_Double_Buffered_Mode (Controller.all, Stream);
 
          Enable (Controller.all, Stream);
-      end Start;
+      end Start_Periph_To_Mem;
 
-      ---------------------
-      -- Set_Next_Buffer --
-      ---------------------
+      ------------------------
+      -- Wait_For_Interrupt --
+      ------------------------
 
-      entry Set_Next_Buffer
-        (Source      : Address;
-         Data_Count  : UInt16)
-         when Not_Fully_Loaded
-      is
+      entry Wait_For_Interrupt when Interrupt_Triggered is
       begin
-         if Data_Count /= Current_NDT (Controller.all, Stream) then
-            null;
-         end if;
+         Interrupt_Triggered := False;
+      end Wait_For_Interrupt;
 
-         case In_Use is
-            when None =>
-               raise Program_Error with "TODO...";
-            when Buffer_0 =>
-               Set_Memory_Buffer (Controller.all,
-                                  Stream,
-                                  Memory_Buffer_1,
-                                  Source);
-               State (Memory_Buffer_1) := Loaded;
-            when Buffer_1 =>
-               Set_Memory_Buffer (Controller.all,
-                                  Stream,
-                                  Memory_Buffer_0,
-                                  Source);
-               State (Memory_Buffer_0) := Loaded;
+      ---------------------
+      -- Not_In_Transfer --
+      ---------------------
+
+      function Not_In_Transfer return Address is
+      begin
+         case Current_Memory_Buffer (Controller.all, Stream) is
+            when Memory_Buffer_0 =>
+               return Buffer_1;
+            when Memory_Buffer_1 =>
+               return Buffer_0;
          end case;
-
-         Not_Fully_Loaded :=
-           State (Memory_Buffer_0) = Empty
-           or else
-           State (Memory_Buffer_1) = Empty;
-      end Set_Next_Buffer;
+      end Not_In_Transfer;
 
       -----------------------
       -- Interrupt_Handler --
@@ -115,27 +140,16 @@ package body Double_Buffers_Interrupts is
             if Status (Controller.all, Stream, Flag) then
                case Flag is
                   when FIFO_Error_Indicated =>
-                     Last_Status := DMA_FIFO_Error;
+                     --                       raise Program_Error with "FIFO_Error_Indicated";
+                     null;
                   when Direct_Mode_Error_Indicated =>
-                     Last_Status := DMA_Direct_Mode_Error;
+                     raise Program_Error with "Direct_Mode_Error";
                   when Transfer_Error_Indicated =>
-                     Last_Status := DMA_Transfer_Error;
+                     raise Program_Error with "Transfer_Error";
                   when Half_Transfer_Complete_Indicated =>
                      null;
                   when Transfer_Complete_Indicated =>
-                     Not_Fully_Loaded := True;
-
-                     case In_Use is
-                     when None =>
-                        raise Program_Error with "Whut?!?";
-                     when Buffer_0 =>
-                        In_Use := Buffer_1;
-                        State (Memory_Buffer_0) := Empty;
-
-                     when Buffer_1 =>
-                        In_Use := Buffer_0;
-                        State (Memory_Buffer_1) := Empty;
-                     end case;
+                     Interrupt_Triggered := True;
                end case;
                Clear_Status (Controller.all, Stream, Flag);
             end if;

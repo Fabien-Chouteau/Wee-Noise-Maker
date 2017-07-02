@@ -20,7 +20,6 @@
 -------------------------------------------------------------------------------
 
 with WNM.I2C;
-with HAL.Audio;
 
 package WNM.Audio_DAC is
 
@@ -29,10 +28,6 @@ package WNM.Audio_DAC is
    procedure Initialize
      with Pre  => WNM.I2C.Initialized,
           Post => Initialized;
-
-   type Audio_Buffer_Access is access all HAL.Audio.Audio_Buffer;
-
-   procedure Give_Buffer (Buf : not null Audio_Buffer_Access);
 
    type DAC_Volume is range 0 .. 100;
    procedure Set_Volume (Volume : DAC_Volume);

@@ -26,10 +26,6 @@ with HAL;            use HAL;
 
 package Double_Buffers_Interrupts is
 
-   type Buffer_In_Use is (None, Buffer_0, Buffer_1);
-   type Buffer_State is (Empty, Loaded);
-   type Buffer_State_Array is array (Memory_Buffer_Target) of Buffer_State;
-
    protected type DMA_Interrupt_Controller
      (Controller : not null access DMA_Controller;
       Stream     : DMA_Stream_Selector;
@@ -37,24 +33,29 @@ package Double_Buffers_Interrupts is
    is
       pragma Interrupt_Priority (Any_Priority'Last);
 
-      procedure Start
+      procedure Start_Mem_To_Periph
         (Destination : Address;
-         Source      : Address;
+         Source_0    : Address;
+         Source_1    : Address;
          Data_Count  : UInt16);
 
-      entry Set_Next_Buffer (Source      : Address;
-                             Data_Count  : UInt16);
+      procedure Start_Periph_To_Mem
+        (Source        : Address;
+         Destination_0 : Address;
+         Destination_1 : Address;
+         Data_Count    : UInt16);
 
+      entry Wait_For_Interrupt;
+
+      function Not_In_Transfer return Address;
    private
 
       procedure Interrupt_Handler;
       pragma Attach_Handler (Interrupt_Handler, ID);
 
-      Not_Fully_Loaded : Boolean := True;
-      In_Use           : Buffer_In_Use := None;
-      State            : Buffer_State_Array := (others => Empty);
-
-      Last_Status             : DMA_Error_Code := DMA_No_Error;
+      Interrupt_Triggered : Boolean := False;
+      Buffer_0 : Address := Null_Address;
+      Buffer_1 : Address := Null_Address;
    end DMA_Interrupt_Controller;
 
    type DMA_Interrupt_Controller_Access is access all DMA_Interrupt_Controller;
