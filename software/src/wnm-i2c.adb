@@ -43,7 +43,7 @@ package body WNM.I2C is
 
       Enable_Clock (Points);
 
-      Configure_Alternate_Function (Points, GPIO_AF_4_I2C1);
+      Configure_Alternate_Function (Points, GPIO_AF_I2C1_4);
 
       Configure_IO (Points,
                     (Speed       => Speed_High,

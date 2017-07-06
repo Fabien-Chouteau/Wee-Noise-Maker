@@ -44,7 +44,7 @@ private
    Timer_L : Timer renames Timer_2;
    Timer_R : Timer renames Timer_3;
 
-   AF_L : constant STM32.GPIO_Alternate_Function := GPIO_AF_1_TIM2;
-   AF_R : constant STM32.GPIO_Alternate_Function := GPIO_AF_2_TIM3;
+   AF_L : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM2_1;
+   AF_R : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM3_2;
 
 end WNM.Encoders;

@@ -116,12 +116,11 @@ package body WNM.Screen is
       Screen.Turn_On;
 
       Copy_Bitmap (wnm_logo_text.Data, 6, 1);
-      Screen.Hidden_Buffer (1).Draw_Line (Color     => White,
-                                          Start     => (6, 10),
+      Screen.Hidden_Buffer (1).Set_Source (White);
+      Screen.Hidden_Buffer (1).Draw_Line (Start     => (6, 10),
                                           Stop      => (32, 10),
                                           Thickness => 1);
-      Screen.Hidden_Buffer (1).Draw_Line (Color     => White,
-                                          Start     => (63, 10),
+      Screen.Hidden_Buffer (1).Draw_Line (Start     => (63, 10),
                                           Stop      => (89, 10),
                                           Thickness => 1);
 
@@ -144,7 +143,8 @@ package body WNM.Screen is
    procedure Update is
       Buffer : HAL.Bitmap.Any_Bitmap_Buffer renames Screen.Hidden_Buffer (1);
    begin
-      Buffer.Fill (Black);
+      Buffer.Set_Source (Black);
+      Buffer.Fill;
       Screen.Update_Layers;
    end Update;
 
