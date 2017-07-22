@@ -25,7 +25,6 @@
 --  LEDs. Press the current chan to erase the squence.
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
---  with Test_I2S;
 with WNM.Sequencer; use WNM.Sequencer;
 
 package body WNM.UI is
@@ -75,15 +74,9 @@ package body WNM.UI is
                      when Chan_A .. Chan_E =>
                         --  Select current channel
                         Select_Channel (To_Channel (B));
-                     when B1 =>
-                        --  Octave Down...
-                        null;
-                     when B8 =>
-                        --  Octave Up...
-                        null;
-                     when B9 .. B16 | B2 .. B3 | B5 .. B7 =>
-                        --  Play note...
-                        null;
+                     when Keyboard_Buttons =>
+                        --  Play note or octave Up/Down
+                        Sequencer.On_Press (B);
                      when others => null;
                   end case;
                when On_Long_Press =>
@@ -102,9 +95,9 @@ package body WNM.UI is
                   end case;
                when On_Release =>
                   case B is
-                     when B9 .. B16 | B2 .. B3 | B5 .. B7 =>
-                        --  Release note...
-                        null;
+                     when Keyboard_Buttons =>
+                        --  Release note or octave Up/Down
+                        Sequencer.On_Release (B);
                      when others => null;
                   end case;
                when others => null;
@@ -148,7 +141,7 @@ package body WNM.UI is
       Turn_Off (Chan_D);
       Turn_Off (Chan_E);
       Turn_On (To_Button (Chan));
---        Test_I2S.Set_Current_Channel (Chan);
+      Sequencer.Select_Channel (Chan);
       Current_Chan := Chan;
    end Select_Channel;
 
@@ -158,13 +151,6 @@ package body WNM.UI is
 
    procedure Set_FX (B : Buttons) is
    begin
---        if B = B1 then
---           if FX_Is_On (B) then
---              Test_I2S.Disable_FX;
---           else
---              Test_I2S.Enable_FX;
---           end if;
---        end if;
       FX_Is_On (B) := not FX_Is_On (B);
    end Set_FX;
 
@@ -175,6 +161,7 @@ package body WNM.UI is
    procedure Set_Chan_Instrument (B : Buttons) is
    begin
       Current_Instrument (Current_Chan) := B;
+      Sequencer.Set_Instrument (To_Value (B));
    end Set_Chan_Instrument;
 
    -----------
@@ -376,28 +363,24 @@ package body WNM.UI is
             end if;
          end loop;
 
-         if Sequencer.State = Play or else Sequencer.State = Play_And_Rec then
+         if Sequencer.State in Play | Play_And_Rec then
             Turn_On (Play);
          else
             Turn_Off (Play);
          end if;
 
-         case Sequencer.Step is
-            when 1 | 5 | 9 | 13 =>
---                 Turn_On (BPM_Vol);
-               if Sequencer.State = Rec or else Sequencer.State = Play_And_Rec then
-                  Turn_On (Rec);
-               end if;
-            when others =>
---                 Turn_Off (BPM_Vol);
-               if Sequencer.State = Rec then
-                  Turn_Off (Rec);
-               end if;
-         end case;
+         if Sequencer.State = Rec
+           or else
+             (Sequencer.State = Play_And_Rec
+              and then
+              Sequencer.Step in 1 | 5 | 9 | 13)
+         then
+            Turn_On (Rec);
+         else
+            Turn_Off (Rec);
+         end if;
 
          case Current_Input_Mode is
-            when Volume_BPM =>
-               null;
             when FX_Select =>
                Turn_Off (FX);
                --  The FX LED will be on if there's at least one FX enabled
@@ -417,12 +400,30 @@ package body WNM.UI is
                      Turn_Off (B);
                   end if;
                end loop;
-            when Note =>
+            when others =>
                for B in B1 .. B16 loop
                   Turn_Off (B);
                end loop;
-            when Sequence_Edit =>
-               null;
+               if Sequencer.State in Play_And_Rec | Play then
+                  case Sequencer.Step is
+                     when 1 => Turn_On (B1);
+                     when 2 => Turn_On (B2);
+                     when 3 => Turn_On (B3);
+                     when 4 => Turn_On (B4);
+                     when 5 => Turn_On (B5);
+                     when 6 => Turn_On (B6);
+                     when 7 => Turn_On (B7);
+                     when 8 => Turn_On (B8);
+                     when 9 => Turn_On (B9);
+                     when 10 => Turn_On (B10);
+                     when 11 => Turn_On (B11);
+                     when 12 => Turn_On (B12);
+                     when 13 => Turn_On (B13);
+                     when 14 => Turn_On (B14);
+                     when 15 => Turn_On (B15);
+                     when 16 => Turn_On (B16);
+                  end case;
+               end if;
          end case;
       end loop;
    end UI_Task;

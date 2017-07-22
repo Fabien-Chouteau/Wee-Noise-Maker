@@ -20,8 +20,13 @@
 -------------------------------------------------------------------------------
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
+with MIDI;
+with Quick_Synth;
+with WNM.Sequence;                 use WNM.Sequence;
 
 package body WNM.Sequencer is
+
+   use type MIDI.Octaves;
 
    Start_Sequencer_Task : Suspension_Object;
    Sequencer_Task_Period : Time_Span := Seconds (1);
@@ -53,6 +58,25 @@ package body WNM.Sequencer is
                                   when Play_Event => Rec,
                                   when Rec_Event  => Play));
 
+   Octave : MIDI.Octaves := 4;
+
+   function To_Key (B : Keyboard_Buttons; Oct : MIDI.Octaves) return MIDI.MIDI_Key is
+     (case B is
+         when B9  => MIDI.Key (Oct, MIDI.C),
+         when B2  => MIDI.Key (Oct, MIDI.Cs),
+         when B10 => MIDI.Key (Oct, MIDI.D),
+         when B3  => MIDI.Key (Oct, MIDI.Ds),
+         when B11 => MIDI.Key (Oct, MIDI.E),
+         when B12 => MIDI.Key (Oct, MIDI.F),
+         when B5  => MIDI.Key (Oct, MIDI.Fs),
+         when B13 => MIDI.Key (Oct, MIDI.G),
+         when B6  => MIDI.Key (Oct, MIDI.Gs),
+         when B14 => MIDI.Key (Oct, MIDI.A),
+         when B7  => MIDI.Key (Oct, MIDI.As),
+         when B15 => MIDI.Key (Oct, MIDI.B),
+         when B16 => MIDI.Key (Oct + 1, MIDI.C),
+         when others => MIDI.A0);
+
    -----------
    -- State --
    -----------
@@ -74,6 +98,9 @@ package body WNM.Sequencer is
    procedure Play_Pause is
    begin
       Current_Seq_State := Transition (Current_Seq_State, Play_Event);
+      if Current_Seq_State in Play | Play_And_Rec then
+         Current_Step := Sequencer_Steps'First;
+      end if;
    end Play_Pause;
 
    ---------
@@ -90,9 +117,33 @@ package body WNM.Sequencer is
    --------------
 
    procedure On_Press (Button : Keyboard_Buttons) is
-      pragma Unreferenced (Button);
    begin
-      Sequences (Current_Chan).Add ((Int => 10));
+      case Button is
+         when B1 =>
+            if Octave > MIDI.Octaves'First then
+               Octave := Octave - 1;
+            end if;
+         when B8 =>
+            if Octave < MIDI.Octaves'Last - 1 then
+               Octave := Octave + 1;
+            end if;
+         when B4 =>
+            null;
+         when B2 .. B3 | B5 .. B7 | B9 .. B16 =>
+            declare
+               Msg : MIDI.Message (MIDI.Note_On);
+            begin
+               Msg.Channel := 0;
+               Msg.Cmd.Key := To_Key (Button, Octave);
+               Msg.Cmd.Velocity := 16#77#;
+               Quick_Synth.Event (Msg);
+
+               if Current_Seq_State in Play_And_Rec | Rec then
+                  Add (Sequences (Current_Chan), Current_Step, Msg.Cmd);
+               end if;
+            end;
+      end case;
+
    end On_Press;
 
    ----------------
@@ -101,7 +152,28 @@ package body WNM.Sequencer is
 
    procedure On_Release (Button : Keyboard_Buttons) is
    begin
-      raise Program_Error with "Unimplemented procedure On_Release";
+      case Button is
+         when B2 .. B3 | B5 .. B7 | B9 .. B16 =>
+            declare
+               Msg : MIDI.Message (MIDI.Note_Off);
+            begin
+               Msg.Channel := (case Current_Chan is
+                                  when Chan_A => 0,
+                                  when Chan_B => 1,
+                                  when Chan_C => 2,
+                                  when Chan_D => 3,
+                                  when Chan_E => 4);
+               Msg.Cmd.Key := To_Key (Button, Octave);
+               Msg.Cmd.Velocity := 16#77#;
+               Quick_Synth.Event (Msg);
+
+               if Current_Seq_State in Play_And_Rec | Rec then
+                  Add (Sequences (Current_Chan), Current_Step, Msg.Cmd);
+               end if;
+            end;
+         when others =>
+            null;
+      end case;
    end On_Release;
 
    --------------------
@@ -122,14 +194,15 @@ package body WNM.Sequencer is
       Instrument (Current_Chan) := Val;
    end Set_Instrument;
 
-   ---------------------
-   -- Set_Beat_Period --
-   ---------------------
 
-   procedure Set_Beat_Period (Period : Time_Span) is
+   -------------
+   -- Set_BPM --
+   -------------
+
+   procedure Set_BPM (BPM : Positive) is
    begin
-      Sequencer_Task_Period := Period;
-   end Set_Beat_Period;
+      Sequencer_Task_Period := Milliseconds ((60 * 1000) / BPM);
+   end Set_BPM;
 
    -----------
    -- Start --
@@ -157,6 +230,29 @@ package body WNM.Sequencer is
       loop
          Next_Start := Next_Start + Period / Steps_Per_Beat;
          delay until Next_Start;
+
+         if Current_Seq_State in Play | Play_And_Rec then
+            for Chan in Sequences'Range loop
+               for Index in 1 .. Last_Index (Sequences (Chan), Current_Step) loop
+                  declare
+                     Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Chan),
+                                                              Current_Step,
+                                                              Index);
+                     Msg : MIDI.Message (Midi_Cmd.Kind);
+                  begin
+                     Msg.Cmd := Midi_Cmd;
+                     Msg.Channel := (case Chan is
+                                        when Chan_A => 0,
+                                        when Chan_B => 1,
+                                        when Chan_C => 2,
+                                        when Chan_D => 3,
+                                        when Chan_E => 4);
+
+                     Quick_Synth.Event (Msg);
+                  end;
+               end loop;
+            end loop;
+         end if;
 
          if Current_Step /= Sequencer_Steps'Last then
             Current_Step := Current_Step + 1;

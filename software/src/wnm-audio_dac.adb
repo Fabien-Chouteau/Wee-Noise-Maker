@@ -36,7 +36,7 @@ with System;                       use System;
 with Ada.Synchronous_Task_Control;
 with Ada.Interrupts.Names;
 with Sound_Gen_Interfaces;         use Sound_Gen_Interfaces;
---  with Quick_Synth;
+with Quick_Synth;
 
 with WNM.I2C;
 
@@ -183,10 +183,6 @@ package body WNM.Audio_DAC is
       Enable_Clock (Audio_I2S_RX);
 
       Conf.Mode                     := Slave_Receive;
-      Conf.Standard                 := I2S_Philips_Standard;
-      Conf.Clock_Polarity           := Steady_State_Low;
-      Conf.Data_Length              := Data_16bits;
-      Conf.Chan_Length              := Channel_16bits;
       Conf.Master_Clock_Out_Enabled := False;
       Conf.Transmit_DMA_Enabled     := False;
       Conf.Receive_DMA_Enabled      := True;
@@ -217,7 +213,7 @@ package body WNM.Audio_DAC is
       Config.Peripheral_Data_Format := HalfWords;
       Config.Memory_Data_Format := HalfWords;
       Config.Operation_Mode := Circular_Mode;
-      Config.Priority := Priority_High;
+      Config.Priority := Priority_Very_High;
       Config.FIFO_Enabled := False;
       Config.FIFO_Threshold := FIFO_Threshold_Full_Configuration;
       Config.Memory_Burst_Size := Memory_Burst_Single;
@@ -228,9 +224,8 @@ package body WNM.Audio_DAC is
 
       Enable_Clock (Audio_RX_DMA);
 
-      Config.Channel := Audio_RX_DMA_Chan;
+      Config.Channel   := Audio_RX_DMA_Chan;
       Config.Direction := Peripheral_To_Memory;
-      Config.Operation_Mode := Circular_Mode;
       Configure (Audio_RX_DMA, Audio_RX_DMA_Stream, Config);
    end Initialize_DMA;
 
@@ -365,6 +360,8 @@ package body WNM.Audio_DAC is
    end I2S_Stream;
 
    task body I2S_Stream is
+      Unused_TX : Audio_Buffer_Access;
+      Unused_RX : Audio_Buffer_Access;
    begin
       Ada.Synchronous_Task_Control.Suspend_Until_True (Task_Start);
 
@@ -386,21 +383,20 @@ package body WNM.Audio_DAC is
 
       loop
          Audio_TX_DMA_Int.Wait_For_Interrupt;
+
          if Audio_TX_DMA_Int.Not_In_Transfer = TX0.all'Address then
-            --  Quick_Synth.Fill (TX0.all);
-            if Audio_RX_DMA_Int.Not_In_Transfer = RX0.all'Address then
-               TX0.all := RX0.all;
-            else
-               TX0.all := RX1.all;
-            end if;
+            Unused_TX := TX0;
          else
-            --  Quick_Synth.Fill (TX1.all);
-            if Audio_RX_DMA_Int.Not_In_Transfer = RX0.all'Address then
-               TX1.all := RX0.all;
-            else
-               TX1.all := RX1.all;
-            end if;
+            Unused_TX := TX1;
          end if;
+
+         if Audio_RX_DMA_Int.Not_In_Transfer = RX0.all'Address then
+            Unused_RX := RX0;
+         else
+            Unused_RX := RX1;
+         end if;
+
+         Quick_Synth.Fill (Unused_RX.all, Unused_TX.all);
       end loop;
    end I2S_Stream;
 

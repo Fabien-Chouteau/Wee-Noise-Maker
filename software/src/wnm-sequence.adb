@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with MIDI; use MIDI;
+
 package body WNM.Sequence is
 
    -----------
@@ -27,23 +29,26 @@ package body WNM.Sequence is
 
    procedure Clear (This : in out Instance) is
    begin
-      This.Cnt := 0;
+      This.Cnt := (others => 0);
    end Clear;
 
    ---------
    -- Add --
    ---------
 
-   procedure Add (This : in out Instance; Evt : Event) is
+   procedure Add (This : in out Instance;
+                  Step : Sequencer_Steps;
+                  Cmd  : MIDI.Command)
+   is
    begin
-      if This.Cnt < This.Events'Last then
-         for Index in This.Events'First .. This.Cnt loop
-            if This.Events (Index) = Evt then
+      if This.Cnt (Step) < This.Events'Last (2) then
+         for Index in This.Events'First (2) .. This.Cnt (Step) loop
+            if This.Events (Step, Index) = Cmd then
                return;
             end if;
          end loop;
-         This.Cnt := This.Cnt + 1;
-         This.Events (This.Cnt) := Evt;
+         This.Cnt (Step) := This.Cnt (Step) + 1;
+         This.Events (Step, This.Cnt (Step)) := Cmd;
       end if;
    end Add;
 
@@ -51,26 +56,43 @@ package body WNM.Sequence is
    -- Remove --
    ------------
 
-   procedure Remove (This : in out Instance; Evt : Event) is
+   procedure Remove (This : in out Instance;
+                     Step : Sequencer_Steps;
+                     Evt  : MIDI.Command)
+   is
    begin
-      if This.Cnt /= 0 then
-         for Index in This.Events'First .. This.Cnt loop
-            if This.Events (Index) = Evt then
-               for Del in Index .. This.Cnt - 1 loop
-                  This.Events (Del) := This.Events (Del + 1);
+      if This.Cnt (Step) /= 0 then
+         for Index in This.Events'First (2) .. This.Cnt (Step) loop
+            if This.Events (Step, Index) = Evt then
+               for Del in Index .. This.Cnt (Step) - 1 loop
+                  This.Events (Step, Del) := This.Events (Step, Del + 1);
                end loop;
-               This.Cnt := This.Cnt - 1;
+               This.Cnt (Step) := This.Cnt (Step) - 1;
                return;
             end if;
          end loop;
       end if;
    end Remove;
 
-   ----------
-   -- List --
-   ----------
+   ----------------
+   -- Last_Index --
+   ----------------
 
-   function List (This : Instance) return Event_Array is
-     (This.Events (1 .. This.Cnt));
+   function Last_Index (This : Instance;
+                        Step : Sequencer_Steps)
+                        return Natural
+   is (This.Cnt (Step));
+
+   ---------
+   -- Cmd --
+   ---------
+
+   function Cmd (This  : Instance;
+                 Step  : Sequencer_Steps;
+                 Index : Positive) return MIDI.Command
+   is
+   begin
+      return This.Events (Step, Index);
+   end Cmd;
 
 end WNM.Sequence;

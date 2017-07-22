@@ -47,7 +47,7 @@ package WNM.Sequencer is
    procedure Set_Instrument (Val : Keyboard_Value);
    --  Set the instrument of the current channel
 
-   procedure Set_Beat_Period (Period : Time_Span);
+   procedure Set_BPM (BPM : Positive);
    --  Also known as 60/BPM...
 
    procedure Start;
