@@ -38,6 +38,8 @@ with Ada.Interrupts.Names;
 with Sound_Gen_Interfaces;         use Sound_Gen_Interfaces;
 --  with Quick_Synth;
 
+with WNM.I2C;
+
 package body WNM.Audio_DAC is
 
    type Audio_Buffer_Access is access all HAL.Audio.Audio_Buffer;
@@ -129,7 +131,8 @@ package body WNM.Audio_DAC is
                         Output_Type => Push_Pull,
                         Resistors   => Floating));
 
-         Configure_Alternate_Function (Audio_I2S_Points, STM32.Device.GPIO_AF_I2S3_6);
+         Configure_Alternate_Function (Audio_I2S_Points,
+                                       STM32.Device.GPIO_AF_SPI3_6);
 
          Enable_Clock (Audio_I2S_Points_Ext);
 
@@ -139,7 +142,8 @@ package body WNM.Audio_DAC is
                         Output_Type => Push_Pull,
                         Resistors   => Floating));
 
-         Configure_Alternate_Function (Audio_I2S_Points_Ext, STM32.Device.GPIO_AF_I2S3ext_7);
+         Configure_Alternate_Function (Audio_I2S_Points_Ext,
+                                       STM32.Device.GPIO_AF_I2S3ext_7);
 
       end Initialize_GPIO;
 
@@ -194,7 +198,6 @@ package body WNM.Audio_DAC is
       Audio_I2S_RX.Enable;
 
    end Initialize_I2S;
-
 
    --------------------
    -- Initialize_DMA --
@@ -322,7 +325,7 @@ package body WNM.Audio_DAC is
                                Invert_SCLK => False,
                                Master_Mode => False,
                                Data_Len    => Data_16b,
-                               I2S         => I2S_Or_Left_Justified,
+                               I2S         => I2S_Left_Justified,
                                LR_Align    => False,
                                LR_Polarity => False);
 
@@ -383,16 +386,16 @@ package body WNM.Audio_DAC is
 
       loop
          Audio_TX_DMA_Int.Wait_For_Interrupt;
-         if Audio_TX_DMA_Int.Not_In_Transfer = TX0'Address then
+         if Audio_TX_DMA_Int.Not_In_Transfer = TX0.all'Address then
             --  Quick_Synth.Fill (TX0.all);
-            if Audio_RX_DMA_Int.Not_In_Transfer = RX0'Address then
+            if Audio_RX_DMA_Int.Not_In_Transfer = RX0.all'Address then
                TX0.all := RX0.all;
             else
                TX0.all := RX1.all;
             end if;
          else
             --  Quick_Synth.Fill (TX1.all);
-            if Audio_RX_DMA_Int.Not_In_Transfer = RX0'Address then
+            if Audio_RX_DMA_Int.Not_In_Transfer = RX0.all'Address then
                TX1.all := RX0.all;
             else
                TX1.all := RX1.all;

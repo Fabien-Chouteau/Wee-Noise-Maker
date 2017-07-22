@@ -19,15 +19,12 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.I2C;
-
 package WNM.Audio_DAC is
 
    function Initialized return Boolean;
 
    procedure Initialize
-     with Pre  => WNM.I2C.Initialized,
-          Post => Initialized;
+     with Post => Initialized;
 
    type DAC_Volume is range 0 .. 100;
    procedure Set_Volume (Volume : DAC_Volume);
