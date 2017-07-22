@@ -21,6 +21,7 @@
 
 with Ada.Real_Time; use Ada.Real_Time;
 with System;
+with MIDI;
 
 package WNM is
 
@@ -41,8 +42,14 @@ package WNM is
 
    type Channels is (Chan_A, Chan_B, Chan_C, Chan_D, Chan_E);
 
-   function To_Channel (B : Channel_Buttons) return Channels;
-   function To_Button (Chan : Channels) return Channel_Buttons;
+   function To_Channel (B : Channel_Buttons) return Channels
+     with Inline_Always;
+   function To_Button (Chan : Channels) return Channel_Buttons
+     with Inline_Always;
+   function To_Channel (Chan : MIDI.MIDI_Channel) return Channels
+     with Inline_Always;
+   function To_MIDI_Channel (Chan : Channels) return MIDI.MIDI_Channel
+     with Inline_Always;
 
    type Sequencer_Steps is range 1 .. 16;
    Steps_Per_Beat      : constant := 4;

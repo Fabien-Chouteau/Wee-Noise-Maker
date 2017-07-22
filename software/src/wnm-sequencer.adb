@@ -133,7 +133,7 @@ package body WNM.Sequencer is
             declare
                Msg : MIDI.Message (MIDI.Note_On);
             begin
-               Msg.Channel := 0;
+               Msg.Channel := To_MIDI_Channel (Current_Chan);
                Msg.Cmd.Key := To_Key (Button, Octave);
                Msg.Cmd.Velocity := 16#77#;
                Quick_Synth.Event (Msg);
@@ -143,7 +143,6 @@ package body WNM.Sequencer is
                end if;
             end;
       end case;
-
    end On_Press;
 
    ----------------
@@ -157,12 +156,7 @@ package body WNM.Sequencer is
             declare
                Msg : MIDI.Message (MIDI.Note_Off);
             begin
-               Msg.Channel := (case Current_Chan is
-                                  when Chan_A => 0,
-                                  when Chan_B => 1,
-                                  when Chan_C => 2,
-                                  when Chan_D => 3,
-                                  when Chan_E => 4);
+               Msg.Channel := To_MIDI_Channel (Current_Chan);
                Msg.Cmd.Key := To_Key (Button, Octave);
                Msg.Cmd.Velocity := 16#77#;
                Quick_Synth.Event (Msg);
@@ -241,12 +235,7 @@ package body WNM.Sequencer is
                      Msg : MIDI.Message (Midi_Cmd.Kind);
                   begin
                      Msg.Cmd := Midi_Cmd;
-                     Msg.Channel := (case Chan is
-                                        when Chan_A => 0,
-                                        when Chan_B => 1,
-                                        when Chan_C => 2,
-                                        when Chan_D => 3,
-                                        when Chan_E => 4);
+                     Msg.Channel := To_MIDI_Channel (Current_Chan);
 
                      Quick_Synth.Event (Msg);
                   end;

@@ -34,24 +34,47 @@ package body WNM is
    -- To_Channel --
    ----------------
 
-   function To_Channel (B : Channel_Buttons) return Channels is
-     (case B is
-         when Chan_A => Chan_A,
-         when Chan_B => Chan_B,
-         when Chan_C => Chan_C,
-         when Chan_D => Chan_D,
-         when Chan_E => Chan_E);
+   function To_Channel (B : Channel_Buttons) return Channels
+   is (case B is
+          when Chan_A => Chan_A,
+          when Chan_B => Chan_B,
+          when Chan_C => Chan_C,
+          when Chan_D => Chan_D,
+          when Chan_E => Chan_E);
 
    ---------------
    -- To_Button --
    ---------------
 
-   function To_Button (Chan : Channels) return Channel_Buttons is
-     (case Chan is
-         when Chan_A => Chan_A,
-         when Chan_B => Chan_B,
-         when Chan_C => Chan_C,
-         when Chan_D => Chan_D,
-         when Chan_E => Chan_E);
+   function To_Button (Chan : Channels) return Channel_Buttons
+   is (case Chan is
+          when Chan_A => Chan_A,
+          when Chan_B => Chan_B,
+          when Chan_C => Chan_C,
+          when Chan_D => Chan_D,
+          when Chan_E => Chan_E);
 
+   ----------------
+   -- To_Channel --
+   ----------------
+
+   function To_Channel (Chan : MIDI.MIDI_Channel) return Channels
+   is (case Chan is
+          when 0      => Chan_A,
+          when 1      => Chan_B,
+          when 2      => Chan_C,
+          when 3      => Chan_D,
+          when others => Chan_E);
+
+   ---------------------
+   -- To_MIDI_Channel --
+   ---------------------
+
+   function To_MIDI_Channel (Chan : Channels) return MIDI.MIDI_Channel
+   is (case Chan is
+          when Chan_A => 0,
+          when Chan_B => 1,
+          when Chan_C => 2,
+          when Chan_D => 3,
+          when Chan_E => 4);
 end WNM;

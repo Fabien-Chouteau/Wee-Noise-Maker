@@ -17,14 +17,7 @@ package body Quick_Synth is
 
    procedure Event (Msg : MIDI.Message) is
       use type WNM.Channels;
-
-      Chan : constant WNM.Channels := (case Msg.Channel is
-                                          when 0 => WNM.Chan_A,
-                                          when 1 => WNM.Chan_B,
-                                          when 2 => WNM.Chan_C,
-                                          when 3 => WNM.Chan_D,
-                                          when 4 => WNM.Chan_E,
-                                          when others => WNM.Chan_A);
+      Chan : constant WNM.Channels := WNM.To_Channel (Msg.Channel);
    begin
 
       case Msg.Kind is
