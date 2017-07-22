@@ -3,13 +3,13 @@ with Interfaces;           use Interfaces;
 with Simple_Synthesizer;
 with HAL; use HAL;
 
-with WNM;
-
 package body Quick_Synth is
 
    My_Synths : array (WNM.Channels) of  Simple_Synthesizer.Synthesizer
      (Stereo    => True,
       Amplitude => Natural (Unsigned_16'Last / 10));
+
+   Chan_Muted : array (WNM.Channels) of Boolean := (others => False);
 
    -----------
    -- Event --
@@ -40,7 +40,6 @@ package body Quick_Synth is
       end case;
    end Event;
 
-
    ----------
    -- Fill --
    ----------
@@ -56,20 +55,58 @@ package body Quick_Synth is
          Output (Index) := Input (Index);
       end loop;
 
-      for Synth of My_Synths loop
-         Synth.Receive (Tmp);
-         for Index in Output'Range loop
-            Val := Integer_32 (Output (Index)) + Integer_32 (Tmp (Index));
-            if Val > Integer_32 (Integer_16'Last) then
-               Output (Index) := Integer_16'Last;
-            elsif Val < Integer_32 (Integer_16'First) then
-               Output (Index) := Integer_16'First;
-            else
-               Output (Index) := Integer_16 (Val);
-            end if;
-         end loop;
+      for Chan in WNM.Channels loop
+         My_Synths (Chan).Receive (Tmp);
+
+         if not Chan_Muted (Chan) then
+            for Index in Output'Range loop
+               Val := Integer_32 (Output (Index)) + Integer_32 (Tmp (Index));
+               if Val > Integer_32 (Integer_16'Last) then
+                  Output (Index) := Integer_16'Last;
+               elsif Val < Integer_32 (Integer_16'First) then
+                  Output (Index) := Integer_16'First;
+               else
+                  Output (Index) := Integer_16 (Val);
+               end if;
+            end loop;
+         end if;
       end loop;
    end Fill;
+
+   ----------
+   -- Mute --
+   ----------
+
+   procedure Mute (Chan : WNM.Channels) is
+   begin
+      Chan_Muted (Chan) := True;
+   end Mute;
+
+   ------------
+   -- Unmute --
+   ------------
+
+   procedure Unmute (Chan : WNM.Channels) is
+   begin
+      Chan_Muted (Chan) := False;
+   end Unmute;
+
+   -----------------
+   -- Toggle_Mute --
+   -----------------
+
+   procedure Toggle_Mute (Chan : WNM.Channels) is
+   begin
+      Chan_Muted (Chan) := not Chan_Muted (Chan);
+   end Toggle_Mute;
+
+   -----------
+   -- Muted --
+   -----------
+
+   function Muted (Chan : WNM.Channels) return Boolean
+   is (Chan_Muted (Chan));
+
 begin
    for Synth of My_Synths loop
       Synth.Set_Frequency (Audio_Freq_48kHz);

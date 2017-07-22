@@ -26,6 +26,7 @@
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 with WNM.Sequencer; use WNM.Sequencer;
+with Quick_Synth;   use Quick_Synth;
 
 package body WNM.UI is
 
@@ -114,11 +115,23 @@ package body WNM.UI is
             end if;
 
          when FX_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Set_FX (B);
-            elsif B = FX and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
-            end if;
+            case Evt is
+               when On_Press =>
+                  case B is
+                     when  B1 .. B16 =>
+                        Set_FX (B);
+                     when Chan_A .. Chan_E =>
+                        Quick_Synth.Toggle_Mute (To_Channel (B));
+                     when others =>
+                        null;
+                  end case;
+               when On_Release =>
+                  if B = FX then
+                     Current_Input_Mode := Default_Input_Mode;
+                  end if;
+               when others =>
+                  null;
+            end case;
 
          when Chan_Assign =>
             if B in B1 .. B16 and then Evt = On_Press then
@@ -356,7 +369,13 @@ package body WNM.UI is
          --------------
 
          for B in Buttons range Chan_A .. Chan_E loop
-            if Current_Chan = To_Channel (B) then
+            if Current_Input_Mode = FX_Select then
+               if not Quick_Synth.Muted (To_Channel (B)) then
+                  Turn_On (B);
+               else
+                  Turn_Off (B);
+               end if;
+            elsif Current_Chan = To_Channel (B) then
                Turn_On (B);
             else
                Turn_Off (B);
