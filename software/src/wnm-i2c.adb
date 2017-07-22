@@ -19,18 +19,34 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with STM32.Device;                 use STM32.Device;
-with STM32.GPIO;                   use STM32.GPIO;
-with STM32.I2C;                    use STM32.I2C;
+with STM32.Device;         use STM32.Device;
+with STM32.GPIO;           use STM32.GPIO;
+with STM32.I2C;            use STM32.I2C;
+with STM32.I2C.DMA;        use STM32.I2C.DMA;
+with STM32.DMA;            use STM32.DMA;
+with STM32.DMA.Interrupts;
+
 with Ravenscar_Time;
+with HAL; use HAL;
+with HAL.I2C; use HAL.I2C;
+with STM32.I2S; use STM32.I2S;
 
 package body WNM.I2C is
 
-   I2C_Port : STM32.I2C.I2C_Port renames I2C_1;
-   Init_Done : Boolean := False;
+   I2C_Port : STM32.I2C.DMA.I2C_Port_DMA renames I2C_1_DMA;
 
+   I2C_DMA        : STM32.DMA.DMA_Controller renames DMA_1;
+   I2C_DMA_Chan   : STM32.DMA.DMA_Channel_Selector renames
+     STM32.DMA.Channel_1;
+   I2C_DMA_Stream : STM32.DMA.DMA_Stream_Selector renames
+     STM32.DMA.Stream_6;
+   I2C_DMA_Int    : STM32.DMA.Interrupts.DMA_Interrupt_Controller renames
+     DMA1_Stream6;
+
+   procedure Initialize;
    procedure Initialize_I2C_GPIO;
-   procedure Configure_I2C;
+   procedure Initialize_I2C;
+   procedure Initialize_DMA;
 
    -------------------------
    -- Initialize_I2C_GPIO --
@@ -53,11 +69,11 @@ package body WNM.I2C is
       --  Lock (Points);
    end Initialize_I2C_GPIO;
 
-   -------------------
-   -- Configure_I2C --
-   -------------------
+   --------------------
+   -- Initialize_I2C --
+   --------------------
 
-   procedure Configure_I2C
+   procedure Initialize_I2C
    is
       I2C_Conf : I2C_Configuration;
    begin
@@ -71,10 +87,42 @@ package body WNM.I2C is
       I2C_Conf.General_Call_Enabled := False;
       I2C_Conf.Clock_Stretching_Enabled := True;
 
-      I2C_Conf.Clock_Speed := 800_000;
+      I2C_Conf.Clock_Speed := 400_000;
+      I2C_Conf.Enable_DMA := True;
 
       I2C_Port.Configure (I2C_Conf);
-   end Configure_I2C;
+   end Initialize_I2C;
+
+   --------------------
+   -- Initialize_DMA --
+   --------------------
+
+   procedure Initialize_DMA is
+      Config : DMA_Stream_Configuration;
+   begin
+      Enable_Clock (I2C_DMA);
+
+      Config.Increment_Peripheral_Address := False;
+      Config.Increment_Memory_Address := True;
+      Config.Peripheral_Data_Format := Bytes;
+      Config.Memory_Data_Format := Bytes;
+      Config.Operation_Mode := Normal_Mode;
+      Config.Priority := Priority_High;
+      Config.FIFO_Enabled := False;
+      Config.FIFO_Threshold := FIFO_Threshold_Full_Configuration;
+      Config.Memory_Burst_Size := Memory_Burst_Inc4;
+      Config.Peripheral_Burst_Size := Peripheral_Burst_Single;
+
+      -- TX DMA --
+
+      Config.Channel   := I2C_DMA_Chan;
+      Config.Direction := Memory_To_Peripheral;
+
+      Configure (I2C_DMA, I2C_DMA_Stream, Config);
+
+      I2C_Port.Set_TX_DMA_Handler (I2C_DMA_Int'Access);
+--        I2C_Port.Set_Polling_Threshold (1000);
+   end Initialize_DMA;
 
    ----------------
    -- Initialize --
@@ -84,16 +132,9 @@ package body WNM.I2C is
    is
    begin
       Initialize_I2C_GPIO;
-      Configure_I2C;
-      Init_Done := True;
+      Initialize_DMA;
+      Initialize_I2C;
    end Initialize;
-
-   -----------------
-   -- Initialized --
-   -----------------
-
-   function Initialized return Boolean
-   is (Init_Done);
 
    ----------
    -- Port --
@@ -106,4 +147,6 @@ package body WNM.I2C is
       return I2C_Port'Access;
    end Port;
 
+begin
+   Initialize;
 end WNM.I2C;

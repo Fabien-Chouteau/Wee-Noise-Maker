@@ -23,11 +23,6 @@ with HAL.I2C;
 
 package WNM.I2C is
 
-   procedure Initialize
-     with Post => Initialized;
-
-   function Initialized return Boolean;
-
    function Port return not null HAL.I2C.Any_I2C_Port;
 
 end WNM.I2C;
