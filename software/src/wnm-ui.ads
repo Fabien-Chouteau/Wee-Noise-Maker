@@ -30,6 +30,14 @@ package WNM.UI is
 
    procedure Start;
 
+   type Input_Mode_Type is (Note,
+                            Sequence_Edit,
+                            Volume_BPM,
+                            FX_Select,
+                            Chan_Assign);
+
+   function Input_Mode return Input_Mode_Type;
+
    function Is_Pressed (B : Buttons) return Boolean;
 
    procedure Turn_On (B : LEDs);
@@ -149,7 +157,7 @@ private
       B15       => False,
       B16       => False,
       Rec       => True,
-      Play      => False,
+      Play      => True,
       FX        => False,
       Chan_A    => True,
       Chan_B    => True,

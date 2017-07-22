@@ -36,44 +36,35 @@ package body WNM.UI is
    procedure Turn_Off (LED_Addr : LED_Address);
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
    procedure Select_Channel (Chan : Channels);
-   procedure Set_Volume (B : Buttons);
 
    procedure Set_FX (B : Buttons);
    procedure Set_Chan_Instrument (B : Buttons);
 
-   type Input_Mode is (Note,
-                       Sequence_Edit,
-                       Volume_Select,
-                       FX_Select,
-                       Chan_Assign);
+   Default_Input_Mode : constant Input_Mode_Type := Note;
 
-   Default_Input_Mode : constant Input_Mode := Note;
-
-   Current_Volume : Buttons := B1;
    Current_Chan : Channels := Chan_A;
    Current_Instrument : array (Channels) of Buttons := (others => B1);
    FX_Is_On : array (Buttons) of Boolean := (others => False);
-   Current_Input_Mode : Input_Mode := Note;
+   Current_Input_Mode : Input_Mode_Type := Note;
+
+   ----------------
+   -- Input_Mode --
+   ----------------
+
+   function Input_Mode return Input_Mode_Type
+   is (Current_Input_Mode);
 
    ------------------
    -- Signal_Event --
    ------------------
 
---     Last_BPM_Press : Time := Time_First;
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event) is
---        Now : constant Time := Clock;
    begin
       case Current_Input_Mode is
          when Note =>
             case Evt is
                when On_Press =>
                   case B is
---                       when  BPM_Vol =>
---                          --  Tap tempo
---                          if Now - Last_BPM_Press < Seconds (2) then
---                             Sequencer.Set_Beat_Period (Now - Last_BPM_Press);
---                          end if;
---                          Last_BPM_Press := Now;
                      when FX =>
                         --  Switch to FX mode
                         Current_Input_Mode := FX_Select;
@@ -93,14 +84,13 @@ package body WNM.UI is
                      when B9 .. B16 | B2 .. B3 | B5 .. B7 =>
                         --  Play note...
                         null;
---                          Test_I2S.Set_Current_Note (B);
                      when others => null;
                   end case;
                when On_Long_Press =>
                   case B is
---                       when BPM_Vol =>
---                          --  Switch to volume select mode
---                          Current_Input_Mode := Volume_Select;
+                     when Play =>
+                        --  Switch to volume/BPM config mode
+                        Current_Input_Mode := Volume_BPM;
                      when Rec =>
                         --  Switch to squence edition mode
                         Current_Input_Mode := Sequence_Edit;
@@ -108,6 +98,13 @@ package body WNM.UI is
                         --  Switch to channel assignment mode
                         Select_Channel (To_Channel (B));
                         Current_Input_Mode := Chan_Assign;
+                     when others => null;
+                  end case;
+               when On_Release =>
+                  case B is
+                     when B9 .. B16 | B2 .. B3 | B5 .. B7 =>
+                        --  Release note...
+                        null;
                      when others => null;
                   end case;
                when others => null;
@@ -118,11 +115,9 @@ package body WNM.UI is
                Current_Input_Mode := Default_Input_Mode;
             end if;
 
-         when Volume_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Set_Volume (B);
---              elsif B = BPM_Vol and then Evt = On_Release then
---                 Current_Input_Mode := Default_Input_Mode;
+         when Volume_BPM =>
+            if B = Play and Evt = On_Release then
+               Current_Input_Mode := Default_Input_Mode;
             end if;
 
          when FX_Select =>
@@ -156,15 +151,6 @@ package body WNM.UI is
 --        Test_I2S.Set_Current_Channel (Chan);
       Current_Chan := Chan;
    end Select_Channel;
-
-   ----------------
-   -- Set_Volume --
-   ----------------
-
-   procedure Set_Volume (B : Buttons) is
-   begin
-      Current_Volume := B;
-   end Set_Volume;
 
    ------------
    -- Set_FX --
@@ -249,7 +235,7 @@ package body WNM.UI is
 
       Reset (LED_Timer);
 
-      Configure (LED_Timer, Prescaler => 100, Period => 800);
+      Configure (LED_Timer, Prescaler => 100, Period => 700);
 
       Enable_Interrupt (LED_Timer, Timer_Update_Interrupt);
 
@@ -378,9 +364,9 @@ package body WNM.UI is
             Last_State (B) := Key_State (B);
          end loop;
 
-         ---------------
-         --  Set LEDs --
-         ---------------
+         --------------
+         -- Set LEDs --
+         --------------
 
          for B in Buttons range Chan_A .. Chan_E loop
             if Current_Chan = To_Channel (B) then
@@ -410,14 +396,8 @@ package body WNM.UI is
          end case;
 
          case Current_Input_Mode is
-            when Volume_Select =>
-               for B in B1 .. B16 loop
-                  if B <= Current_Volume then
-                     Turn_On (B);
-                  else
-                     Turn_Off (B);
-                  end if;
-               end loop;
+            when Volume_BPM =>
+               null;
             when FX_Select =>
                Turn_Off (FX);
                --  The FX LED will be on if there's at least one FX enabled
@@ -444,7 +424,6 @@ package body WNM.UI is
             when Sequence_Edit =>
                null;
          end case;
-
       end loop;
    end UI_Task;
 
