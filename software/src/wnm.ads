@@ -48,7 +48,7 @@ package WNM is
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 4;
 
-   UI_Task_Period   : constant Time_Span := Milliseconds (10);
+   UI_Task_Period   : constant Time_Span := Milliseconds (50);
    UI_Task_Priority : constant System.Priority := System.Default_Priority + 1;
 
    LED_Task_Period   : constant Time_Span := Microseconds (1000);
@@ -60,7 +60,7 @@ package WNM is
    DAC_Task_Priority : constant System.Priority := System.Default_Priority + 3;
 
    Long_Press_Time_Span : constant Time_Span := Milliseconds (300);
-   --  How much 2time users have to press a button to get the alternative
+   --  How much time users have to press a button to get the alternative
    --  function.
 
 end WNM;
