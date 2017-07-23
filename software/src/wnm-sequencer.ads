@@ -51,7 +51,7 @@ package WNM.Sequencer is
 
    function Instrument (Track : Tracks) return Keyboard_Value;
 
-   procedure Set_BPM (BPM : Positive);
+   procedure Set_BPM (BPM : Beat_Per_Minute);
    --  Also known as 60/BPM...
 
    procedure Start;

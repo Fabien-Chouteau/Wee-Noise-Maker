@@ -51,6 +51,7 @@ package WNM is
    function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
      with Inline_Always;
 
+   subtype Beat_Per_Minute is Positive range 50 .. 200;
    type Sequencer_Steps is range 1 .. 16;
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 4;

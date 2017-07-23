@@ -29,7 +29,8 @@ package body WNM.Sequencer is
    use type MIDI.Octaves;
 
    Start_Sequencer_Task : Suspension_Object;
-   Sequencer_Task_Period : Time_Span := Seconds (1);
+
+   Sequencer_BPM : Beat_Per_Minute := Beat_Per_Minute'First;
 
    Current_Step      : Sequencer_Steps := Sequencer_Steps'First with Atomic;
    Current_Seq_State : Sequencer_State := Pause with Atomic;
@@ -205,9 +206,9 @@ package body WNM.Sequencer is
    -- Set_BPM --
    -------------
 
-   procedure Set_BPM (BPM : Positive) is
+   procedure Set_BPM (BPM : Beat_Per_Minute) is
    begin
-      Sequencer_Task_Period := Milliseconds ((60 * 1000) / BPM);
+      Sequencer_BPM := BPM;
    end Set_BPM;
 
    -----------
@@ -229,38 +230,50 @@ package body WNM.Sequencer is
 
    task body Sequencer_Task is
       Next_Start : Time;
-      Period     : Time_Span renames Sequencer_Task_Period;
+
+      type Microstep_Cnt is mod 2;
+      Microstep : Microstep_Cnt := 1;
    begin
       Suspend_Until_True (Start_Sequencer_Task);
       Next_Start := Clock;
       loop
-         Next_Start := Next_Start + Period / Steps_Per_Beat;
+         Next_Start := Next_Start +
+           (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
          delay until Next_Start;
 
-         if Current_Seq_State in Play | Play_And_Rec then
-            for Track in Sequences'Range loop
-               for Index in 1 .. Last_Index (Sequences (Track), Current_Step) loop
-                  declare
-                     Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Track),
+         case Microstep is
+
+         --  Begining of a new step
+         when 0 =>
+            if Current_Step /= Sequencer_Steps'Last then
+               Current_Step := Current_Step + 1;
+            else
+               Current_Step := Sequencer_Steps'First;
+            end if;
+
+         --  At the middle of the step we play the recorded notes
+         when 1 =>
+            if Current_Seq_State in Play | Play_And_Rec then
+               for Track in Sequences'Range loop
+                  for Index in 1 .. Last_Index (Sequences (Track), Current_Step) loop
+                     declare
+                        Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Track),
                                                               Current_Step,
-                                                              Index);
-                     Msg : MIDI.Message (Midi_Cmd.Kind);
-                  begin
-                     Msg.Cmd := Midi_Cmd;
-                     Msg.Channel := To_MIDI_Channel (Track);
+                                                                 Index);
+                        Msg : MIDI.Message (Midi_Cmd.Kind);
+                     begin
+                        Msg.Cmd := Midi_Cmd;
+                        Msg.Channel := To_MIDI_Channel (Track);
 
-                     Quick_Synth.Event (Msg);
-                  end;
+                        Quick_Synth.Event (Msg);
+                     end;
+                  end loop;
                end loop;
-            end loop;
-         end if;
-
-         if Current_Step /= Sequencer_Steps'Last then
-            Current_Step := Current_Step + 1;
-         else
-            Current_Step := Sequencer_Steps'First;
-         end if;
+            end if;
+         end case;
+         Microstep := Microstep + 1;
       end loop;
+
    end Sequencer_Task;
 
 end WNM.Sequencer;

@@ -362,13 +362,13 @@ package body WNM.UI is
 
          -- Tacks LEDs --
          for B in Buttons range Track_A .. Track_E loop
-            if Current_Input_Mode = FX_Select then
-               if not Quick_Synth.Muted (To_Track (B)) then
-                  Turn_On (B);
-               else
-                  Turn_Off (B);
-               end if;
-            elsif Sequencer.Track = To_Track (B) then
+
+            if (Sequencer.Track = To_Track (B)
+                and then Current_Input_Mode /= FX_Select)
+              or else
+                (not Quick_Synth.Muted (To_Track (B))
+                 and then Current_Input_Mode = FX_Select)
+            then
                Turn_On (B);
             else
                Turn_Off (B);
