@@ -5,18 +5,21 @@ with HAL; use HAL;
 
 package body Quick_Synth is
 
+   use type WNM.Channels;
+
    My_Synths : array (WNM.Channels) of  Simple_Synthesizer.Synthesizer
      (Stereo    => True,
       Amplitude => Natural (Unsigned_16'Last / 10));
 
    Chan_Muted : array (WNM.Channels) of Boolean := (others => False);
+   Solo_Mode_Enabled : Boolean := False;
+   Solo_Chan : WNM.Channels := WNM.Chan_A;
 
    -----------
    -- Event --
    -----------
 
    procedure Event (Msg : MIDI.Message) is
-      use type WNM.Channels;
       Chan : constant WNM.Channels := WNM.To_Channel (Msg.Channel);
    begin
 
@@ -51,7 +54,12 @@ package body Quick_Synth is
       for Chan in WNM.Channels loop
          My_Synths (Chan).Receive (Tmp);
 
-         if not Chan_Muted (Chan) then
+         if (not Chan_Muted (Chan) and then not Solo_Mode_Enabled)
+           or else
+            (not Chan_Muted (Chan) and then Solo_Chan = Chan)
+           or else
+            (Solo_Mode_Enabled and then Solo_Chan = Chan)
+         then
             for Index in Output'Range loop
                Val := Integer_32 (Output (Index)) + Integer_32 (Tmp (Index));
                if Val > Integer_32 (Integer_16'Last) then
@@ -99,6 +107,38 @@ package body Quick_Synth is
 
    function Muted (Chan : WNM.Channels) return Boolean
    is (Chan_Muted (Chan));
+
+   -----------------
+   -- Toggle_Solo --
+   -----------------
+
+   procedure Toggle_Solo (Chan : WNM.Channels) is
+   begin
+      if Solo_Mode_Enabled then
+         if Solo_Chan = Chan then
+            Solo_Mode_Enabled := False;
+         else
+            Solo_Chan := Chan;
+         end if;
+      else
+         Solo_Mode_Enabled := True;
+         Solo_Chan := Chan;
+      end if;
+   end Toggle_Solo;
+
+   -------------
+   -- In_Solo --
+   -------------
+
+   function In_Solo return Boolean
+   is (Solo_Mode_Enabled);
+
+   ----------
+   -- Solo --
+   ----------
+
+   function Solo return WNM.Channels
+   is (Solo_Chan);
 
 begin
    for Synth of My_Synths loop

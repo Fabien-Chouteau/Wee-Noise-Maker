@@ -118,7 +118,29 @@ package body WNM.UI is
             case Evt is
                when On_Press =>
                   case B is
-                     when  B1 .. B16 =>
+                     when  B4 =>
+                        Quick_Synth.Toggle_Solo (Chan_A);
+                     when  B5 =>
+                        Quick_Synth.Toggle_Solo (Chan_B);
+                        FX_Is_On (B) := (Quick_Synth.In_Solo
+                                         and then
+                                         Quick_Synth.Solo = Chan_B);
+                     when  B6 =>
+                        Quick_Synth.Toggle_Solo (Chan_C);
+                        FX_Is_On (B) := (Quick_Synth.In_Solo
+                                         and then
+                                         Quick_Synth.Solo = Chan_C);
+                     when  B7 =>
+                        Quick_Synth.Toggle_Solo (Chan_D);
+                        FX_Is_On (B) := (Quick_Synth.In_Solo
+                                         and then
+                                         Quick_Synth.Solo = Chan_D);
+                     when  B8 =>
+                        Quick_Synth.Toggle_Solo (Chan_E);
+                        FX_Is_On (B) := (Quick_Synth.In_Solo
+                                         and then
+                                         Quick_Synth.Solo = Chan_E);
+                     when  B1 .. B3 | B9 .. B16 =>
                         Set_FX (B);
                      when Chan_A .. Chan_E =>
                         Quick_Synth.Toggle_Mute (To_Channel (B));
@@ -368,6 +390,7 @@ package body WNM.UI is
          -- Set LEDs --
          --------------
 
+         -- Tacks LEDs --
          for B in Buttons range Chan_A .. Chan_E loop
             if Current_Input_Mode = FX_Select then
                if not Quick_Synth.Muted (To_Channel (B)) then
@@ -382,12 +405,14 @@ package body WNM.UI is
             end if;
          end loop;
 
+         -- Play LED --
          if Sequencer.State in Play | Play_And_Rec then
             Turn_On (Play);
          else
             Turn_Off (Play);
          end if;
 
+         -- Rec LED --
          if Sequencer.State = Rec
            or else
              (Sequencer.State = Play_And_Rec
@@ -399,10 +424,25 @@ package body WNM.UI is
             Turn_Off (Rec);
          end if;
 
+         --  B1 .. B16 LEDs --
          case Current_Input_Mode is
+
+            -- FX selection mode --
             when FX_Select =>
                Turn_Off (FX);
                --  The FX LED will be on if there's at least one FX enabled
+
+               for B in B4 .. B8 loop
+                  FX_Is_On (B) := (Quick_Synth.In_Solo
+                                   and then
+                                   Quick_Synth.Solo = (case B is
+                                        when B4 => Chan_A,
+                                        when B5 => Chan_B,
+                                        when B6 => Chan_C,
+                                        when B7 => Chan_D,
+                                        when others => Chan_E));
+               end loop;
+
                for B in B1 .. B16 loop
                   if FX_Is_On (B) then
                      Turn_On (B);
@@ -411,6 +451,8 @@ package body WNM.UI is
                      Turn_Off (B);
                   end if;
                end loop;
+
+            -- Track assign mode --
             when Chan_Assign =>
                for B in B1 .. B16 loop
                   if Current_Instrument (Current_Chan) = B then
@@ -419,10 +461,14 @@ package body WNM.UI is
                      Turn_Off (B);
                   end if;
                end loop;
+
+            --  Any other mode --
             when others =>
+
                for B in B1 .. B16 loop
                   Turn_Off (B);
                end loop;
+
                if Sequencer.State in Play_And_Rec | Play then
                   case Sequencer.Step is
                      when 1 => Turn_On (B1);

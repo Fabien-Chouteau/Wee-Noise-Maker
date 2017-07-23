@@ -235,7 +235,7 @@ package body WNM.Sequencer is
                      Msg : MIDI.Message (Midi_Cmd.Kind);
                   begin
                      Msg.Cmd := Midi_Cmd;
-                     Msg.Channel := To_MIDI_Channel (Current_Chan);
+                     Msg.Channel := To_MIDI_Channel (Chan);
 
                      Quick_Synth.Event (Msg);
                   end;

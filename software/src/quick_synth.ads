@@ -11,4 +11,9 @@ package Quick_Synth is
    procedure Unmute (Chan : WNM.Channels);
    procedure Toggle_Mute (Chan : WNM.Channels);
    function Muted (Chan : WNM.Channels) return Boolean;
+
+   procedure Toggle_Solo (Chan : WNM.Channels);
+   function In_Solo return Boolean;
+   function Solo return WNM.Channels;
+
 end Quick_Synth;
