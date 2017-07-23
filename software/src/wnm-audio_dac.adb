@@ -44,8 +44,6 @@ package body WNM.Audio_DAC is
 
    type Audio_Buffer_Access is access all HAL.Audio.Audio_Buffer;
 
-   Init_Done : Boolean := False;
-
    Task_Start : Ada.Synchronous_Task_Control.Suspension_Object;
 
    DAC_Dev : SGTL5000.SGTL5000_DAC (Port => WNM.I2C.Port,
@@ -102,6 +100,7 @@ package body WNM.Audio_DAC is
 
    MCLK_Point : GPIO_Point renames PC7;
 
+   procedure Initialize;
    procedure Initialize_DMA;
    procedure Initialize_I2S;
    procedure Initialize_MCLK with Unreferenced;
@@ -252,13 +251,6 @@ package body WNM.Audio_DAC is
       MCLK_Control.Enable_Output;
    end Initialize_MCLK;
 
-   -----------------
-   -- Initialized --
-   -----------------
-
-   function Initialized return Boolean
-     is (Init_Done);
-
    ----------------
    -- Initialize --
    ----------------
@@ -347,8 +339,6 @@ package body WNM.Audio_DAC is
 
       --  Mute
       DAC_Dev.Mute_Line_Out (True);
-
-      Init_Done := True;
    end Initialize;
 
    ----------------
@@ -412,4 +402,6 @@ package body WNM.Audio_DAC is
       DAC_Dev.Set_Headphones_Volume (HP_Vol, HP_Vol);
    end Set_Volume;
 
+begin
+   Initialize;
 end WNM.Audio_DAC;

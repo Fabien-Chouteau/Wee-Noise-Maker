@@ -21,11 +21,6 @@
 
 package WNM.Audio_DAC is
 
-   function Initialized return Boolean;
-
-   procedure Initialize
-     with Post => Initialized;
-
    type DAC_Volume is range 0 .. 100;
    procedure Set_Volume (Volume : DAC_Volume);
 

@@ -21,24 +21,20 @@
 
 with Ada.Real_Time; use Ada.Real_Time;
 
---  with WNM.Sequencer;
+with WNM.Sequencer;
 with WNM.UI;
-with WNM.Encoders;
-with WNM.Screen;
-with WNM.I2C;
+with WNM.GUI;
+with WNM.Master_Volume;
 
 procedure Main is
-   pragma Priority (WNM.Synth_Task_Priority);
 begin
 
-   WNM.I2C.Initialize;
-   WNM.Screen.Initialize;
-   WNM.Encoders.Initialize;
-
---     WNM.Sequencer.Start;
    WNM.UI.Start;
+   WNM.Sequencer.Start;
 
-   --  Wait forever...
-   delay until Time_Last;
-
+   loop
+      WNM.Master_Volume.Update;
+      WNM.GUI.Update;
+      delay until Clock + Milliseconds (100);
+   end loop;
 end Main;

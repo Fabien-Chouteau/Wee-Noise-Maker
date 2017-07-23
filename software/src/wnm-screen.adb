@@ -26,25 +26,12 @@ with HAL.GPIO;                     use HAL.GPIO;
 with SSD1306.Standard_Resolutions; use SSD1306.Standard_Resolutions;
 with Ravenscar_Time;
 with HAL.Bitmap;                   use HAL.Bitmap;
-with Ada.Unchecked_Deallocation;
 
 with WNM.I2C;
 
-with wnm_logo_wave_1;
-with wnm_logo_wave_2;
-with wnm_logo_wave_3;
-with wnm_logo_wave_4;
-with wnm_logo_text;
-
-with Giza.Bitmaps.Indexed_1bit;
 with Giza.Colors;
 
 package body WNM.Screen is
-
-   type String_Access is access all String;
-
---     Current_Mode : Screen_Mode := Text;
-   Current_Text : String_Access := new String'("Wee Noise Maker");
 
    Screen_Reset : STM32.GPIO.GPIO_Point renames PC13;
 
@@ -52,10 +39,7 @@ package body WNM.Screen is
                                   Screen_Reset'Access,
                                   Ravenscar_Time.Delays);
 
-   procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
-
-   procedure Copy_Bitmap (Bmp  : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
-                          X, Y : Integer);
+   procedure Initialize;
 
    ----------------
    -- Initialize --
@@ -114,26 +98,6 @@ package body WNM.Screen is
    procedure Wakeup is
    begin
       Screen.Turn_On;
-
-      Copy_Bitmap (wnm_logo_text.Data, 6, 1);
-      Screen.Hidden_Buffer (1).Set_Source (White);
-      Screen.Hidden_Buffer (1).Draw_Line (Start     => (6, 10),
-                                          Stop      => (32, 10),
-                                          Thickness => 1);
-      Screen.Hidden_Buffer (1).Draw_Line (Start     => (63, 10),
-                                          Stop      => (89, 10),
-                                          Thickness => 1);
-
-      for I in 1 .. 1 loop
-         Copy_Bitmap ((case (I mod 4) is
-                         when 0 => wnm_logo_wave_1.Data,
-                         when 1 => wnm_logo_wave_2.Data,
-                         when 2 => wnm_logo_wave_3.Data,
-                         when others => wnm_logo_wave_4.Data),
-                      33, 8);
-         Screen.Update_Layers;
-         delay until Clock + Milliseconds (200);
-      end loop;
    end Wakeup;
 
    ------------
@@ -152,18 +116,6 @@ package body WNM.Screen is
    function Buffer return not null HAL.Bitmap.Any_Bitmap_Buffer
    is (Screen.Hidden_Buffer (1));
 
-   ----------
-   -- Text --
-   ----------
-
-   procedure Text (Str : String) is
-   begin
-      if Current_Text /= null then
-         Free (Current_Text);
-      end if;
-
-      Current_Text := new String'(Str);
---        Current_Mode := Text;
-
-   end Text;
+begin
+   Initialize;
 end WNM.Screen;

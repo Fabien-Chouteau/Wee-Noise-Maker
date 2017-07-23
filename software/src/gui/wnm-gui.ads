@@ -21,4 +21,23 @@
 
 package WNM.GUI is
 
+   procedure Update;
+
+--     type Window is interface;
+--     type Window_Ref is not null access Window'Class;
+--
+--     procedure Draw (This   : Window;
+--                     Buffer : HAL.Bitmap.Bitmap_Buffer'Class)
+--     is abstract;
+--
+--
+--     type Pop_Up_Window is interface;
+--     type Pop_Up_Window_Ref is not null access Pop_Up_Window'Class;
+--
+--     function Finished (This : Pop_Up_Window) return Boolean
+--     is abstract;
+--
+--     procedure Set_Base_Window (Win : Window_Ref);
+--     procedure Add_Pop_Up (Win : Pop_Up_Window_Ref);
+--
 end WNM.GUI;

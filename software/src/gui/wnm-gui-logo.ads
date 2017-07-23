@@ -19,23 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;
-with Giza.Bitmaps.Indexed_1bit;
+with HAL;
 
-package WNM.Screen is
-
-   procedure Update;
-
-   function Buffer return not null HAL.Bitmap.Any_Bitmap_Buffer;
-
-   procedure Copy_Bitmap (Bmp  : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
-                          X, Y : Integer);
-
-   procedure Sleep;
-   procedure Wakeup;
-
-private
-
-   type Screen_Mode is (Text, Parameter);
-
-end WNM.Screen;
+package WNM.GUI.Logo is
+   procedure Draw_On_Screen (Anim_Step : HAL.UInt2);
+end WNM.GUI.Logo;
