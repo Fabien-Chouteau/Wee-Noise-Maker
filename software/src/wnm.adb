@@ -30,51 +30,51 @@ package body WNM is
       return Keyboard_Value (B'Enum_Rep - B1'Enum_Rep + 1);
    end To_Value;
 
-   ----------------
-   -- To_Channel --
-   ----------------
+   --------------
+   -- To_Track --
+   --------------
 
-   function To_Channel (B : Channel_Buttons) return Channels
+   function To_Track (B : Tacks_Buttons) return Tracks
    is (case B is
-          when Chan_A => Chan_A,
-          when Chan_B => Chan_B,
-          when Chan_C => Chan_C,
-          when Chan_D => Chan_D,
-          when Chan_E => Chan_E);
+          when Track_A => Track_A,
+          when Track_B => Track_B,
+          when Track_C => Track_C,
+          when Track_D => Track_D,
+          when Track_E => Track_E);
 
    ---------------
    -- To_Button --
    ---------------
 
-   function To_Button (Chan : Channels) return Channel_Buttons
+   function To_Button (Chan : Tracks) return Tacks_Buttons
    is (case Chan is
-          when Chan_A => Chan_A,
-          when Chan_B => Chan_B,
-          when Chan_C => Chan_C,
-          when Chan_D => Chan_D,
-          when Chan_E => Chan_E);
+          when Track_A => Track_A,
+          when Track_B => Track_B,
+          when Track_C => Track_C,
+          when Track_D => Track_D,
+          when Track_E => Track_E);
 
-   ----------------
-   -- To_Channel --
-   ----------------
+   --------------
+   -- To_Track --
+   --------------
 
-   function To_Channel (Chan : MIDI.MIDI_Channel) return Channels
+   function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
    is (case Chan is
-          when 0      => Chan_A,
-          when 1      => Chan_B,
-          when 2      => Chan_C,
-          when 3      => Chan_D,
-          when others => Chan_E);
+          when 0      => Track_A,
+          when 1      => Track_B,
+          when 2      => Track_C,
+          when 3      => Track_D,
+          when others => Track_E);
 
    ---------------------
    -- To_MIDI_Channel --
    ---------------------
 
-   function To_MIDI_Channel (Chan : Channels) return MIDI.MIDI_Channel
+   function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
    is (case Chan is
-          when Chan_A => 0,
-          when Chan_B => 1,
-          when Chan_C => 2,
-          when Chan_D => 3,
-          when Chan_E => 4);
+          when Track_A => 0,
+          when Track_B => 1,
+          when Track_C => 2,
+          when Track_D => 3,
+          when Track_E => 4);
 end WNM;

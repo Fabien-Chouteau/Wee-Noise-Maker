@@ -5,31 +5,31 @@ with HAL; use HAL;
 
 package body Quick_Synth is
 
-   use type WNM.Channels;
+   use type WNM.Tracks;
 
-   My_Synths : array (WNM.Channels) of  Simple_Synthesizer.Synthesizer
+   My_Synths : array (WNM.Tracks) of  Simple_Synthesizer.Synthesizer
      (Stereo    => True,
       Amplitude => Natural (Unsigned_16'Last / 10));
 
-   Chan_Muted : array (WNM.Channels) of Boolean := (others => False);
+   Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
    Solo_Mode_Enabled : Boolean := False;
-   Solo_Chan : WNM.Channels := WNM.Chan_A;
+   Solo_Track : WNM.Tracks := WNM.Track_A;
 
    -----------
    -- Event --
    -----------
 
    procedure Event (Msg : MIDI.Message) is
-      Chan : constant WNM.Channels := WNM.To_Channel (Msg.Channel);
+      Track : constant WNM.Tracks := WNM.To_Track (Msg.Channel);
    begin
 
       case Msg.Kind is
          when MIDI.Note_On =>
-            My_Synths (Chan).Set_Note_Frequency
+            My_Synths (Track).Set_Note_Frequency
               (MIDI.Key_To_Frequency (Msg.Cmd.Key));
          when  MIDI.Note_Off =>
-            if My_Synths (Chan).Note_Frequency = MIDI.Key_To_Frequency (Msg.Cmd.Key) then
-               My_Synths (Chan).Set_Note_Frequency (0.0);
+            if My_Synths (Track).Note_Frequency = MIDI.Key_To_Frequency (Msg.Cmd.Key) then
+               My_Synths (Track).Set_Note_Frequency (0.0);
             end if;
          when others =>
             null;
@@ -51,14 +51,14 @@ package body Quick_Synth is
          Output (Index) := Input (Index);
       end loop;
 
-      for Chan in WNM.Channels loop
-         My_Synths (Chan).Receive (Tmp);
+      for Track in WNM.Tracks loop
+         My_Synths (Track).Receive (Tmp);
 
-         if (not Chan_Muted (Chan) and then not Solo_Mode_Enabled)
+         if (not Track_Muted (Track) and then not Solo_Mode_Enabled)
            or else
-            (not Chan_Muted (Chan) and then Solo_Chan = Chan)
+            (not Track_Muted (Track) and then Solo_Track = Track)
            or else
-            (Solo_Mode_Enabled and then Solo_Chan = Chan)
+            (Solo_Mode_Enabled and then Solo_Track = Track)
          then
             for Index in Output'Range loop
                Val := Integer_32 (Output (Index)) + Integer_32 (Tmp (Index));
@@ -78,51 +78,51 @@ package body Quick_Synth is
    -- Mute --
    ----------
 
-   procedure Mute (Chan : WNM.Channels) is
+   procedure Mute (Track : WNM.Tracks) is
    begin
-      Chan_Muted (Chan) := True;
+      Track_Muted (Track) := True;
    end Mute;
 
    ------------
    -- Unmute --
    ------------
 
-   procedure Unmute (Chan : WNM.Channels) is
+   procedure Unmute (Track : WNM.Tracks) is
    begin
-      Chan_Muted (Chan) := False;
+      Track_Muted (Track) := False;
    end Unmute;
 
    -----------------
    -- Toggle_Mute --
    -----------------
 
-   procedure Toggle_Mute (Chan : WNM.Channels) is
+   procedure Toggle_Mute (Track : WNM.Tracks) is
    begin
-      Chan_Muted (Chan) := not Chan_Muted (Chan);
+      Track_Muted (Track) := not Track_Muted (Track);
    end Toggle_Mute;
 
    -----------
    -- Muted --
    -----------
 
-   function Muted (Chan : WNM.Channels) return Boolean
-   is (Chan_Muted (Chan));
+   function Muted (Track : WNM.Tracks) return Boolean
+   is (Track_Muted (Track));
 
    -----------------
    -- Toggle_Solo --
    -----------------
 
-   procedure Toggle_Solo (Chan : WNM.Channels) is
+   procedure Toggle_Solo (Track : WNM.Tracks) is
    begin
       if Solo_Mode_Enabled then
-         if Solo_Chan = Chan then
+         if Solo_Track = Track then
             Solo_Mode_Enabled := False;
          else
-            Solo_Chan := Chan;
+            Solo_Track := Track;
          end if;
       else
          Solo_Mode_Enabled := True;
-         Solo_Chan := Chan;
+         Solo_Track := Track;
       end if;
    end Toggle_Solo;
 
@@ -137,8 +137,8 @@ package body Quick_Synth is
    -- Solo --
    ----------
 
-   function Solo return WNM.Channels
-   is (Solo_Chan);
+   function Solo return WNM.Tracks
+   is (Solo_Track);
 
 begin
    for Synth of My_Synths loop

@@ -34,7 +34,7 @@ package WNM.UI is
                             Sequence_Edit,
                             Volume_BPM,
                             FX_Select,
-                            Chan_Assign);
+                            Track_Assign);
 
    function Input_Mode return Input_Mode_Type;
 
@@ -65,11 +65,11 @@ private
       Rec       => PA10,
       Play      => PC6,
       FX        => PD15,
-      Chan_A    => PB1,
-      Chan_B    => PE10,
-      Chan_C    => PE14,
-      Chan_D    => PB14,
-      Chan_E    => PD8,
+      Track_A    => PB1,
+      Track_B    => PE10,
+      Track_C    => PE14,
+      Track_D    => PB14,
+      Track_E    => PD8,
       Encoder_L => PC14,
       Encoder_R => PC15);
 
@@ -119,11 +119,11 @@ private
       Rec     => (Row => 1, Col => 9),
       Play    => (Row => 2, Col => 9),
       FX      => (Row => 3, Col => 9),
-      Chan_A  => (Row => 3, Col => 4),
-      Chan_B  => (Row => 3, Col => 5),
-      Chan_C  => (Row => 3, Col => 6),
-      Chan_D  => (Row => 3, Col => 7),
-      Chan_E  => (Row => 3, Col => 8));
+      Track_A  => (Row => 3, Col => 4),
+      Track_B  => (Row => 3, Col => 5),
+      Track_C  => (Row => 3, Col => 6),
+      Track_D  => (Row => 3, Col => 7),
+      Track_E  => (Row => 3, Col => 8));
 
    LED_State : array (Buttons) of Boolean := (others => False);
 
@@ -159,11 +159,11 @@ private
       Rec       => True,
       Play      => True,
       FX        => False,
-      Chan_A    => True,
-      Chan_B    => True,
-      Chan_C    => True,
-      Chan_D    => True,
-      Chan_E    => True,
+      Track_A   => True,
+      Track_B   => True,
+      Track_C   => True,
+      Track_D   => True,
+      Track_E   => True,
       Encoder_L => True,
       Encoder_R => True);
 

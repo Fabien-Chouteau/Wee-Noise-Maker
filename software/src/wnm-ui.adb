@@ -35,15 +35,11 @@ package body WNM.UI is
    procedure Turn_On (LED_Addr : LED_Address);
    procedure Turn_Off (LED_Addr : LED_Address);
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
-   procedure Select_Channel (Chan : Channels);
 
    procedure Set_FX (B : Buttons);
-   procedure Set_Chan_Instrument (B : Buttons);
 
    Default_Input_Mode : constant Input_Mode_Type := Note;
 
-   Current_Chan : Channels := Chan_A;
-   Current_Instrument : array (Channels) of Buttons := (others => B1);
    FX_Is_On : array (Buttons) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
@@ -72,9 +68,9 @@ package body WNM.UI is
                         Sequencer.Play_Pause;
                      when Rec =>
                         Sequencer.Rec;
-                     when Chan_A .. Chan_E =>
-                        --  Select current channel
-                        Select_Channel (To_Channel (B));
+                     when Track_A .. Track_E =>
+                        --  Select current track
+                        Sequencer.Select_Track (To_Track (B));
                      when Keyboard_Buttons =>
                         --  Play note or octave Up/Down
                         Sequencer.On_Press (B);
@@ -88,10 +84,10 @@ package body WNM.UI is
                      when Rec =>
                         --  Switch to squence edition mode
                         Current_Input_Mode := Sequence_Edit;
-                     when Chan_A .. Chan_E =>
+                     when Track_A .. Track_E =>
                         --  Switch to channel assignment mode
-                        Select_Channel (To_Channel (B));
-                        Current_Input_Mode := Chan_Assign;
+                        Sequencer.Select_Track (To_Track (B));
+                        Current_Input_Mode := Track_Assign;
                      when others => null;
                   end case;
                when On_Release =>
@@ -119,31 +115,31 @@ package body WNM.UI is
                when On_Press =>
                   case B is
                      when  B4 =>
-                        Quick_Synth.Toggle_Solo (Chan_A);
+                        Quick_Synth.Toggle_Solo (Track_A);
                      when  B5 =>
-                        Quick_Synth.Toggle_Solo (Chan_B);
+                        Quick_Synth.Toggle_Solo (Track_B);
                         FX_Is_On (B) := (Quick_Synth.In_Solo
                                          and then
-                                         Quick_Synth.Solo = Chan_B);
+                                         Quick_Synth.Solo = Track_B);
                      when  B6 =>
-                        Quick_Synth.Toggle_Solo (Chan_C);
+                        Quick_Synth.Toggle_Solo (Track_C);
                         FX_Is_On (B) := (Quick_Synth.In_Solo
                                          and then
-                                         Quick_Synth.Solo = Chan_C);
+                                         Quick_Synth.Solo = Track_C);
                      when  B7 =>
-                        Quick_Synth.Toggle_Solo (Chan_D);
+                        Quick_Synth.Toggle_Solo (Track_D);
                         FX_Is_On (B) := (Quick_Synth.In_Solo
                                          and then
-                                         Quick_Synth.Solo = Chan_D);
+                                         Quick_Synth.Solo = Track_D);
                      when  B8 =>
-                        Quick_Synth.Toggle_Solo (Chan_E);
+                        Quick_Synth.Toggle_Solo (Track_E);
                         FX_Is_On (B) := (Quick_Synth.In_Solo
                                          and then
-                                         Quick_Synth.Solo = Chan_E);
+                                         Quick_Synth.Solo = Track_E);
                      when  B1 .. B3 | B9 .. B16 =>
                         Set_FX (B);
-                     when Chan_A .. Chan_E =>
-                        Quick_Synth.Toggle_Mute (To_Channel (B));
+                     when Track_A .. Track_E =>
+                        Quick_Synth.Toggle_Mute (To_Track (B));
                      when others =>
                         null;
                   end case;
@@ -155,30 +151,14 @@ package body WNM.UI is
                   null;
             end case;
 
-         when Chan_Assign =>
+         when Track_Assign =>
             if B in B1 .. B16 and then Evt = On_Press then
-               Set_Chan_Instrument (B);
-            elsif B = To_Button (Current_Chan) and then Evt = On_Release then
+               Sequencer.Set_Instrument (To_Value (B));
+            elsif B = To_Button (Sequencer.Track) and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
       end case;
    end Signal_Event;
-
-   --------------------
-   -- Select_Channel --
-   --------------------
-
-   procedure Select_Channel (Chan : Channels) is
-   begin
-      Turn_Off (Chan_A);
-      Turn_Off (Chan_B);
-      Turn_Off (Chan_C);
-      Turn_Off (Chan_D);
-      Turn_Off (Chan_E);
-      Turn_On (To_Button (Chan));
-      Sequencer.Select_Channel (Chan);
-      Current_Chan := Chan;
-   end Select_Channel;
 
    ------------
    -- Set_FX --
@@ -188,16 +168,6 @@ package body WNM.UI is
    begin
       FX_Is_On (B) := not FX_Is_On (B);
    end Set_FX;
-
-   -------------------------
-   -- Set_Chan_Instrument --
-   -------------------------
-
-   procedure Set_Chan_Instrument (B : Buttons) is
-   begin
-      Current_Instrument (Current_Chan) := B;
-      Sequencer.Set_Instrument (To_Value (B));
-   end Set_Chan_Instrument;
 
    -----------
    -- Start --
@@ -391,14 +361,14 @@ package body WNM.UI is
          --------------
 
          -- Tacks LEDs --
-         for B in Buttons range Chan_A .. Chan_E loop
+         for B in Buttons range Track_A .. Track_E loop
             if Current_Input_Mode = FX_Select then
-               if not Quick_Synth.Muted (To_Channel (B)) then
+               if not Quick_Synth.Muted (To_Track (B)) then
                   Turn_On (B);
                else
                   Turn_Off (B);
                end if;
-            elsif Current_Chan = To_Channel (B) then
+            elsif Sequencer.Track = To_Track (B) then
                Turn_On (B);
             else
                Turn_Off (B);
@@ -436,11 +406,11 @@ package body WNM.UI is
                   FX_Is_On (B) := (Quick_Synth.In_Solo
                                    and then
                                    Quick_Synth.Solo = (case B is
-                                        when B4 => Chan_A,
-                                        when B5 => Chan_B,
-                                        when B6 => Chan_C,
-                                        when B7 => Chan_D,
-                                        when others => Chan_E));
+                                        when B4 => Track_A,
+                                        when B5 => Track_B,
+                                        when B6 => Track_C,
+                                        when B7 => Track_D,
+                                        when others => Track_E));
                end loop;
 
                for B in B1 .. B16 loop
@@ -453,9 +423,9 @@ package body WNM.UI is
                end loop;
 
             -- Track assign mode --
-            when Chan_Assign =>
+            when Track_Assign =>
                for B in B1 .. B16 loop
-                  if Current_Instrument (Current_Chan) = B then
+                  if Sequencer.Instrument (Sequencer.Track) = To_Value (B) then
                      Turn_On (B);
                   else
                      Turn_Off (B);

@@ -28,27 +28,27 @@ package WNM is
    type Buttons is (B1, B2, B3, B4, B5, B6, B7, B8,
                     B9, B10, B11, B12, B13, B14, B15, B16,
                     Rec, Play, FX,
-                    Chan_A, Chan_B, Chan_C, Chan_D, Chan_E,
+                    Track_A, Track_B, Track_C, Track_D, Track_E,
                     Encoder_L, Encoder_R);
 
-   subtype Channel_Buttons is Buttons range Chan_A .. Chan_E;
+   subtype Tacks_Buttons is Buttons range Track_A .. Track_E;
    subtype Keyboard_Buttons is Buttons range B1 .. B16;
 
    type Keyboard_Value is range 1 .. 16;
 
-   subtype LEDs is Buttons range B1 .. Chan_E;
+   subtype LEDs is Buttons range B1 .. Track_E;
 
    function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
 
-   type Channels is (Chan_A, Chan_B, Chan_C, Chan_D, Chan_E);
+   type Tracks is (Track_A, Track_B, Track_C, Track_D, Track_E);
 
-   function To_Channel (B : Channel_Buttons) return Channels
+   function To_Track (B : Tacks_Buttons) return Tracks
      with Inline_Always;
-   function To_Button (Chan : Channels) return Channel_Buttons
+   function To_Button (Chan : Tracks) return Tacks_Buttons
      with Inline_Always;
-   function To_Channel (Chan : MIDI.MIDI_Channel) return Channels
+   function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;
-   function To_MIDI_Channel (Chan : Channels) return MIDI.MIDI_Channel
+   function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
      with Inline_Always;
 
    type Sequencer_Steps is range 1 .. 16;

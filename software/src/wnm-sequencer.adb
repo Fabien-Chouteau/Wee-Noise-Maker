@@ -33,10 +33,9 @@ package body WNM.Sequencer is
 
    Current_Step      : Sequencer_Steps := Sequencer_Steps'First with Atomic;
    Current_Seq_State : Sequencer_State := Pause with Atomic;
-   Current_Chan      : Channels := Channels'First;
-   Instrument        : array (Channels) of Keyboard_Value :=
+   Current_Track     : Tracks := Tracks'First;
+   Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
-   pragma Unreferenced (Instrument);
 
    type Sequencer_State_Event is (Play_Event, Rec_Event);
 
@@ -133,13 +132,13 @@ package body WNM.Sequencer is
             declare
                Msg : MIDI.Message (MIDI.Note_On);
             begin
-               Msg.Channel := To_MIDI_Channel (Current_Chan);
+               Msg.Channel := To_MIDI_Channel (Current_Track);
                Msg.Cmd.Key := To_Key (Button, Octave);
                Msg.Cmd.Velocity := 16#77#;
                Quick_Synth.Event (Msg);
 
                if Current_Seq_State in Play_And_Rec | Rec then
-                  Add (Sequences (Current_Chan), Current_Step, Msg.Cmd);
+                  Add (Sequences (Current_Track), Current_Step, Msg.Cmd);
                end if;
             end;
       end case;
@@ -156,13 +155,13 @@ package body WNM.Sequencer is
             declare
                Msg : MIDI.Message (MIDI.Note_Off);
             begin
-               Msg.Channel := To_MIDI_Channel (Current_Chan);
+               Msg.Channel := To_MIDI_Channel (Current_Track);
                Msg.Cmd.Key := To_Key (Button, Octave);
                Msg.Cmd.Velocity := 16#77#;
                Quick_Synth.Event (Msg);
 
                if Current_Seq_State in Play_And_Rec | Rec then
-                  Add (Sequences (Current_Chan), Current_Step, Msg.Cmd);
+                  Add (Sequences (Current_Track), Current_Step, Msg.Cmd);
                end if;
             end;
          when others =>
@@ -174,10 +173,17 @@ package body WNM.Sequencer is
    -- Select_Channel --
    --------------------
 
-   procedure Select_Channel (Chan : Channels) is
+   procedure Select_Track (Track : Tracks) is
    begin
-      Current_Chan := Chan;
-   end Select_Channel;
+      Current_Track := Track;
+   end Select_Track;
+
+   -----------
+   -- Track --
+   -----------
+
+   function Track return Tracks
+   is (Current_Track);
 
    --------------------
    -- Set_Instrument --
@@ -185,9 +191,15 @@ package body WNM.Sequencer is
 
    procedure Set_Instrument (Val : Keyboard_Value) is
    begin
-      Instrument (Current_Chan) := Val;
+      Track_Instrument (Current_Track) := Val;
    end Set_Instrument;
 
+   ----------------
+   -- Instrument --
+   ----------------
+
+   function Instrument (Track : Tracks) return Keyboard_Value
+   is (Track_Instrument (Track));
 
    -------------
    -- Set_BPM --
@@ -226,16 +238,16 @@ package body WNM.Sequencer is
          delay until Next_Start;
 
          if Current_Seq_State in Play | Play_And_Rec then
-            for Chan in Sequences'Range loop
-               for Index in 1 .. Last_Index (Sequences (Chan), Current_Step) loop
+            for Track in Sequences'Range loop
+               for Index in 1 .. Last_Index (Sequences (Track), Current_Step) loop
                   declare
-                     Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Chan),
+                     Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Track),
                                                               Current_Step,
                                                               Index);
                      Msg : MIDI.Message (Midi_Cmd.Kind);
                   begin
                      Msg.Cmd := Midi_Cmd;
-                     Msg.Channel := To_MIDI_Channel (Chan);
+                     Msg.Channel := To_MIDI_Channel (Track);
 
                      Quick_Synth.Event (Msg);
                   end;

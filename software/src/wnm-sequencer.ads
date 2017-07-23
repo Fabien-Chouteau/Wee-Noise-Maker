@@ -41,11 +41,15 @@ package WNM.Sequencer is
 
    procedure On_Release (Button : Keyboard_Buttons);
 
-   procedure Select_Channel (Chan : Channels);
-   --  Select the current channel
+   procedure Select_Track (Track : Tracks);
+   --  Select the current track
+
+   function Track return Tracks;
 
    procedure Set_Instrument (Val : Keyboard_Value);
-   --  Set the instrument of the current channel
+   --  Set the instrument of the current track
+
+   function Instrument (Track : Tracks) return Keyboard_Value;
 
    procedure Set_BPM (BPM : Positive);
    --  Also known as 60/BPM...
@@ -55,6 +59,6 @@ package WNM.Sequencer is
 
 private
 
-   Sequences : array (Channels) of WNM.Sequence.Instance;
+   Sequences : array (Tracks) of WNM.Sequence.Instance;
 
 end WNM.Sequencer;

@@ -124,7 +124,7 @@ package body WNM.Screen is
                                           Stop      => (89, 10),
                                           Thickness => 1);
 
-      for I in 1 .. 5 loop
+      for I in 1 .. 1 loop
          Copy_Bitmap ((case (I mod 4) is
                          when 0 => wnm_logo_wave_1.Data,
                          when 1 => wnm_logo_wave_2.Data,
