@@ -211,6 +211,27 @@ package body WNM.Sequencer is
       Sequencer_BPM := BPM;
    end Set_BPM;
 
+   ----------------
+   -- Change_BPM --
+   ----------------
+
+   procedure Change_BPM (BPM_Delta : Integer) is
+      Res : Integer;
+   begin
+      Res := Sequencer_BPM + BPM_Delta;
+      if Res in Beat_Per_Minute then
+         Sequencer_BPM := Res;
+      end if;
+   end Change_BPM;
+
+   ---------
+   -- BPM --
+   ---------
+
+   function BPM return Beat_Per_Minute
+   is (Sequencer_BPM);
+
+
    -----------
    -- Start --
    -----------

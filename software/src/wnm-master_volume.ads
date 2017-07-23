@@ -19,47 +19,28 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with WNM.Sequence;
+--  Volume update requires I2C communication with the DAC. Doing this from the
+--  UI would introduce too much lag in a task that must be fast.
 
-package WNM.Sequencer is
+package WNM.Master_Volume is
 
-   type Sequencer_State is (Pause, Play, Rec, Play_And_Rec);
+   subtype Volume_Value is Natural range 0 .. 100;
 
-   function State return Sequencer_State;
-   --  Current state of the sequencer
+   procedure Update;
+   --  Send the current volume value to the DAC. This is meant to be called in
+   --  a low priority task,
 
-   function Step return Sequencer_Steps;
-   --  Current step
+   procedure Set (Vol : Volume_Value);
+   --  Set the desired volume value. The value will not be update until the
+   --  Update sub-program is executed.
+   --  Set_Volume is not blocking and can be called in an high priority task.
 
-   procedure Play_Pause;
-   --  Use it to signal a play/pause event
+   procedure Change (Delta_Vol : Integer);
+   --  Change the desired volume value. The value will not be update until the
+   --  Update sub-program is executed.
+   --  Change_Volume is not blocking and can be called in an high priority
+   --  task.
 
-   procedure Rec;
-   --  Use it to signal a rec/stop record event
+   function Value return Volume_Value;
 
-   procedure On_Press (Button : Keyboard_Buttons);
-
-   procedure On_Release (Button : Keyboard_Buttons);
-
-   procedure Select_Track (Track : Tracks);
-   --  Select the current track
-
-   function Track return Tracks;
-
-   procedure Set_Instrument (Val : Keyboard_Value);
-   --  Set the instrument of the current track
-
-   function Instrument (Track : Tracks) return Keyboard_Value;
-
-   procedure Set_BPM (BPM : Beat_Per_Minute);
-   procedure Change_BPM (BPM_Delta : Integer);
-   function BPM return Beat_Per_Minute;
-
-   procedure Start;
-   --  Start the sequencer task
-
-private
-
-   Sequences : array (Tracks) of WNM.Sequence.Instance;
-
-end WNM.Sequencer;
+end WNM.Master_Volume;

@@ -23,14 +23,15 @@ private with STM32.Device;
 private with STM32.GPIO;
 private with STM32.Timers;
 
-package WNM.Encoders is
+package WNM.Encoders
+  with Elaborate_Body
+is
 
-   procedure Initialize;
-
-   function Left return Integer;
-   function Right return Integer;
+   function Left_Diff return Integer;
+   function Right_Diff return Integer;
 
 private
+
    use STM32.Device;
    use STM32.GPIO;
    use STM32.Timers;
@@ -46,5 +47,7 @@ private
 
    AF_L : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM2_1;
    AF_R : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM3_2;
+
+   Capture_Filter : constant Timer_Input_Capture_Filter := 6;
 
 end WNM.Encoders;

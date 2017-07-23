@@ -26,29 +26,31 @@ package body  WNM.Encoders is
    Last_Count_L : Integer := 0;
    Last_Count_R : Integer := 0;
 
+   procedure Initialize;
+
    ----------
    -- Left --
    ----------
 
-   function Left return Integer is
+   function Left_Diff return Integer is
       Now : constant Integer := Integer (Current_Counter (Timer_L));
       Ret : constant Integer := Now - Last_Count_L;
    begin
       Last_Count_L := Now;
       return Ret;
-   end Left;
+   end Left_Diff;
 
    -----------
    -- Right --
    -----------
 
-   function Right return Integer is
+   function Right_Diff return Integer is
       Now : constant Integer := Integer (Current_Counter (Timer_R));
       Ret : constant Integer := Now - Last_Count_R;
    begin
       Last_Count_R := Now;
       return Ret;
-   end Right;
+   end Right_Diff;
 
    ----------------
    -- Initialize --
@@ -65,10 +67,10 @@ package body  WNM.Encoders is
       Enable_Clock (Timer_L);
       Enable_Clock (Timer_R);
 
-      Config.Mode := Mode_AF;
+      Config.Mode        := Mode_AF;
       Config.Output_Type := Push_Pull;
-      Config.Resistors := Pull_Up;
-      Config.Speed := Speed_100MHz;
+      Config.Resistors   := Pull_Up;
+      Config.Speed       := Speed_100MHz;
 
       Point_L_A.Configure_IO (Config);
       Point_L_B.Configure_IO (Config);
@@ -82,13 +84,13 @@ package body  WNM.Encoders is
 
       Configure_Encoder_Interface
         (Timer_L,
-         Mode         => Encoder_Mode_TI1_TI2,
+         Mode         => Encoder_Mode_TI1,
          IC1_Polarity => Rising,
          IC2_Polarity => Rising);
 
       Configure_Encoder_Interface
         (Timer_R,
-         Mode         => Encoder_Mode_TI1_TI2,
+         Mode         => Encoder_Mode_TI1,
          IC1_Polarity => Rising,
          IC2_Polarity => Rising);
 
@@ -112,7 +114,7 @@ package body  WNM.Encoders is
          Polarity  => Rising,
          Selection => Direct_TI,
          Prescaler => Div1,
-         Filter    => 0);
+         Filter    => Capture_Filter);
 
       Configure_Channel_Input
         (Timer_L,
@@ -120,7 +122,7 @@ package body  WNM.Encoders is
          Polarity  => Rising,
          Selection => Direct_TI,
          Prescaler => Div1,
-         Filter    => 0);
+         Filter    => Capture_Filter);
 
       Configure_Channel_Input
         (Timer_R,
@@ -128,7 +130,7 @@ package body  WNM.Encoders is
          Polarity  => Rising,
          Selection => Direct_TI,
          Prescaler => Div1,
-         Filter    => 0);
+         Filter    => Capture_Filter);
 
       Configure_Channel_Input
         (Timer_R,
@@ -136,7 +138,7 @@ package body  WNM.Encoders is
          Polarity  => Rising,
          Selection => Direct_TI,
          Prescaler => Div1,
-         Filter    => 0);
+         Filter    => Capture_Filter);
 
       Enable_Channel (Timer_L, Channel_1);
       Enable_Channel (Timer_L, Channel_2);
@@ -150,4 +152,6 @@ package body  WNM.Encoders is
       Enable (Timer_R);
    end Initialize;
 
+begin
+   Initialize;
 end WNM.Encoders;

@@ -25,8 +25,10 @@
 --  LEDs. Press the current chan to erase the squence.
 
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
-with WNM.Sequencer; use WNM.Sequencer;
-with Quick_Synth;   use Quick_Synth;
+with WNM.Sequencer;                use WNM.Sequencer;
+with WNM.Encoders;                 use WNM.Encoders;
+with Quick_Synth;                  use Quick_Synth;
+with WNM.Master_Volume;
 
 package body WNM.UI is
 
@@ -298,6 +300,13 @@ package body WNM.UI is
       Last_State    : array (Buttons) of Raw_Key_State := (others => Up);
       Pressed_Since : array (Buttons) of Time := (others => Time_First);
       Last_Event    : array (Buttons) of Buttton_Event := (others => On_Release);
+
+
+      type Microstep_Cnt is mod 2;
+      Microstep : Microstep_Cnt := 0;
+
+      L_Enco : Integer;
+      R_Enco : Integer;
    begin
       Suspend_Until_True (UI_Task_Start);
 
@@ -305,6 +314,8 @@ package body WNM.UI is
       loop
          Next_Start := Next_Start + Period;
          delay until Next_Start;
+
+         Microstep := Microstep + 1;
 
          --  Handle buttons
          for B in Buttons loop
@@ -355,6 +366,23 @@ package body WNM.UI is
 
             Last_State (B) := Key_State (B);
          end loop;
+
+         --------------
+         -- Encoders --
+         --------------
+
+         if Microstep = 0 then
+            L_Enco := WNM.Encoders.Left_Diff;
+            R_Enco := WNM.Encoders.Right_Diff;
+
+            case Current_Input_Mode is
+            when Volume_BPM =>
+               WNM.Sequencer.Set_BPM_Delta (R_Enco);
+               WNM.Master_Volume.Change (L_Enco);
+            when others =>
+               null;
+            end case;
+         end if;
 
          --------------
          -- Set LEDs --

@@ -19,47 +19,50 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with WNM.Sequence;
+with WNM.Audio_DAC; use WNM.Audio_DAC;
 
-package WNM.Sequencer is
+package body WNM.Master_Volume is
 
-   type Sequencer_State is (Pause, Play, Rec, Play_And_Rec);
+   Desired_Volume : Volume_Value := 40;
 
-   function State return Sequencer_State;
-   --  Current state of the sequencer
+   ------------
+   -- Update --
+   ------------
 
-   function Step return Sequencer_Steps;
-   --  Current step
+   procedure Update is
+   begin
+      WNM.Audio_DAC.Set_Volume (DAC_Volume (Desired_Volume));
+   end Update;
 
-   procedure Play_Pause;
-   --  Use it to signal a play/pause event
+   ---------
+   -- Set --
+   ---------
 
-   procedure Rec;
-   --  Use it to signal a rec/stop record event
+   procedure Set (Vol : Volume_Value) is
+   begin
+      Desired_Volume := Vol;
+   end Set;
 
-   procedure On_Press (Button : Keyboard_Buttons);
+   ------------
+   -- Change --
+   ------------
 
-   procedure On_Release (Button : Keyboard_Buttons);
+   procedure Change (Delta_Vol : Integer) is
+      Tmp : Integer;
+   begin
 
-   procedure Select_Track (Track : Tracks);
-   --  Select the current track
+      Tmp := Integer (Desired_Volume) + Delta_Vol;
 
-   function Track return Tracks;
+      if Tmp in Volume_Value then
+         Desired_Volume := Tmp;
+      end if;
+   end Change;
 
-   procedure Set_Instrument (Val : Keyboard_Value);
-   --  Set the instrument of the current track
+   -----------
+   -- Value --
+   -----------
 
-   function Instrument (Track : Tracks) return Keyboard_Value;
+   function Value return Volume_Value
+   is (Desired_Volume);
 
-   procedure Set_BPM (BPM : Beat_Per_Minute);
-   procedure Change_BPM (BPM_Delta : Integer);
-   function BPM return Beat_Per_Minute;
-
-   procedure Start;
-   --  Start the sequencer task
-
-private
-
-   Sequences : array (Tracks) of WNM.Sequence.Instance;
-
-end WNM.Sequencer;
+end WNM.Master_Volume;
