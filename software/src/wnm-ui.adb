@@ -289,7 +289,8 @@ package body WNM.UI is
 
    task UI_Task is
       pragma Priority (UI_Task_Priority);
-      pragma Storage_Size (512);
+      pragma Storage_Size (UI_Task_Stack_Size);
+      pragma Secondary_Stack_Size (UI_Task_Secondary_Stack_Size);
    end UI_Task;
 
    task body UI_Task is

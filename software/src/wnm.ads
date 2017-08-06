@@ -56,16 +56,18 @@ package WNM is
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 4;
 
-   UI_Task_Period   : constant Time_Span := Milliseconds (50);
-   UI_Task_Priority : constant System.Priority := System.Default_Priority + 1;
+   DAC_Task_Priority       : constant System.Priority := System.Default_Priority + 10;
+   Synth_Task_Priority     : constant System.Priority := DAC_Task_Priority - 1;
+   Sample_Task_Priority    : constant System.Priority := Synth_Task_Priority - 1;
+   Sequencer_Task_Priority : constant System.Priority := Sample_Task_Priority - 1;
+   UI_Task_Priority        : constant System.Priority := Sequencer_Task_Priority - 1;
+   LED_Task_Priority       : constant System.Priority := UI_Task_Priority - 1;
+
+   UI_Task_Period               : constant Time_Span := Milliseconds (50);
+   UI_Task_Stack_Size           : constant := 5 * 1024;
+   UI_Task_Secondary_Stack_Size : constant := 10 * 1024;
 
    LED_Task_Period   : constant Time_Span := Microseconds (1000);
-   LED_Task_Priority : constant System.Priority := System.Default_Priority;
-
-   Sequencer_Task_Priority : constant System.Priority := System.Default_Priority;
-
-   Synth_Task_Priority : constant System.Priority := System.Default_Priority + 2;
-   DAC_Task_Priority : constant System.Priority := System.Default_Priority + 3;
 
    Long_Press_Time_Span : constant Time_Span := Milliseconds (300);
    --  How much time users have to press a button to get the alternative

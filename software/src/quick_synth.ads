@@ -24,6 +24,9 @@ with MIDI;
 with WNM;
 
 package Quick_Synth is
+
+   procedure Test_Stream;
+
    procedure Event (Msg : MIDI.Message);
    procedure Fill (Input  :     HAL.Audio.Audio_Buffer;
                    Output : out HAL.Audio.Audio_Buffer);
