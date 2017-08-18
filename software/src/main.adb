@@ -25,10 +25,14 @@ with WNM.Sequencer;
 with WNM.UI;
 with WNM.GUI;
 with WNM.Master_Volume;
+with WNM.SDCard;
+with WNM.Sample_Stream;
 
 procedure Main is
 begin
 
+   WNM.SDCard.Initialize;
+   WNM.Sample_Stream.Start_Sample_Stream_Task;
    WNM.UI.Start;
    WNM.Sequencer.Start;
 
