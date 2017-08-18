@@ -29,6 +29,7 @@ with WNM.Sequencer;                use WNM.Sequencer;
 with WNM.Encoders;                 use WNM.Encoders;
 with Quick_Synth;                  use Quick_Synth;
 with WNM.Master_Volume;
+with WNM.Pattern_Sequencer;
 
 package body WNM.UI is
 
@@ -110,6 +111,11 @@ package body WNM.UI is
          when Volume_BPM =>
             if B = Play and Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
+               WNM.Pattern_Sequencer.End_Sequence_Edit;
+            end if;
+
+            if B in Track_A .. Track_E and then Evt = On_Press then
+               Pattern_Sequencer.Add_To_Sequence (To_Pattern (B));
             end if;
 
          when FX_Select =>
@@ -384,16 +390,29 @@ package body WNM.UI is
          -- Tacks LEDs --
          for B in Buttons range Track_A .. Track_E loop
 
-            if (Sequencer.Track = To_Track (B)
-                and then Current_Input_Mode /= FX_Select)
-              or else
-                (not Quick_Synth.Muted (To_Track (B))
-                 and then Current_Input_Mode = FX_Select)
-            then
-               Turn_On (B);
-            else
-               Turn_Off (B);
-            end if;
+            case Current_Input_Mode is
+               when FX_Select =>
+                  if Quick_Synth.Muted (To_Track (B)) then
+                     Turn_Off (B);
+                  else
+                     Turn_On (B);
+                  end if;
+
+               when Volume_BPM =>
+                  if Pattern_Sequencer.Current_Pattern = To_Pattern (B) then
+                     Turn_On (B);
+                  else
+                     Turn_Off (B);
+                  end if;
+
+               when others =>
+                  if Sequencer.Track = To_Track (B) then
+                     Turn_On (B);
+                  else
+                     Turn_Off (B);
+                  end if;
+
+            end case;
          end loop;
 
          -- Play LED --

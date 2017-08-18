@@ -41,10 +41,15 @@ package WNM is
    function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
 
    type Tracks is (Track_A, Track_B, Track_C, Track_D, Track_E);
+   type Patterns is (Pattern_A, Pattern_B, Pattern_C, Pattern_D, Pattern_E);
 
    function To_Track (B : Tacks_Buttons) return Tracks
      with Inline_Always;
    function To_Button (Chan : Tracks) return Tacks_Buttons
+     with Inline_Always;
+   function To_Pattern (B : Tacks_Buttons) return Patterns
+     with Inline_Always;
+   function To_Button (Pattern : Patterns) return Tacks_Buttons
      with Inline_Always;
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;

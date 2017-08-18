@@ -54,6 +54,30 @@ package body WNM is
           when Track_D => Track_D,
           when Track_E => Track_E);
 
+   ----------------
+   -- To_Pattern --
+   ----------------
+
+   function To_Pattern (B : Tacks_Buttons) return Patterns
+   is (case B is
+          when Track_A => Pattern_A,
+          when Track_B => Pattern_B,
+          when Track_C => Pattern_C,
+          when Track_D => Pattern_D,
+          when Track_E => Pattern_E);
+
+   ---------------
+   -- To_Button --
+   ---------------
+
+   function To_Button (Pattern : Patterns) return Tacks_Buttons
+   is (case Pattern is
+          when Pattern_A => Track_A,
+          when Pattern_B => Track_B,
+          when Pattern_C => Track_C,
+          when Pattern_D => Track_D,
+          when Pattern_E => Track_E);
+
    --------------
    -- To_Track --
    --------------
