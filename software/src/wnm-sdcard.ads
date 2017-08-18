@@ -47,9 +47,17 @@ with Ada.Interrupts.Names;
 
 package WNM.SDCard is
 
+   procedure Initialize;
+
+   function Mount_Dir return String;
+
+private
+
    type SDCard_Controller
      (Device : not null access STM32.SDMMC.SDMMC_Controller) is
-   limited new Block_Driver with private;
+   limited new HAL.Block_Drivers.Block_Driver with record
+      Card_Detected : Boolean := False;
+   end record;
 
    Device_Error : exception;
 
@@ -84,14 +92,6 @@ package WNM.SDCard is
    --  Writes Data.
    --  Data size needs to be a multiple of the card's block size and maximum
    --  length is 2**16
-
-private
-
-   type SDCard_Controller
-     (Device : not null access STM32.SDMMC.SDMMC_Controller) is
-   limited new HAL.Block_Drivers.Block_Driver with record
-      Card_Detected : Boolean := False;
-   end record;
 
    SD_Pins    : constant GPIO_Points := (PC8, PC9, PC10, PC11, PC12, PD2);
    SD_Pins_AF : constant GPIO_Alternate_Function := GPIO_AF_SDIO_12;

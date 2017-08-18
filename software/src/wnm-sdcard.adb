@@ -35,9 +35,32 @@ with STM32_SVD.RCC;           use STM32_SVD.RCC;
 with STM32.SDMMC;             use STM32.SDMMC;
 with STM32.SDMMC_Interrupt;   use STM32.SDMMC_Interrupt;
 
+with File_IO;                 use File_IO;
+
 package body WNM.SDCard is
 
    SD_Interrupt_Handler : aliased SDMMC_Interrupt_Handler (SD_Interrupt);
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize is
+   begin
+      SDCard_Device.Initialize;
+
+      if Mount_Drive ("sdcard", SDCard_Device'Access) /= OK then
+         raise Program_Error with "No file system...";
+      end if;
+   end Initialize;
+
+   ---------------
+   -- Mount_Dir --
+   ---------------
+
+   function Mount_Dir return String
+   is ("/sdcard/");
+
 
    ----------------
    -- Initialize --
@@ -105,6 +128,7 @@ package body WNM.SDCard is
       This.Device.Enable_DMA_Transfers (RX_Int => SD_Rx_DMA_Int'Access,
                                         TX_Int => SD_Tx_DMA_Int'Access,
                                         SD_Int => SD_Interrupt_Handler'Access);
+
    end Initialize;
 
    --------------------------
