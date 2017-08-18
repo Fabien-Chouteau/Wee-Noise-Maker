@@ -28,7 +28,7 @@ package WNM.Sample_Stream is
 
    procedure Start_Sample_Stream_Task;
 
-   type Stream_ID is range 0 .. 5;
+   type Stream_ID is range 0 .. 10;
 
    Invalid_Stream : constant Stream_ID := Stream_ID'First;
 
@@ -105,7 +105,7 @@ private
 
       Something_To_Do : Boolean := False;
 
-      Requests  : Request_FIFO.FIFO (5);
+      Requests  : Request_FIFO.FIFO (10);
    end Streams_Prot;
 
    type Stream_State is (Unused, In_Progress);
