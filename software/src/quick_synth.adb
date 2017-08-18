@@ -34,9 +34,12 @@ package body Quick_Synth is
      (Stereo    => True,
       Amplitude => Natural (Unsigned_16'Last / 10));
 
+   Time_To_Live : array (WNM.Tracks) of Natural := (others => 0);
    Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
    Solo_Mode_Enabled : Boolean := False;
    Solo_Track : WNM.Tracks := WNM.Track_A;
+
+   Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0);
 
    procedure Copy (Src : not null Any_Managed_Buffer;
                    Dst : out HAL.Audio.Audio_Buffer);
@@ -71,28 +74,6 @@ package body Quick_Synth is
        or else
          (Solo_Mode_Enabled and then Solo_Track = Track));
 
-   -----------------
-   -- Test_Stream --
-   -----------------
-
-   procedure Test_Stream is
-   begin
-      --  bass_drum.raw  crash_cymbal.raw  electro_tom.raw  snare.raw  test.raw
-      for Track in Tracks loop
-         Start (Filepath    => (case Track is
-                                   when Track_A => "/sdcard/test.raw",
-                                   when Track_B => "/sdcard/snare.raw",
-                                   when Track_C => "/sdcard/electro_tom.raw",
-                                   when Track_D => "/sdcard/crash_cymbal.raw",
-                                   when Track_E => "/sdcard/bass_drum.raw"
-                               ),
-                Start_Point => 0,
-                End_Point   => 1024 * 100,
-                Track       => Track,
-                Looping     => False);
-      end loop;
-   end Test_Stream;
-
    -----------
    -- Event --
    -----------
@@ -124,18 +105,19 @@ package body Quick_Synth is
                                          when MIDI.E5  => "/sdcard/drums/Hi_Conga.raw",
                                          when MIDI.F5  => "/sdcard/drums/Md_Conga.raw",
                                          when MIDI.Fs5 => "/sdcard/quotes/wake.raw",
-                                         when MIDI.G5 => "/sdcard/quotes/darkside.raw",
+                                         when MIDI.G5  => "/sdcard/quotes/darkside.raw",
                                          when MIDI.Gs5 => "/sdcard/quotes/failure2_x.raw",
-                                         when MIDI.A5 => "/sdcard/quotes/failure3.raw",
+                                         when MIDI.A5  => "/sdcard/quotes/failure3.raw",
                                          when MIDI.As5 => "/sdcard/quotes/halbye.raw",
-                                         when MIDI.B5 => "/sdcard/quotes/learn.raw",
-                                         when MIDI.C6 => "/sdcard/quotes/trap.raw",
-                                         when others  => "/sdcard/test.raw"),
+                                         when MIDI.B5  => "/sdcard/quotes/learn.raw",
+                                         when MIDI.C6  => "/sdcard/quotes/trap.raw",
+                                         when others   => "/sdcard/test.raw"),
                       Start_Point => 0,
                       End_Point   => Natural'Last,
                       Track       => Track,
                       Looping     => False);
             else
+               Time_To_Live (Track) := 50;
                My_Synths (Track).Set_Note_Frequency
                  (MIDI.Key_To_Frequency (Msg.Cmd.Key));
             end if;
@@ -196,8 +178,12 @@ package body Quick_Synth is
 
       for Track in WNM.Tracks loop
          My_Synths (Track).Receive (Tmp);
+         Time_To_Live (Track) :=  (if Time_To_Live (Track) /= 0 then
+                                      Time_To_Live (Track) - 1
+                                   else
+                                      0);
 
-         if Is_It_On (Track) then
+         if Time_To_Live (Track) /= 0 and then Is_It_On (Track) then
             Mix (Tmp);
          end if;
       end loop;
