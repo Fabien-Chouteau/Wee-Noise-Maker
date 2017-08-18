@@ -19,8 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with WNM.Sequence;
-
 package WNM.Sequencer is
 
    type Sequencer_State is (Pause, Play, Rec, Play_And_Rec);
@@ -55,11 +53,9 @@ package WNM.Sequencer is
    procedure Change_BPM (BPM_Delta : Integer);
    function BPM return Beat_Per_Minute;
 
+   procedure Execute_Step;
+
    procedure Start;
    --  Start the sequencer task
-
-private
-
-   Sequences : array (Tracks) of WNM.Sequence.Instance;
 
 end WNM.Sequencer;

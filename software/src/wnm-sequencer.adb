@@ -19,24 +19,31 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 with MIDI;
 with Quick_Synth;
-with WNM.Sequence;                 use WNM.Sequence;
+with WNM.Sequence;          use WNM.Sequence;
+with WNM.Pattern_Sequencer;
 
 package body WNM.Sequencer is
 
    use type MIDI.Octaves;
 
-   Start_Sequencer_Task : Suspension_Object;
+   Sequences : array (Patterns, Tracks) of WNM.Sequence.Instance;
 
-   Sequencer_BPM : Beat_Per_Minute := Beat_Per_Minute'First;
+   Sequencer_BPM : Beat_Per_Minute := 90;
 
    Current_Step      : Sequencer_Steps := Sequencer_Steps'First with Atomic;
    Current_Seq_State : Sequencer_State := Pause with Atomic;
-   Current_Track     : Tracks := Tracks'First;
+   Current_Track     : Tracks := Tracks'First with Atomic;
    Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
+
+   Next_Start : Time := Time_Last;
+
+   type Microstep_Cnt is mod 2;
+   Microstep : Microstep_Cnt := 1;
+
+   procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps);
 
    type Sequencer_State_Event is (Play_Event, Rec_Event);
 
@@ -136,10 +143,21 @@ package body WNM.Sequencer is
                Msg.Channel := To_MIDI_Channel (Current_Track);
                Msg.Cmd.Key := To_Key (Button, Octave);
                Msg.Cmd.Velocity := 16#77#;
-               Quick_Synth.Event (Msg);
+
+               --  If the user played the node earlier than the step time and
+               --  we record in the sequence, it's going to be played twice:
+               --  now and when the step time comes.
+               --
+               --  So we only play the current note when we are not in this
+               --  case.
+               if not (Microstep = 1 and then Current_Seq_State in Play_And_Rec | Rec) then
+                  Quick_Synth.Event (Msg);
+               end if;
 
                if Current_Seq_State in Play_And_Rec | Rec then
-                  Add (Sequences (Current_Track), Current_Step, Msg.Cmd);
+                  Add (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+                       Current_Step,
+                       Msg.Cmd);
                end if;
             end;
       end case;
@@ -151,23 +169,24 @@ package body WNM.Sequencer is
 
    procedure On_Release (Button : Keyboard_Buttons) is
    begin
-      case Button is
-         when B2 .. B3 | B5 .. B7 | B9 .. B16 =>
-            declare
-               Msg : MIDI.Message (MIDI.Note_Off);
-            begin
-               Msg.Channel := To_MIDI_Channel (Current_Track);
-               Msg.Cmd.Key := To_Key (Button, Octave);
-               Msg.Cmd.Velocity := 16#77#;
-               Quick_Synth.Event (Msg);
-
-               if Current_Seq_State in Play_And_Rec | Rec then
-                  Add (Sequences (Current_Track), Current_Step, Msg.Cmd);
-               end if;
-            end;
-         when others =>
-            null;
-      end case;
+--        case Button is
+--           when B2 .. B3 | B5 .. B7 | B9 .. B16 =>
+--              declare
+--                 Msg : MIDI.Message (MIDI.Note_Off);
+--              begin
+--                 Msg.Channel := To_MIDI_Channel (Current_Track);
+--                 Msg.Cmd.Key := To_Key (Button, Octave);
+--                 Msg.Cmd.Velocity := 16#77#;
+--                 Quick_Synth.Event (Msg);
+--
+--                 if Current_Seq_State in Play_And_Rec | Rec then
+--                    Add (Sequences (Current_Track), Current_Step, Msg.Cmd);
+--                 end if;
+--              end;
+--           when others =>
+--              null;
+--        end case;
+      null;
    end On_Release;
 
    --------------------
@@ -231,38 +250,46 @@ package body WNM.Sequencer is
    function BPM return Beat_Per_Minute
    is (Sequencer_BPM);
 
+   ------------------
+   -- Process_Step --
+   ------------------
 
-   -----------
-   -- Start --
-   -----------
-
-   procedure Start is
+   procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps) is
    begin
-      Set_True (Start_Sequencer_Task);
-   end Start;
+      for Track in Tracks loop
+         for Index in 1 .. Last_Index (Sequences (Pattern, Track), Step) loop
+            declare
+               Midi_Cmd : constant MIDI.Command :=
+                 Cmd (Sequences (Pattern, Track), Step, Index);
 
-   --------------------
-   -- Sequencer_Task --
-   --------------------
+               Msg : MIDI.Message (Midi_Cmd.Kind);
+            begin
+               Msg.Cmd := Midi_Cmd;
+               Msg.Channel := To_MIDI_Channel (Track);
 
-   task Sequencer_Task is
-      pragma Priority (Sequencer_Task_Priority);
-   end Sequencer_Task;
+               Quick_Synth.Event (Msg);
+            end;
+         end loop;
+      end loop;
+   end Process_Step;
 
-   task body Sequencer_Task is
-      Next_Start : Time;
+   ------------------
+   -- Execute_Step --
+   ------------------
 
-      type Microstep_Cnt is mod 2;
-      Microstep : Microstep_Cnt := 1;
+   procedure Execute_Step is
+      Now : constant Time := Clock;
    begin
-      Suspend_Until_True (Start_Sequencer_Task);
-      Next_Start := Clock;
-      loop
-         Next_Start := Next_Start +
-           (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
-         delay until Next_Start;
 
-         case Microstep is
+      if Now < Next_Start then
+         --  Nothing to do yet...
+         return;
+      end if;
+
+      Next_Start := Next_Start +
+        (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
+
+      case Microstep is
 
          --  Begining of a new step
          when 0 =>
@@ -270,31 +297,75 @@ package body WNM.Sequencer is
                Current_Step := Current_Step + 1;
             else
                Current_Step := Sequencer_Steps'First;
+               Pattern_Sequencer.Signal_End_Of_Pattern;
             end if;
 
          --  At the middle of the step we play the recorded notes
          when 1 =>
             if Current_Seq_State in Play | Play_And_Rec then
-               for Track in Sequences'Range loop
-                  for Index in 1 .. Last_Index (Sequences (Track), Current_Step) loop
-                     declare
-                        Midi_Cmd : constant MIDI.Command := Cmd (Sequences (Track),
-                                                              Current_Step,
-                                                                 Index);
-                        Msg : MIDI.Message (Midi_Cmd.Kind);
-                     begin
-                        Msg.Cmd := Midi_Cmd;
-                        Msg.Channel := To_MIDI_Channel (Track);
-
-                        Quick_Synth.Event (Msg);
-                     end;
-                  end loop;
-               end loop;
+               Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
             end if;
-         end case;
-         Microstep := Microstep + 1;
-      end loop;
+      end case;
+      Microstep := Microstep + 1;
+   end Execute_Step;
 
-   end Sequencer_Task;
+   -----------
+   -- Start --
+   -----------
+
+   procedure Start is
+   begin
+
+      for Pattern in Patterns loop
+         for Track in Tracks loop
+            Clear (Sequences (Pattern, Track));
+         end loop;
+      end loop;
+      Next_Start := Clock + Milliseconds (100);
+   end Start;
+
+
+--     --------------------
+--     -- Sequencer_Task --
+--     --------------------
+--
+--     task Sequencer_Task is
+--        pragma Priority (Sequencer_Task_Priority);
+--     end Sequencer_Task;
+--
+--     task body Sequencer_Task is
+--        Next_Start : Time;
+--
+--        type Microstep_Cnt is mod 2;
+--        Microstep : Microstep_Cnt := 1;
+--     begin
+--        Suspend_Until_True (Start_Sequencer_Task);
+--        Next_Start := Clock;
+--        loop
+--           Next_Start := Next_Start +
+--             (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
+--           delay until Next_Start;
+--
+--           case Microstep is
+--
+--           --  Begining of a new step
+--           when 0 =>
+--              if Current_Step /= Sequencer_Steps'Last then
+--                 Current_Step := Current_Step + 1;
+--              else
+--                 Current_Step := Sequencer_Steps'First;
+--                 Pattern_Sequencer.Signal_End_Of_Pattern;
+--              end if;
+--
+--           --  At the middle of the step we play the recorded notes
+--           when 1 =>
+--              if Current_Seq_State in Play | Play_And_Rec then
+--                 Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
+--              end if;
+--           end case;
+--           Microstep := Microstep + 1;
+--        end loop;
+--
+--     end Sequencer_Task;
 
 end WNM.Sequencer;
