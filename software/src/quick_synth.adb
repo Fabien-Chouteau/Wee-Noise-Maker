@@ -282,6 +282,29 @@ package body Quick_Synth is
    function Solo return WNM.Tracks
    is (Solo_Track);
 
+   ----------------
+   -- Change_Pan --
+   ----------------
+
+   procedure Change_Pan (Track : WNM.Tracks;
+                         Pan   : Integer)
+   is
+   begin
+      Pan_For_Track (Track) := Pan_For_Track (Track) + Pan;
+      if Pan_For_Track (Track) > 100 then
+         Pan_For_Track (Track) := 100;
+      elsif Pan_For_Track (Track) < -100 then
+         Pan_For_Track (Track) := -100;
+      end if;
+   end Change_Pan;
+
+   ---------
+   -- Pan --
+   ---------
+
+   function Pan (Track : WNM.Tracks) return Integer
+   is (Pan_For_Track (Track));
+
 begin
    for Synth of My_Synths loop
       Synth.Set_Frequency (Audio_Freq_48kHz);

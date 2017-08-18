@@ -40,4 +40,8 @@ package Quick_Synth is
    function In_Solo return Boolean;
    function Solo return WNM.Tracks;
 
+   procedure Change_Pan (Track : WNM.Tracks;
+                         Pan   : Integer);
+   function Pan (Track : WNM.Tracks) return Integer;
+
 end Quick_Synth;
