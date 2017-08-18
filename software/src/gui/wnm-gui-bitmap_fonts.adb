@@ -35,12 +35,18 @@ package body WNM.GUI.Bitmap_Fonts is
       X_Offset    : in out Integer;
       Y_Offset    : Integer;
       C           : Character;
-      Invert_From : Integer := Integer'Last)
+      Invert_From : Integer := 95;
+      Invert_To   : Integer := 95)
    is
       Index : constant Integer := Character'Pos (C) - Character'Pos ('!');
       Bitmap_Offset : constant Integer := Index * 5;
 
       function Color (X, Y : Integer) return Boolean;
+      function Invert (X : Integer) return Boolean;
+
+      -----------
+      -- Color --
+      -----------
 
       function Color (X, Y : Integer) return Boolean is
          Giza_Color : Giza.Colors.Color;
@@ -54,18 +60,27 @@ package body WNM.GUI.Bitmap_Fonts is
             return False;
          end if;
       end Color;
+
+      ------------
+      -- Invert --
+      ------------
+
+      function Invert (X : Integer) return Boolean
+      is (X in Invert_From .. Invert_To);
+
    begin
       Draw_Loop : for X in 0 .. 5 loop
          for Y in 0 .. 7 loop
 
             if X + X_Offset > Buffer.Width - 1 then
                exit Draw_Loop;
-            elsif X + X_Offset >= 0 and then Y + Y_Offset in 0 .. Buffer.Height - 1 then
+            elsif X + X_Offset >= 0
+              and then
+                Y + Y_Offset in 0 .. Buffer.Height - 1
+            then
                Buffer.Set_Pixel ((X + X_Offset, Y + Y_Offset),
-                                 (if Color (X, Y) then
-                                    (if X + X_Offset > Invert_From then White else Black)
-                                  else
-                                    (if X + X_Offset > Invert_From then Black else White)));
+                                 (if Color (X, Y) xor Invert (X + X_Offset)
+                                  then White else Black));
             end if;
          end loop;
       end loop Draw_Loop;
@@ -82,8 +97,10 @@ package body WNM.GUI.Bitmap_Fonts is
       X_Offset    : in out Integer;
       Y_Offset    : Integer;
       Str         : String;
-      Invert_From : Integer := Integer'Last)
+      Invert_From : Integer := 95;
+      Invert_To   : Integer := 95)
    is
+      Start : Integer;
    begin
       for C of Str loop
          if X_Offset > Buffer.Width then
@@ -93,8 +110,18 @@ package body WNM.GUI.Bitmap_Fonts is
                 X_Offset,
                 Y_Offset,
                 C,
-                Invert_From);
+                Invert_From,
+                Invert_To);
       end loop;
+
+      if X_Offset < Invert_To then
+         Start :=  Integer'Max (X_Offset, Invert_From);
+
+         Buffer.Set_Source (White);
+         Buffer.Fill_Rect ((Position => (Start, Y_Offset),
+                            Width    => Invert_To - Start,
+                            Height   => 8));
+      end if;
    end Print;
 
 end WNM.GUI.Bitmap_Fonts;

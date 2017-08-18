@@ -27,11 +27,15 @@ package WNM.GUI.Bitmap_Fonts is
                     X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     C           : Character;
-                    Invert_From : Integer := Integer'Last);
+                    Invert_From : Integer := 95;
+                    Invert_To   : Integer := 95)
+   with Pre => Invert_From <= Invert_To;
 
    procedure Print (Buffer      : in out HAL.Bitmap.Bitmap_Buffer'Class;
                     X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     Str         : String;
-                    Invert_From : Integer := Integer'Last);
+                    Invert_From : Integer := 95;
+                    Invert_To   : Integer := 95)
+   with Pre => Invert_From <= Invert_To;
 end WNM.GUI.Bitmap_Fonts;
