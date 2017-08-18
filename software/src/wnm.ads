@@ -59,7 +59,7 @@ package WNM is
    subtype Beat_Per_Minute is Positive range 50 .. 200;
    type Sequencer_Steps is range 1 .. 16;
    Steps_Per_Beat      : constant := 4;
-   Max_Events_Per_Step : constant := 4;
+   Max_Events_Per_Step : constant := 6;
 
    DAC_Task_Priority       : constant System.Priority := System.Default_Priority + 10;
    Synth_Task_Priority     : constant System.Priority := DAC_Task_Priority - 1;
@@ -69,8 +69,8 @@ package WNM is
    LED_Task_Priority       : constant System.Priority := UI_Task_Priority - 1;
 
    UI_Task_Period               : constant Time_Span := Milliseconds (50);
-   UI_Task_Stack_Size           : constant := 5 * 1024;
-   UI_Task_Secondary_Stack_Size : constant := 10 * 1024;
+   UI_Task_Stack_Size           : constant := 10 * 1024;
+   UI_Task_Secondary_Stack_Size : constant := 5 * 1024;
 
    LED_Task_Period   : constant Time_Span := Microseconds (1000);
 
