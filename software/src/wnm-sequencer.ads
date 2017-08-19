@@ -68,4 +68,9 @@ package WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean;
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean;
+
+   function Trig (Step : Sequencer_Steps) return Trigger;
+   procedure Trig_Next (Step : Sequencer_Steps);
+   procedure Trig_Prev (Step : Sequencer_Steps);
+
 end WNM.Sequencer;

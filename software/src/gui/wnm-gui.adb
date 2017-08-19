@@ -89,6 +89,14 @@ package body WNM.GUI is
                                         Y_Offset    => 0,
                                         Str         => String'("Enable FX"),
                                         Invert_From => 0);
+         when WNM.UI.Trig_Edit =>
+            WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
+            B := 1;
+            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
+                                        X_Offset    => B,
+                                        Y_Offset    => 0,
+                                        Str         => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
+                                        Invert_From => 0);
       end case;
       WNM.Screen.Update;
 

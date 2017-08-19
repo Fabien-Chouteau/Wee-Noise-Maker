@@ -27,7 +27,7 @@ package body WNM.Sequence is
 
    procedure Clear (This : in out Instance) is
    begin
-      This.Events := (others => False);
+      This.Events := (others => None);
    end Clear;
 
    ---------
@@ -35,10 +35,11 @@ package body WNM.Sequence is
    ---------
 
    procedure Set (This : in out Instance;
-                  Step : Sequencer_Steps)
+                  Step : Sequencer_Steps;
+                  Trig : Trigger := Always)
    is
    begin
-      This.Events (Step) := True;
+      This.Events (Step) := Trig;
    end Set;
 
    ------------
@@ -49,8 +50,42 @@ package body WNM.Sequence is
                      Step : Sequencer_Steps)
    is
    begin
-      This.Events (Step) := not This.Events (Step);
+      if This.Events (Step) /= None then
+         This.Events (Step) := None;
+      else
+         This.Events (Step) := Always;
+      end if;
    end Toggle;
+
+   ----------
+   -- Next --
+   ----------
+
+   procedure Next (This : in out Instance;
+                   Step : Sequencer_Steps)
+   is
+   begin
+      if This.Events (Step) = Trigger'Last then
+         This.Events (Step) := Trigger'First;
+      else
+         This.Events (Step) := Trigger'Succ (This.Events (Step));
+      end if;
+   end Next;
+
+   --------------
+   -- Previous --
+   --------------
+
+   procedure Previous (This : in out Instance;
+                       Step : Sequencer_Steps)
+   is
+   begin
+      if This.Events (Step) = Trigger'First then
+         This.Events (Step) := Trigger'Last;
+      else
+         This.Events (Step) := Trigger'Pred (This.Events (Step));
+      end if;
+   end Previous;
 
    -----------
    -- Clear --
@@ -60,19 +95,19 @@ package body WNM.Sequence is
                     Step : Sequencer_Steps)
    is
    begin
-      This.Events (Step) := False;
+      This.Events (Step) := None;
    end Clear;
 
-   ---------
-   -- Set --
-   ---------
+   ----------
+   -- Trig --
+   ----------
 
-   function Set (This  : Instance;
-                 Step  : Sequencer_Steps)
-                 return Boolean
+   function Trig (This  : Instance;
+                  Step  : Sequencer_Steps)
+                 return Trigger
    is
    begin
       return This.Events (Step);
-   end Set;
+   end Trig;
 
 end WNM.Sequence;

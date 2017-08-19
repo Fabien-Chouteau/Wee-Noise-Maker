@@ -42,6 +42,8 @@ package WNM is
    subtype Tracks is Keyboard_Buttons;
    subtype Patterns is Keyboard_Buttons;
 
+   type Trigger is (None, Always, Percent_25, Percent_50, Percent_75);
+
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;
    function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel

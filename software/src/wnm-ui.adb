@@ -46,6 +46,8 @@ package body WNM.UI is
    FX_Is_On : array (Buttons) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
+   Editting_Step : Sequencer_Steps := 1;
+
    ----------------
    -- Input_Mode --
    ----------------
@@ -87,6 +89,9 @@ package body WNM.UI is
                      when Rec =>
                         --  Switch to squence edition mode
                         Sequencer.Rec_Long;
+                     when B1 .. B16 =>
+                        Current_Input_Mode := Trig_Edit;
+                        Editting_Step := To_Value (B);
                      when others => null;
                   end case;
                when On_Release =>
@@ -161,6 +166,10 @@ package body WNM.UI is
                Pattern_Sequencer.Add_To_Sequence (B);
             elsif B = Track_C and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
+               Current_Input_Mode := Default_Input_Mode;
+            end if;
+         when Trig_Edit =>
+            if To_Value (B) = Editting_Step and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
       end case;
@@ -287,6 +296,49 @@ package body WNM.UI is
       Col_To_Point (LED_Addr.Col).Clear;
    end Turn_Off;
 
+   ---------------------------
+   -- Current_Editting_Trig --
+   ---------------------------
+
+   function Current_Editting_Trig return Sequencer_Steps
+   is (Editting_Step);
+
+   --------------------
+   -- Has_Long_Press --
+   --------------------
+
+   function Has_Long_Press (Button : Buttons) return Boolean is
+      In_Edit : constant Boolean := Sequencer.State in Play_And_Edit | Edit;
+   begin
+      return (case Button is
+              when B1        => In_Edit,
+              when B2        => In_Edit,
+              when B3        => In_Edit,
+              when B4        => In_Edit,
+              when B5        => In_Edit,
+              when B6        => In_Edit,
+              when B7        => In_Edit,
+              when B8        => In_Edit,
+              when B9        => In_Edit,
+              when B10       => In_Edit,
+              when B11       => In_Edit,
+              when B12       => In_Edit,
+              when B13       => In_Edit,
+              when B14       => In_Edit,
+              when B15       => In_Edit,
+              when B16       => In_Edit,
+              when Rec       => True,
+              when Play      => True,
+              when FX        => False,
+              when Track_A   => False,
+              when Track_B   => False,
+              when Track_C   => False,
+              when Track_D   => False,
+              when Track_E   => False,
+              when Encoder_L => True,
+              when Encoder_R => True);
+   end Has_Long_Press;
+
    -------------
    -- UI_Task --
    -------------
@@ -383,6 +435,12 @@ package body WNM.UI is
                WNM.Master_Volume.Change (L_Enco * 5);
             when Track_Select =>
                Quick_Synth.Change_Pan (Sequencer.Track, R_Enco * 10);
+            when Trig_Edit =>
+               if L_Enco > 0 then
+                  WNM.Sequencer.Trig_Next (Editting_Step);
+               elsif L_Enco < 0 then
+                  WNM.Sequencer.Trig_Prev (Editting_Step);
+               end if;
             when others =>
                null;
          end case;

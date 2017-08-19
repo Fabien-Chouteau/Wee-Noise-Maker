@@ -34,7 +34,8 @@ package WNM.UI is
                             Volume_BPM,
                             FX_Select,
                             Track_Select,
-                            Pattern_Select);
+                            Pattern_Select,
+                            Trig_Edit);
 
    function Input_Mode return Input_Mode_Type;
 
@@ -42,6 +43,9 @@ package WNM.UI is
 
    procedure Turn_On (B : LEDs);
    procedure Turn_Off (B : LEDs);
+
+   function Current_Editting_Trig return Sequencer_Steps
+     with Pre => Input_Mode = Trig_Edit;
 
 private
 
@@ -138,34 +142,8 @@ private
    --  In the future we shouldn't have to export this info, the array could
    --  then be moved in UI_Task.
 
-   Has_Long_Press : constant array (Buttons) of Boolean :=
+   function Has_Long_Press (Button : Buttons) return Boolean;
    --  Can this button trigger a On_Long_Press event?
-     (B1        => False,
-      B2        => False,
-      B3        => False,
-      B4        => False,
-      B5        => False,
-      B6        => False,
-      B7        => False,
-      B8        => False,
-      B9        => False,
-      B10       => False,
-      B11       => False,
-      B12       => False,
-      B13       => False,
-      B14       => False,
-      B15       => False,
-      B16       => False,
-      Rec       => True,
-      Play      => True,
-      FX        => False,
-      Track_A   => False,
-      Track_B   => False,
-      Track_C   => False,
-      Track_D   => False,
-      Track_E   => False,
-      Encoder_L => True,
-      Encoder_R => True);
 
    LED_Timer : STM32.Timers.Timer renames Timer_7;
    LED_Timer_Control : PWM_Modulator;

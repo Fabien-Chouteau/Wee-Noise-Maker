@@ -23,6 +23,7 @@ with MIDI;
 with Quick_Synth;
 with WNM.Sequence;          use WNM.Sequence;
 with WNM.Pattern_Sequencer;
+with HAL;                   use HAL;
 
 package body WNM.Sequencer is
 
@@ -44,6 +45,13 @@ package body WNM.Sequencer is
    Microstep : Microstep_Cnt := 1;
 
    procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps);
+
+   Rand_X : UInt32 := 123456789;
+   Rand_Y : UInt32 := 362436069;
+   Rand_Z : UInt32 := 521288629;
+
+   type Rand_Percent is range 0 .. 100;
+   function Random return Rand_Percent;
 
    type Sequencer_State_Event is (Play_Event,
                                   Rec_Event,
@@ -247,6 +255,25 @@ package body WNM.Sequencer is
    function BPM return Beat_Per_Minute
    is (Sequencer_BPM);
 
+   ------------
+   -- Random --
+   ------------
+
+   function Random return Rand_Percent is
+      T : UInt32;
+   begin
+      Rand_X := Rand_X xor Shift_Left (Rand_X, 16);
+      Rand_X := Rand_X xor Shift_Right (Rand_X, 5);
+      Rand_X := Rand_X xor Shift_Left (Rand_X, 1);
+
+      T := Rand_X;
+      Rand_X := Rand_Y;
+      Rand_Y := Rand_Z;
+      Rand_Z := T xor Rand_X xor Rand_Y;
+
+      return Rand_Percent (Rand_Z mod 100);
+   end Random;
+
    ------------------
    -- Process_Step --
    ------------------
@@ -254,9 +281,24 @@ package body WNM.Sequencer is
    procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps) is
    begin
       for Track in Tracks loop
-         if Set (Sequences (Pattern, Track), Step) then
-            Quick_Synth.Trig (Track);
-         end if;
+         case Trig (Sequences (Pattern, Track), Step) is
+            when None =>
+               null;
+            when Always =>
+               Quick_Synth.Trig (Track);
+            when Percent_25 =>
+               if Random <= 25 then
+                  Quick_Synth.Trig (Track);
+               end if;
+            when Percent_50 =>
+               if Random <= 50 then
+                  Quick_Synth.Trig (Track);
+               end if;
+            when Percent_75 =>
+               if Random <= 75 then
+                  Quick_Synth.Trig (Track);
+               end if;
+         end case;
       end loop;
    end Process_Step;
 
@@ -317,8 +359,8 @@ package body WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean is
    begin
-      return Set (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
-                  Step);
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+                   Step) /= None;
    end Set;
 
    ---------
@@ -327,7 +369,36 @@ package body WNM.Sequencer is
 
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean is
    begin
-      return Set (Sequences (Pattern_Sequencer.Current_Pattern, Track), Step);
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Track), Step) /= None;
    end Set;
+
+   ----------
+   -- Trig --
+   ----------
+
+   function Trig (Step : Sequencer_Steps) return Trigger is
+   begin
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+                   Step);
+   end Trig;
+
+   ---------------
+   -- Trig_Next --
+   ---------------
+
+   procedure Trig_Next (Step : Sequencer_Steps) is
+   begin
+      Next (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track), Step);
+   end Trig_Next;
+
+   ---------------
+   -- Trig_Prev --
+   ---------------
+
+   procedure Trig_Prev (Step : Sequencer_Steps) is
+   begin
+      Previous (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track), Step);
+   end Trig_Prev;
+
 
 end WNM.Sequencer;

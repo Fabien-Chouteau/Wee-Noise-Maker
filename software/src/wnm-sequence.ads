@@ -25,24 +25,38 @@ package WNM.Sequence is
    type Instance is private;
    type Ref is access all Instance;
 
-   procedure Clear (This : in out Instance);
+   procedure Clear (This : in out Instance)
+     with Inline_Always;
 
    procedure Set (This : in out Instance;
-                  Step : Sequencer_Steps);
+                  Step : Sequencer_Steps;
+                  Trig : Trigger := Always)
+     with Inline_Always;
+
    procedure Toggle (This : in out Instance;
-                     Step : Sequencer_Steps);
+                     Step : Sequencer_Steps)
+     with Inline_Always;
+
+   procedure Next (This : in out Instance;
+                   Step : Sequencer_Steps)
+     with Inline_Always;
+
+   procedure Previous (This : in out Instance;
+                       Step : Sequencer_Steps)
+     with Inline_Always;
 
    procedure Clear (This : in out Instance;
-                    Step : Sequencer_Steps);
+                    Step : Sequencer_Steps)
+     with Inline_Always;
 
-   function Set (This  : Instance;
+   function Trig (This  : Instance;
                  Step  : Sequencer_Steps)
-                 return Boolean
+                 return Trigger
      with Inline_Always;
 
 private
 
-   type Event_Array is array (Sequencer_Steps) of Boolean with Pack;
+   type Event_Array is array (Sequencer_Steps) of Trigger with Pack;
 
    type Instance is record
       Events : Event_Array;
