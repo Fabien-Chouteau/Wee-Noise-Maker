@@ -38,6 +38,7 @@ package WNM is
    subtype LEDs is Buttons range B1 .. Track_E;
 
    function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
+   function To_Button (V : Keyboard_Value) return Keyboard_Buttons;
 
    subtype Tracks is Keyboard_Buttons;
    subtype Patterns is Keyboard_Buttons;

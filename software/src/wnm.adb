@@ -30,6 +30,15 @@ package body WNM is
       return Keyboard_Value (B'Enum_Rep - B1'Enum_Rep + 1);
    end To_Value;
 
+   ---------------
+   -- To_Button --
+   ---------------
+
+   function To_Button (V : Keyboard_Value) return Keyboard_Buttons is
+   begin
+      return Keyboard_Buttons'Val (V);
+   end To_Button;
+
    --------------
    -- To_Track --
    --------------

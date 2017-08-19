@@ -111,11 +111,6 @@ package body WNM.UI is
                Current_Input_Mode := Default_Input_Mode;
                WNM.Pattern_Sequencer.End_Sequence_Edit;
             end if;
-
-            if B in B1 .. B16 and then Evt = On_Press then
-               Pattern_Sequencer.Add_To_Sequence (B);
-            end if;
-
          when FX_Select =>
             case Evt is
                when On_Press =>
@@ -520,10 +515,7 @@ package body WNM.UI is
                case Sequencer.State is
                   when Edit | Play_And_Edit =>
                         for B in B1 .. B16 loop
-                           if Sequencer.Set (To_Value (B))
-                             or else
-                               Sequencer.Step = To_Value (B)
-                           then
+                           if Sequencer.Set (To_Value (B)) then
                               Turn_On (B);
                            else
                               Turn_Off (B);
@@ -531,10 +523,7 @@ package body WNM.UI is
                         end loop;
                   when Play | Play_And_Rec =>
                      for B in B1 .. B16 loop
-                        if Sequencer.Set (B, Sequencer.Step)
-                          or else
-                            Sequencer.Step = To_Value (B)
-                        then
+                        if Sequencer.Set (B, Sequencer.Step) then
                            Turn_On (B);
                         else
                            Turn_Off (B);
@@ -545,8 +534,11 @@ package body WNM.UI is
                         Turn_Off (B);
                      end loop;
                end case;
-
          end case;
+
+         if Sequencer.State in Play_And_Edit | Play_And_Rec | Play then
+            Turn_On (To_Button (Sequencer.Step));
+         end if;
       end loop;
    end UI_Task;
 
