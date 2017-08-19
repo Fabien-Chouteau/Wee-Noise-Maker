@@ -19,8 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with MIDI;
-
 package WNM.Sequence is
 
 
@@ -29,36 +27,24 @@ package WNM.Sequence is
 
    procedure Clear (This : in out Instance);
 
-   procedure Add (This : in out Instance;
-                  Step : Sequencer_Steps;
-                  Cmd : MIDI.Command);
+   procedure Set (This : in out Instance;
+                  Step : Sequencer_Steps);
+   procedure Toggle (This : in out Instance;
+                     Step : Sequencer_Steps);
 
-   procedure Remove (This : in out Instance;
-                     Step : Sequencer_Steps;
-                     Evt  : MIDI.Command);
+   procedure Clear (This : in out Instance;
+                    Step : Sequencer_Steps);
 
-   function Last_Index (This : Instance;
-                        Step : Sequencer_Steps)
-                        return Natural
-     with Inline_Always;
-
-   function Cmd (This  : Instance;
-                 Step  : Sequencer_Steps;
-                 Index : Positive) return MIDI.Command
+   function Set (This  : Instance;
+                 Step  : Sequencer_Steps)
+                 return Boolean
      with Inline_Always;
 
 private
 
-
-   subtype Event_Count is Natural range 0 .. Max_Events_Per_Step;
-   subtype Event_Index is Event_Count range 1 .. Event_Count'Last;
-
-   type Event_Array is array (Sequencer_Steps, Event_Index)
-     of MIDI.Command with Pack;
-   type Event_Count_Array is array (Sequencer_Steps) of Event_Count;
+   type Event_Array is array (Sequencer_Steps) of Boolean with Pack;
 
    type Instance is record
-      Cnt    : Event_Count_Array := (others => 0);
       Events : Event_Array;
    end record;
 

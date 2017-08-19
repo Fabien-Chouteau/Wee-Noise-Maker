@@ -70,13 +70,13 @@ package body WNM.UI is
                      when Play =>
                         Sequencer.Play_Pause;
                      when Rec =>
-                        Sequencer.Rec;
-                     when Track_A .. Track_E =>
-                        --  Select current track
-                        Sequencer.Select_Track (To_Track (B));
+                        Sequencer.Rec_Pressed;
                      when Keyboard_Buttons =>
-                        --  Play note or octave Up/Down
                         Sequencer.On_Press (B);
+                     when Track_B =>
+                        Current_Input_Mode := Track_Select;
+                     when Track_C =>
+                        Current_Input_Mode := Pattern_Select;
                      when others => null;
                   end case;
                when On_Long_Press =>
@@ -86,11 +86,7 @@ package body WNM.UI is
                         Current_Input_Mode := Volume_BPM;
                      when Rec =>
                         --  Switch to squence edition mode
-                        Current_Input_Mode := Sequence_Edit;
-                     when Track_A .. Track_E =>
-                        --  Switch to channel assignment mode
-                        Sequencer.Select_Track (To_Track (B));
-                        Current_Input_Mode := Track_Assign;
+                        Sequencer.Rec_Long;
                      when others => null;
                   end case;
                when On_Release =>
@@ -98,15 +94,12 @@ package body WNM.UI is
                      when Keyboard_Buttons =>
                         --  Release note or octave Up/Down
                         Sequencer.On_Release (B);
+                     when Rec =>
+                        Sequencer.Rec_Release;
                      when others => null;
                   end case;
                when others => null;
             end case;
-
-         when Sequence_Edit =>
-            if B = Rec and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
-            end if;
 
          when Volume_BPM =>
             if B = Play and Evt = On_Release then
@@ -114,8 +107,8 @@ package body WNM.UI is
                WNM.Pattern_Sequencer.End_Sequence_Edit;
             end if;
 
-            if B in Track_A .. Track_E and then Evt = On_Press then
-               Pattern_Sequencer.Add_To_Sequence (To_Pattern (B));
+            if B in B1 .. B16 and then Evt = On_Press then
+               Pattern_Sequencer.Add_To_Sequence (B);
             end if;
 
          when FX_Select =>
@@ -146,8 +139,6 @@ package body WNM.UI is
                                          Quick_Synth.Solo = Track_E);
                      when  B1 .. B3 | B9 .. B16 =>
                         Set_FX (B);
-                     when Track_A .. Track_E =>
-                        Quick_Synth.Toggle_Mute (To_Track (B));
                      when others =>
                         null;
                   end case;
@@ -159,10 +150,17 @@ package body WNM.UI is
                   null;
             end case;
 
-         when Track_Assign =>
+         when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
-               Sequencer.Set_Instrument (To_Value (B));
-            elsif B = To_Button (Sequencer.Track) and then Evt = On_Release then
+               Sequencer.Select_Track (B);
+            elsif B = Track_B and then Evt = On_Release then
+               Current_Input_Mode := Default_Input_Mode;
+            end if;
+         when Pattern_Select =>
+            if B in B1 .. B16 and then Evt = On_Press then
+               Pattern_Sequencer.Add_To_Sequence (B);
+            elsif B = Track_C and then Evt = On_Release then
+               Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
       end case;
@@ -383,7 +381,7 @@ package body WNM.UI is
             when Volume_BPM =>
                WNM.Sequencer.Change_BPM (R_Enco * 5);
                WNM.Master_Volume.Change (L_Enco * 5);
-            when Track_Assign =>
+            when Track_Select =>
                Quick_Synth.Change_Pan (Sequencer.Track, R_Enco * 10);
             when others =>
                null;
@@ -393,45 +391,17 @@ package body WNM.UI is
          -- Set LEDs --
          --------------
 
-         -- Tacks LEDs --
-         for B in Buttons range Track_A .. Track_E loop
-
-            case Current_Input_Mode is
-               when FX_Select =>
-                  if Quick_Synth.Muted (To_Track (B)) then
-                     Turn_Off (B);
-                  else
-                     Turn_On (B);
-                  end if;
-
-               when Volume_BPM =>
-                  if Pattern_Sequencer.Current_Pattern = To_Pattern (B) then
-                     Turn_On (B);
-                  else
-                     Turn_Off (B);
-                  end if;
-
-               when others =>
-                  if Sequencer.Track = To_Track (B) then
-                     Turn_On (B);
-                  else
-                     Turn_Off (B);
-                  end if;
-
-            end case;
-         end loop;
-
          -- Play LED --
-         if Sequencer.State in Play | Play_And_Rec then
+         if Sequencer.State not in Pause | Edit then
             Turn_On (Play);
          else
             Turn_Off (Play);
          end if;
 
          -- Rec LED --
-         if Sequencer.State = Rec
+         if Sequencer.State = Edit
            or else
-             (Sequencer.State = Play_And_Rec
+             (Sequencer.State in Play_And_Rec | Play_And_Edit
               and then
               Sequencer.Step in 1 | 5 | 9 | 13)
          then
@@ -469,9 +439,18 @@ package body WNM.UI is
                end loop;
 
             -- Track assign mode --
-            when Track_Assign =>
+            when Track_Select =>
                for B in B1 .. B16 loop
-                  if Sequencer.Instrument (Sequencer.Track) = To_Value (B) then
+                  if Sequencer.Track = B then
+                     Turn_On (B);
+                  else
+                     Turn_Off (B);
+                  end if;
+               end loop;
+
+            when Pattern_Select =>
+               for B in B1 .. B16 loop
+                  if Pattern_Sequencer.Current_Pattern = B then
                      Turn_On (B);
                   else
                      Turn_Off (B);
@@ -480,31 +459,35 @@ package body WNM.UI is
 
             --  Any other mode --
             when others =>
+               case Sequencer.State is
+                  when Edit | Play_And_Edit =>
+                        for B in B1 .. B16 loop
+                           if Sequencer.Set (To_Value (B))
+                             or else
+                               Sequencer.Step = To_Value (B)
+                           then
+                              Turn_On (B);
+                           else
+                              Turn_Off (B);
+                           end if;
+                        end loop;
+                  when Play | Play_And_Rec =>
+                     for B in B1 .. B16 loop
+                        if Sequencer.Set (B, Sequencer.Step)
+                          or else
+                            Sequencer.Step = To_Value (B)
+                        then
+                           Turn_On (B);
+                        else
+                           Turn_Off (B);
+                        end if;
+                     end loop;
+                  when others =>
+                     for B in B1 .. B16 loop
+                        Turn_Off (B);
+                     end loop;
+               end case;
 
-               for B in B1 .. B16 loop
-                  Turn_Off (B);
-               end loop;
-
-               if Sequencer.State in Play_And_Rec | Play then
-                  case Sequencer.Step is
-                     when 1 => Turn_On (B1);
-                     when 2 => Turn_On (B2);
-                     when 3 => Turn_On (B3);
-                     when 4 => Turn_On (B4);
-                     when 5 => Turn_On (B5);
-                     when 6 => Turn_On (B6);
-                     when 7 => Turn_On (B7);
-                     when 8 => Turn_On (B8);
-                     when 9 => Turn_On (B9);
-                     when 10 => Turn_On (B10);
-                     when 11 => Turn_On (B11);
-                     when 12 => Turn_On (B12);
-                     when 13 => Turn_On (B13);
-                     when 14 => Turn_On (B14);
-                     when 15 => Turn_On (B15);
-                     when 16 => Turn_On (B16);
-                  end case;
-               end if;
          end case;
       end loop;
    end UI_Task;

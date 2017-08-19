@@ -61,7 +61,7 @@ package body WNM.GUI is
                                           Value => BPM,
                                           Min   => 50,
                                           Max   => 200);
-         when WNM.UI.Track_Assign =>
+         when WNM.UI.Track_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
             WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
@@ -72,6 +72,13 @@ package body WNM.GUI is
             WNM.GUI.Parameters.Print_Pan (Slot  => WNM.GUI.Parameters.Down,
                                           Name  => "PAN",
                                           Value => Quick_Synth.Pan (WNM.Sequencer.Track));
+         when WNM.UI.Pattern_Select =>
+            WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
+            B := 1;
+            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
+                                        X_Offset    => B,
+                                        Y_Offset    => 0,
+                                        Str         => String'("Pattern select"));
          when WNM.UI.Note =>
             WNM.GUI.Logo.Draw_On_Screen (HAL.UInt2 (Anim_Step mod 4));
          when WNM.UI.FX_Select =>
@@ -81,14 +88,6 @@ package body WNM.GUI is
                                         X_Offset    => B,
                                         Y_Offset    => 0,
                                         Str         => String'("Enable FX"),
-                                        Invert_From => 0);
-         when WNM.UI.Sequence_Edit =>
-            WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
-            B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => String'("Edit sequence"),
                                         Invert_From => 0);
       end case;
       WNM.Screen.Update;

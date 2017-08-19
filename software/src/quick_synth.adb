@@ -84,7 +84,7 @@ package body Quick_Synth is
 
       case Msg.Kind is
          when MIDI.Note_On =>
-            if Track = Track_A then
+            if Track = B1 then
                Start (Filepath    => (case Msg.Cmd.Key is
                                          when MIDI.C4  => "/sdcard/drums/Clap.raw",
                                          when MIDI.Cs4 => "/sdcard/drums/Clave.raw",
@@ -129,6 +129,44 @@ package body Quick_Synth is
             null;
       end case;
    end Event;
+
+   ----------
+   -- Trig --
+   ----------
+
+   procedure Trig (Track : WNM.Tracks) is
+   begin
+      Start (Filepath    => (case Track is
+                                when B1 => "/sdcard/drums/Clap.raw",
+--                                  when B => "/sdcard/drums/Clave.raw",
+--                                  when B => "/sdcard/drums/Cymbal-high.raw",
+                                when B6 => "/sdcard/drums/Hat_closed.raw",
+--                                  when B => "/sdcard/drums/Hat_long.raw",
+--                                  when B => "/sdcard/drums/Hi_Tom.raw",
+--                                  when B => "/sdcard/drums/Kick_long.raw",
+                                when B2 => "/sdcard/drums/Kick_short.raw",
+                                when B9 => "/sdcard/drums/Lo_Tom.raw",
+--                                  when B => "/sdcard/drums/Md_Tom.raw",
+                                when B3 => "/sdcard/drums/Rim_Shot.raw",
+                                when B4 => "/sdcard/drums/Snare_lo1.raw",
+                                when B5 => "/sdcard/drums/Snare_lo2.raw",
+--                                  when B => "/sdcard/drums/Snare_lo3.raw",
+                                when B7 => "/sdcard/drums/Cowbell.raw",
+--                                  when B => "/sdcard/drums/Maracas.raw",
+                                when B8 => "/sdcard/drums/Hi_Conga.raw",
+--                                  when B => "/sdcard/drums/Md_Conga.raw",
+                                when B10 => "/sdcard/quotes/wake.raw",
+                                when B11 => "/sdcard/quotes/darkside.raw",
+                                when B12 => "/sdcard/quotes/failure2_x.raw",
+                                when B13 => "/sdcard/quotes/failure3.raw",
+                                when B14 => "/sdcard/quotes/halbye.raw",
+                                when B15 => "/sdcard/quotes/learn.raw",
+                                when B16 => "/sdcard/quotes/trap.raw"),
+             Start_Point => 0,
+             End_Point   => Natural'Last,
+             Track       => Track,
+             Looping     => False);
+   end Trig;
 
    ----------
    -- Fill --

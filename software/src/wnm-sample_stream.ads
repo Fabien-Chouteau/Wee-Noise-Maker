@@ -60,7 +60,7 @@ private
    end record;
 
    No_Request : constant Sample_Request := (Filepath    => null,
-                                            Track       => Track_A,
+                                            Track       => B1,
                                             Start_Point => 0,
                                             End_Point   => 0,
                                             Looping     => False);

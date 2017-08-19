@@ -34,61 +34,24 @@ package body WNM is
    -- To_Track --
    --------------
 
-   function To_Track (B : Tacks_Buttons) return Tracks
-   is (case B is
-          when Track_A => Track_A,
-          when Track_B => Track_B,
-          when Track_C => Track_C,
-          when Track_D => Track_D,
-          when Track_E => Track_E);
-
-   ---------------
-   -- To_Button --
-   ---------------
-
-   function To_Button (Chan : Tracks) return Tacks_Buttons
-   is (case Chan is
-          when Track_A => Track_A,
-          when Track_B => Track_B,
-          when Track_C => Track_C,
-          when Track_D => Track_D,
-          when Track_E => Track_E);
-
-   ----------------
-   -- To_Pattern --
-   ----------------
-
-   function To_Pattern (B : Tacks_Buttons) return Patterns
-   is (case B is
-          when Track_A => Pattern_A,
-          when Track_B => Pattern_B,
-          when Track_C => Pattern_C,
-          when Track_D => Pattern_D,
-          when Track_E => Pattern_E);
-
-   ---------------
-   -- To_Button --
-   ---------------
-
-   function To_Button (Pattern : Patterns) return Tacks_Buttons
-   is (case Pattern is
-          when Pattern_A => Track_A,
-          when Pattern_B => Track_B,
-          when Pattern_C => Track_C,
-          when Pattern_D => Track_D,
-          when Pattern_E => Track_E);
-
-   --------------
-   -- To_Track --
-   --------------
-
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
    is (case Chan is
-          when 0      => Track_A,
-          when 1      => Track_B,
-          when 2      => Track_C,
-          when 3      => Track_D,
-          when others => Track_E);
+          when 0      => B1,
+          when 1      => B2,
+          when 2      => B3,
+          when 3      => B4,
+          when 4      => B5,
+          when 5      => B6,
+          when 6      => B7,
+          when 7      => B8,
+          when 8      => B9,
+          when 9      => B10,
+          when 10     => B11,
+          when 11     => B12,
+          when 12     => B13,
+          when 13     => B14,
+          when 14     => B15,
+          when 15     => B16);
 
    ---------------------
    -- To_MIDI_Channel --
@@ -96,9 +59,20 @@ package body WNM is
 
    function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
    is (case Chan is
-          when Track_A => 0,
-          when Track_B => 1,
-          when Track_C => 2,
-          when Track_D => 3,
-          when Track_E => 4);
+          when B1  => 0,
+          when B2  => 1,
+          when B3  => 2,
+          when B4  => 3,
+          when B5  => 4,
+          when B6  => 5,
+          when B7  => 6,
+          when B8  => 7,
+          when B9  => 8,
+          when B10 => 9,
+          when B11 => 10,
+          when B12 => 11,
+          when B13 => 12,
+          when B14 => 13,
+          when B15 => 14,
+          when B16 => 15);
 end WNM;

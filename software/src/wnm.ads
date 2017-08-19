@@ -31,7 +31,6 @@ package WNM is
                     Track_A, Track_B, Track_C, Track_D, Track_E,
                     Encoder_L, Encoder_R);
 
-   subtype Tacks_Buttons is Buttons range Track_A .. Track_E;
    subtype Keyboard_Buttons is Buttons range B1 .. B16;
 
    type Keyboard_Value is range 1 .. 16;
@@ -40,24 +39,16 @@ package WNM is
 
    function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
 
-   type Tracks is (Track_A, Track_B, Track_C, Track_D, Track_E);
-   type Patterns is (Pattern_A, Pattern_B, Pattern_C, Pattern_D, Pattern_E);
+   subtype Tracks is Keyboard_Buttons;
+   subtype Patterns is Keyboard_Buttons;
 
-   function To_Track (B : Tacks_Buttons) return Tracks
-     with Inline_Always;
-   function To_Button (Chan : Tracks) return Tacks_Buttons
-     with Inline_Always;
-   function To_Pattern (B : Tacks_Buttons) return Patterns
-     with Inline_Always;
-   function To_Button (Pattern : Patterns) return Tacks_Buttons
-     with Inline_Always;
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;
    function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
      with Inline_Always;
 
    subtype Beat_Per_Minute is Positive range 50 .. 200;
-   type Sequencer_Steps is range 1 .. 16;
+   subtype Sequencer_Steps is Keyboard_Value;
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 6;
 

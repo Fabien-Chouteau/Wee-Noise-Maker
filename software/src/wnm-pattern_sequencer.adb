@@ -1,10 +1,10 @@
 package body WNM.Pattern_Sequencer is
-   Max_Patterns_In_Sequence : constant := 10;
+   Max_Patterns_In_Sequence : constant := 30;
 
    subtype Sequence_Range is Positive range 1 .. Max_Patterns_In_Sequence;
 
    Sequence_Of_Pattern : array (Sequence_Range) of Patterns
-     := (others => Pattern_A);
+     := (others => B1);
 
    Current_Pattern_Index : Sequence_Range := 1;
    Last_In_Sequence      : Sequence_Range := 1;

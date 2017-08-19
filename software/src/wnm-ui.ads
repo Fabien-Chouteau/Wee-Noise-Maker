@@ -31,10 +31,10 @@ package WNM.UI is
    procedure Start;
 
    type Input_Mode_Type is (Note,
-                            Sequence_Edit,
                             Volume_BPM,
                             FX_Select,
-                            Track_Assign);
+                            Track_Select,
+                            Pattern_Select);
 
    function Input_Mode return Input_Mode_Type;
 
@@ -159,11 +159,11 @@ private
       Rec       => True,
       Play      => True,
       FX        => False,
-      Track_A   => True,
-      Track_B   => True,
-      Track_C   => True,
-      Track_D   => True,
-      Track_E   => True,
+      Track_A   => False,
+      Track_B   => False,
+      Track_C   => False,
+      Track_D   => False,
+      Track_E   => False,
       Encoder_L => True,
       Encoder_R => True);
 

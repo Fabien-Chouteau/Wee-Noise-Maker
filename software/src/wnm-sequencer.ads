@@ -21,7 +21,11 @@
 
 package WNM.Sequencer is
 
-   type Sequencer_State is (Pause, Play, Rec, Play_And_Rec);
+   type Sequencer_State is (Pause,
+                            Play,
+                            Edit,
+                            Play_And_Rec,
+                            Play_And_Edit);
 
    function State return Sequencer_State;
    --  Current state of the sequencer
@@ -32,8 +36,12 @@ package WNM.Sequencer is
    procedure Play_Pause;
    --  Use it to signal a play/pause event
 
-   procedure Rec;
+   procedure Rec_Pressed;
    --  Use it to signal a rec/stop record event
+
+   procedure Rec_Long;
+
+   procedure Rec_Release;
 
    procedure On_Press (Button : Keyboard_Buttons);
 
@@ -58,4 +66,6 @@ package WNM.Sequencer is
    procedure Start;
    --  Start the sequencer task
 
+   function Set (Step : Sequencer_Steps) return Boolean;
+   function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean;
 end WNM.Sequencer;

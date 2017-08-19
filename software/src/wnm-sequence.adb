@@ -19,8 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with MIDI; use MIDI;
-
 package body WNM.Sequence is
 
    -----------
@@ -29,70 +27,52 @@ package body WNM.Sequence is
 
    procedure Clear (This : in out Instance) is
    begin
-      This.Cnt := (others => 0);
+      This.Events := (others => False);
    end Clear;
 
    ---------
-   -- Add --
+   -- Set --
    ---------
 
-   procedure Add (This : in out Instance;
-                  Step : Sequencer_Steps;
-                  Cmd  : MIDI.Command)
+   procedure Set (This : in out Instance;
+                  Step : Sequencer_Steps)
    is
    begin
-      if This.Cnt (Step) < This.Events'Last (2) then
-         for Index in This.Events'First (2) .. This.Cnt (Step) loop
-            if This.Events (Step, Index) = Cmd then
-               return;
-            end if;
-         end loop;
-         This.Cnt (Step) := This.Cnt (Step) + 1;
-         This.Events (Step, This.Cnt (Step)) := Cmd;
-      end if;
-   end Add;
+      This.Events (Step) := True;
+   end Set;
 
    ------------
-   -- Remove --
+   -- Toggle --
    ------------
 
-   procedure Remove (This : in out Instance;
-                     Step : Sequencer_Steps;
-                     Evt  : MIDI.Command)
+   procedure Toggle (This : in out Instance;
+                     Step : Sequencer_Steps)
    is
    begin
-      if This.Cnt (Step) /= 0 then
-         for Index in This.Events'First (2) .. This.Cnt (Step) loop
-            if This.Events (Step, Index) = Evt then
-               for Del in Index .. This.Cnt (Step) - 1 loop
-                  This.Events (Step, Del) := This.Events (Step, Del + 1);
-               end loop;
-               This.Cnt (Step) := This.Cnt (Step) - 1;
-               return;
-            end if;
-         end loop;
-      end if;
-   end Remove;
+      This.Events (Step) := not This.Events (Step);
+   end Toggle;
 
-   ----------------
-   -- Last_Index --
-   ----------------
+   -----------
+   -- Clear --
+   -----------
 
-   function Last_Index (This : Instance;
-                        Step : Sequencer_Steps)
-                        return Natural
-   is (This.Cnt (Step));
-
-   ---------
-   -- Cmd --
-   ---------
-
-   function Cmd (This  : Instance;
-                 Step  : Sequencer_Steps;
-                 Index : Positive) return MIDI.Command
+   procedure Clear (This : in out Instance;
+                    Step : Sequencer_Steps)
    is
    begin
-      return This.Events (Step, Index);
-   end Cmd;
+      This.Events (Step) := False;
+   end Clear;
+
+   ---------
+   -- Set --
+   ---------
+
+   function Set (This  : Instance;
+                 Step  : Sequencer_Steps)
+                 return Boolean
+   is
+   begin
+      return This.Events (Step);
+   end Set;
 
 end WNM.Sequence;
