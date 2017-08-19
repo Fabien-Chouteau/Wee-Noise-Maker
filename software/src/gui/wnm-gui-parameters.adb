@@ -46,17 +46,12 @@ package body WNM.GUI.Parameters is
       Name  : String;
       Value : Natural)
    is
-      B     : Integer := 5;
-      Limit : Integer;
    begin
-      Limit := Integer ((Float (Value) / 100.0) * 96.0);
-
-      Print (Buffer      => WNM.Screen.Buffer.all,
-             X_Offset    => B,
-             Y_Offset    => Y_Offset (Slot),
-             Str         => String'(Name & ":" & Value'Img & "%"),
-             Invert_From => 0,
-             Invert_To   => Limit);
+      Print_Int (Slot  => Slot,
+                 Name  => Name,
+                 Value => Value,
+                 Min   => 0,
+                 Max   => 100);
    end Print_Percentage;
 
    ---------------

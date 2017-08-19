@@ -100,8 +100,18 @@ package body WNM.GUI.Bitmap_Fonts is
       Invert_From : Integer := 95;
       Invert_To   : Integer := 95)
    is
+      Stop  : Integer;
       Start : Integer;
    begin
+      if Invert_From < X_Offset then
+         Stop := Integer'Min (X_Offset, Invert_To);
+
+         Buffer.Set_Source (White);
+         Buffer.Fill_Rect ((Position => (Invert_From, Y_Offset),
+                            Width    => Stop - Invert_From,
+                            Height   => 8));
+      end if;
+
       for C of Str loop
          if X_Offset > Buffer.Width then
             return;
