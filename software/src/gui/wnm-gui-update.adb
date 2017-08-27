@@ -28,9 +28,10 @@ with WNM.Screen;
 with WNM.UI;
 with WNM.Sequencer;
 with WNM.Master_Volume;
+with WNM.GUI.Menu;
 with Quick_Synth;
 
-package body WNM.GUI is
+package body WNM.GUI.Update is
 
    Anim_Step : HAL.UInt32 := 0;
 
@@ -47,7 +48,10 @@ package body WNM.GUI is
       WNM.Screen.Buffer.Set_Source (HAL.Bitmap.Black);
       WNM.Screen.Buffer.Fill;
 
-      case WNM.UI.Input_Mode is
+      if Menu.In_Menu then
+         Menu.Draw (WNM.Screen.Buffer);
+      else
+         case WNM.UI.Input_Mode is
          when WNM.UI.Volume_BPM =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             BPM := Integer (WNM.Sequencer.BPM);
@@ -97,10 +101,11 @@ package body WNM.GUI is
                                         Y_Offset    => 0,
                                         Str         => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
                                         Invert_From => 0);
-      end case;
+         end case;
+      end if;
       WNM.Screen.Update;
 
       Anim_Step := Anim_Step + 1;
    end Update;
 
-end WNM.GUI;
+end WNM.GUI.Update;

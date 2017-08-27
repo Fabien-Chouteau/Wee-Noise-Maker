@@ -23,7 +23,7 @@ with Ada.Real_Time; use Ada.Real_Time;
 
 with WNM.Sequencer;
 with WNM.UI;
-with WNM.GUI;
+with WNM.GUI.Update;
 with WNM.Master_Volume;
 with WNM.SDCard;
 with WNM.Sample_Stream;
@@ -42,7 +42,7 @@ begin
 
    loop
       WNM.Master_Volume.Update;
-      WNM.GUI.Update;
+      WNM.GUI.Update.Update;
       delay until Clock + Milliseconds (100);
    end loop;
 end Main;

@@ -19,5 +19,72 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI is
-end WNM.GUI;
+package body WNM.GUI.Menu is
+
+   subtype Stack_Index is Natural range 1 .. 10;
+
+   Stack : array (Stack_Index) of Any_Menu_Window := (others => null);
+   Stack_Cnt : Natural;
+
+   -------------
+   -- In_Menu --
+   -------------
+
+   function In_Menu return Boolean
+   is (Stack_Cnt /= 0);
+
+   ----------
+   -- Draw --
+   ----------
+
+   procedure Draw (Screen : not null HAL.Bitmap.Any_Bitmap_Buffer) is
+   begin
+      if Stack_Cnt /= 0 then
+         Stack (Stack_Cnt).Draw (Screen);
+      else
+         raise Program_Error with "We are not in the menu...";
+      end if;
+   end Draw;
+
+   --------------
+   -- On_Event --
+   --------------
+
+   procedure On_Event (Event : Menu_Event) is
+   begin
+      if Stack_Cnt /= 0 then
+         Stack (Stack_Cnt).On_Event (Event);
+      end if;
+   end On_Event;
+
+   ----------
+   -- Push --
+   ----------
+
+   procedure Push (Window : not null Any_Menu_Window) is
+   begin
+      if Stack_Cnt = Stack_Index'Last then
+         raise Program_Error with "No more room in the windows stack";
+      end if;
+
+      Stack_Cnt := Stack_Cnt + 1;
+      Stack (Stack_Cnt) := Window;
+      Window.On_Pushed;
+      Window.On_Focus;
+   end Push;
+
+   ---------
+   -- Pop --
+   ---------
+
+   procedure Pop is
+   begin
+      if Stack_Cnt = 0 then
+         raise Program_Error with "No window in the stack";
+      end if;
+
+      Stack (Stack_Cnt).On_Focus;
+      Stack_Cnt := Stack_Cnt - 1;
+   end Pop;
+
+end WNM.GUI.Menu;

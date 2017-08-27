@@ -19,5 +19,53 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI is
-end WNM.GUI;
+with WNM.Sample_Library; use WNM.Sample_Library;
+
+package WNM.GUI.Menu.Sample_Select is
+
+   function Folder_Select_Window_Singleton return not null Any_Menu_Window;
+   function Sample_Select_Window_Singleton return not null Any_Menu_Window;
+
+private
+
+   type Folder_Select_Window is new Menu_Window with record
+      Current_Folder : WNM.Sample_Library.Sample_Folders;
+   end record;
+
+   overriding
+   procedure Draw (This   : in out Folder_Select_Window;
+                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+
+   overriding
+   procedure On_Event (This  : in out Folder_Select_Window;
+                       Event : Menu_Event);
+
+   overriding
+   procedure On_Pushed (This  : in out Folder_Select_Window);
+
+   overriding
+   procedure On_Focus (This  : in out Folder_Select_Window);
+
+   type Sample_Select_Window is new Menu_Window with record
+      Rang   : WNM.Sample_Library.Sample_Folder_Range;
+      Folder : WNM.Sample_Library.Sample_Folders;
+      Index  : WNM.Sample_Library.Sample_Entry_Index;
+   end record;
+
+   overriding
+   procedure Draw (This   : in out Sample_Select_Window;
+                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+
+   overriding
+   procedure On_Event (This  : in out Sample_Select_Window;
+                       Event : Menu_Event);
+
+   overriding
+   procedure On_Pushed (This  : in out Sample_Select_Window);
+
+   overriding
+   procedure On_Focus (This  : in out Sample_Select_Window);
+
+
+
+end WNM.GUI.Menu.Sample_Select;

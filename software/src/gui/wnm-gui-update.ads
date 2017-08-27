@@ -19,5 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI is
-end WNM.GUI;
+package WNM.GUI.Update is
+
+   procedure Update;
+
+end WNM.GUI.Update;

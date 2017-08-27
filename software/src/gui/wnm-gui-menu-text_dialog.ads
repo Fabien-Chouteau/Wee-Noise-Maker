@@ -19,5 +19,36 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI is
-end WNM.GUI;
+package WNM.GUI.Menu.Text_Dialog is
+
+   function Text_Dialog_Singleton return not null Any_Menu_Window;
+
+private
+
+   type Text_Dialog_Mode is (Text_Mode, Confirm_Mode);
+
+   subtype Text_Range is Natural range 1 .. 15;
+
+   type Text_Dialog_Window is new Menu_Window with record
+      Text    : String (Text_Range);
+      Len     : Natural;
+      Index   : Natural;
+      Mode    : Text_Dialog_Mode;
+      Confirm : Boolean;
+   end record;
+
+   overriding
+   procedure Draw (This   : in out Text_Dialog_Window;
+                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+
+   overriding
+   procedure On_Event (This  : in out Text_Dialog_Window;
+                       Event : Menu_Event);
+
+   overriding
+   procedure On_Pushed (This  : in out Text_Dialog_Window);
+
+   overriding
+   procedure On_Focus (This  : in out Text_Dialog_Window);
+
+end WNM.GUI.Menu.Text_Dialog;

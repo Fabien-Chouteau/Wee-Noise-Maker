@@ -19,5 +19,47 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI is
-end WNM.GUI;
+with HAL.Bitmap;
+
+package WNM.GUI.Menu is
+
+   function In_Menu return Boolean;
+   procedure Draw (Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+
+   type Menu_Event_Kind is (Left_Press,
+                            Right_Press,
+                            Encoder_Left,
+                            Encoder_Right);
+
+   type Menu_Event (Kind : Menu_Event_Kind := Left_Press) is record
+      case Kind is
+         when Encoder_Left | Encoder_Right =>
+            Value : Integer;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   procedure On_Event (Event : Menu_Event);
+
+   type Menu_Window is interface;
+
+   type Any_Menu_Window is access all Menu_Window'Class;
+
+   procedure Draw (This   : in out Menu_Window;
+                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+   is abstract;
+
+   procedure On_Event (This  : in out Menu_Window;
+                       Event : Menu_Event)
+   is abstract;
+
+   procedure On_Pushed (This  : in out Menu_Window)
+   is abstract;
+   procedure On_Focus (This  : in out Menu_Window)
+   is abstract;
+
+   procedure Push (Window : not null Any_Menu_Window);
+   procedure Pop;
+
+end WNM.GUI.Menu;

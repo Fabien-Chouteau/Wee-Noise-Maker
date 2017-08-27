@@ -30,6 +30,9 @@ with WNM.Encoders;                 use WNM.Encoders;
 with Quick_Synth;                  use Quick_Synth;
 with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
+with WNM.Sample_Stream;           use WNM.Sample_Stream;
+with WNM.GUI.Menu;
+with WNM.GUI.Menu.Text_Dialog;
 
 package body WNM.UI is
 
@@ -61,6 +64,18 @@ package body WNM.UI is
 
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event) is
    begin
+      if GUI.Menu.In_Menu and then Evt = On_Press then
+         if B = Encoder_L then
+            GUI.Menu.On_Event ((Kind => GUI.Menu.Left_Press));
+            return;
+         end if;
+
+         if B = Encoder_R then
+            GUI.Menu.On_Event ((Kind => GUI.Menu.Right_Press));
+            return;
+         end if;
+      end if;
+
       case Current_Input_Mode is
          when Note =>
             case Evt is
@@ -79,6 +94,8 @@ package body WNM.UI is
                         Current_Input_Mode := Track_Select;
                      when Track_C =>
                         Current_Input_Mode := Pattern_Select;
+                     when Track_E =>
+                        GUI.Menu.Push (GUI.Menu.Text_Dialog.Text_Dialog_Singleton);
                      when others => null;
                   end case;
                when On_Long_Press =>
@@ -115,29 +132,16 @@ package body WNM.UI is
             case Evt is
                when On_Press =>
                   case B is
-                     when  B4 =>
-                        Quick_Synth.Toggle_Solo (Track_A);
-                     when  B5 =>
-                        Quick_Synth.Toggle_Solo (Track_B);
-                        FX_Is_On (B) := (Quick_Synth.In_Solo
-                                         and then
-                                         Quick_Synth.Solo = Track_B);
-                     when  B6 =>
-                        Quick_Synth.Toggle_Solo (Track_C);
-                        FX_Is_On (B) := (Quick_Synth.In_Solo
-                                         and then
-                                         Quick_Synth.Solo = Track_C);
-                     when  B7 =>
-                        Quick_Synth.Toggle_Solo (Track_D);
-                        FX_Is_On (B) := (Quick_Synth.In_Solo
-                                         and then
-                                         Quick_Synth.Solo = Track_D);
-                     when  B8 =>
-                        Quick_Synth.Toggle_Solo (Track_E);
-                        FX_Is_On (B) := (Quick_Synth.In_Solo
-                                         and then
-                                         Quick_Synth.Solo = Track_E);
-                     when  B1 .. B3 | B9 .. B16 =>
+                     when B1 =>
+                        if Sample_Stream.Now_Recording = Sample_Stream.None then
+                           Sample_Stream.Start_Recording
+                             (Filename => "/sdcard/test_rec.raw",
+                              Source   => Sample_Stream.Input,
+                              Max_Size => 1024 * 1024);
+                        else
+                           Sample_Stream.Stop_Recording;
+                        end if;
+                     when  B2 .. B3 | B9 .. B16 =>
                         Set_FX (B);
                      when others =>
                         null;
@@ -424,7 +428,17 @@ package body WNM.UI is
          L_Enco := WNM.Encoders.Left_Diff;
          R_Enco := WNM.Encoders.Right_Diff;
 
-         case Current_Input_Mode is
+         if GUI.Menu.In_Menu then
+            if L_Enco /= 0 then
+               GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Left,
+                                   Value => L_Enco));
+            end if;
+            if R_Enco /= 0 then
+               GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Right,
+                                   Value => R_Enco));
+            end if;
+         else
+            case Current_Input_Mode is
             when Volume_BPM =>
                WNM.Sequencer.Change_BPM (R_Enco * 5);
                WNM.Master_Volume.Change (L_Enco * 5);
@@ -438,7 +452,8 @@ package body WNM.UI is
                end if;
             when others =>
                null;
-         end case;
+            end case;
+         end if;
 
          --------------
          -- Set LEDs --
