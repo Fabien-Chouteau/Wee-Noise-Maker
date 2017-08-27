@@ -66,6 +66,8 @@ package WNM is
    UI_Task_Stack_Size           : constant := 10 * 1024;
    UI_Task_Secondary_Stack_Size : constant := 5 * 1024;
 
+   Sample_Taks_Stack_Size       : constant := 10 * 1024;
+
    LED_Task_Period   : constant Time_Span := Microseconds (1000);
 
    Long_Press_Time_Span : constant Time_Span := Milliseconds (300);

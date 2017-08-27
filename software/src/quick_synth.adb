@@ -37,12 +37,14 @@ package body Quick_Synth is
    Time_To_Live : array (WNM.Tracks) of Natural := (others => 0);
    Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
    Solo_Mode_Enabled : Boolean := False;
-   Solo_Track : WNM.Tracks := WNM.Track_A;
+   Solo_Track : WNM.Tracks := B1;
 
    Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0);
 
    procedure Copy (Src : not null Any_Managed_Buffer;
                    Dst : out HAL.Audio.Audio_Buffer);
+   procedure Copy (Src : HAL.Audio.Audio_Buffer;
+                   Dst : not null Any_Managed_Buffer);
    function Is_It_On (Track : Tracks) return Boolean;
 
    ----------
@@ -61,6 +63,24 @@ package body Quick_Synth is
       end if;
 
       Dst := Data;
+   end Copy;
+
+   ----------
+   -- Copy --
+   ----------
+
+   procedure Copy (Src : HAL.Audio.Audio_Buffer;
+                   Dst : not null Any_Managed_Buffer)
+   is
+      Data : HAL.Audio.Audio_Buffer (1 .. Integer (Dst.Buffer_Length / 2))
+        with Address => Dst.Buffer_Address;
+   begin
+
+      if Data'Length /= Src'Length then
+         raise Program_Error with "WTF!?!";
+      end if;
+
+      Data := Src;
    end Copy;
 
    --------------
@@ -229,6 +249,36 @@ package body Quick_Synth is
             Release_Buffer (Buf);
          end if;
       end loop;
+
+      -- Recording --
+      case WNM.Sample_Stream.Now_Recording is
+         when WNM.Sample_Stream.None =>
+            null;
+         when WNM.Sample_Stream.Input =>
+            declare
+               Buffer : constant Any_Managed_Buffer := Allocate (Kind => RAM,
+                                                                 Size => 1024);
+            begin
+               if Buffer = null then
+                  raise Program_Error with "Cannot allocate...";
+               end if;
+
+               Copy (Input, Buffer);
+               WNM.Sample_Stream.Push_Record_Buffer (Buffer);
+            end;
+         when WNM.Sample_Stream.Master_Output =>
+            declare
+               Buffer : constant Any_Managed_Buffer := Allocate (Kind => RAM,
+                                                                 Size => 1024);
+            begin
+               if Buffer = null then
+                  raise Program_Error with "Cannot allocate...";
+               end if;
+
+               Copy (Output, Buffer);
+               WNM.Sample_Stream.Push_Record_Buffer (Buffer);
+            end;
+      end case;
    end Fill;
 
    ----------

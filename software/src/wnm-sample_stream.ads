@@ -28,13 +28,16 @@ package WNM.Sample_Stream is
 
    procedure Start_Sample_Stream_Task;
 
+   -------------
+   -- Samples --
+   -------------
+
    type Stream_ID is range 0 .. 10;
 
    Invalid_Stream : constant Stream_ID := Stream_ID'First;
 
    subtype Valid_Stream_ID is Stream_ID range
      Invalid_Stream + 1 .. Stream_ID'Last;
-
 
    procedure Start (Filepath    : String;
                     Start_Point : Natural;
@@ -45,6 +48,23 @@ package WNM.Sample_Stream is
    procedure Next_Buffer (ID     : Stream_ID;
                           Buffer : out Any_Managed_Buffer;
                           Track  : out Tracks);
+
+   ---------------
+   -- Recording --
+   ---------------
+
+   type Rec_Source is (None, Input, Master_Output);
+
+   function Now_Recording return Rec_Source;
+
+   procedure Start_Recording (Filename : String;
+                              Source   : Rec_Source;
+                              Max_Size : Positive)
+     with Pre => Now_Recording = None and then Source /= None;
+
+   procedure Stop_Recording;
+
+   procedure Push_Record_Buffer (Buffer : not null Any_Managed_Buffer);
 
 private
 
@@ -72,9 +92,20 @@ private
    type Free_Array is array (Valid_Stream_ID) of Boolean;
    type Track_Array is array (Valid_Stream_ID) of Tracks;
 
+   type Record_Request is record
+      Active   : Boolean := False;
+      Filepath : String_Access := null;
+      Src      : Rec_Source;
+      Max_Size : File_IO.File_Size;
+   end record;
+
    protected Streams_Prot
      with Priority => DAC_Task_Priority
    is
+
+      -------------
+      -- Samples --
+      -------------
 
       procedure Next_Buffer (ID     : Valid_Stream_ID;
                              Buffer : out Any_Managed_Buffer;
@@ -98,7 +129,20 @@ private
       procedure Push_Request (Req : Sample_Request);
       procedure Pop_Request (Req : out Sample_Request);
 
+      ---------------
+      -- Recording --
+      ---------------
+
+      procedure Set_Rec_Request (Rec : Record_Request);
+      procedure Get_Rec_Request (Rec : out Record_Request);
+      function Now_Recording return Rec_Source;
+      procedure Start_Recording (Src : Rec_Source);
+      procedure Stop_Recording;
+      procedure Push_Record_Buffer (Buffer : not null Any_Managed_Buffer);
+      procedure Get_Record_Buffer (Buffer : out Any_Managed_Buffer);
+
    private
+
       FIFOs     : FIFO_Array;
       Is_Free   : Free_Array := (others => True);
       On_Track  : Track_Array;
@@ -106,6 +150,11 @@ private
       Something_To_Do : Boolean := False;
 
       Requests  : Request_FIFO.FIFO (10);
+
+      Rec_FIFO    : WNM.Buffer_FIFO.FIFO (2);
+      Rec_Size    : Natural := 0;
+      Rec_Src     : Rec_Source;
+      Rec_Request : Record_Request;
    end Streams_Prot;
 
    type Stream_State is (Unused, In_Progress);

@@ -34,10 +34,24 @@ package body WNM is
    -- To_Button --
    ---------------
 
-   function To_Button (V : Keyboard_Value) return Keyboard_Buttons is
-   begin
-      return Keyboard_Buttons'Val (V);
-   end To_Button;
+   function To_Button (V : Keyboard_Value) return Keyboard_Buttons
+   is (case V is
+          when 1  => B1,
+          when 2  => B2,
+          when 3  => B3,
+          when 4  => B4,
+          when 5  => B5,
+          when 6  => B6,
+          when 7  => B7,
+          when 8  => B8,
+          when 9  => B9,
+          when 10 => B10,
+          when 11 => B11,
+          when 12 => B12,
+          when 13 => B13,
+          when 14 => B14,
+          when 15 => B15,
+          when 16 => B16);
 
    --------------
    -- To_Track --
