@@ -6,6 +6,8 @@ package body WNM.Pattern_Sequencer is
    Sequence_Of_Pattern : array (Sequence_Range) of Patterns
      := (others => B1);
 
+   Is_In_Sequence : array (Patterns) of Boolean := (B1     => True,
+                                                    others => False);
    Current_Pattern_Index : Sequence_Range := 1;
    Last_In_Sequence      : Sequence_Range := 1;
    Next_In               : Positive := 1;
@@ -18,12 +20,16 @@ package body WNM.Pattern_Sequencer is
    procedure Add_To_Sequence (Pattern : Patterns) is
    begin
       if not Edit_In_Progress then
+
+         --  Starting a new sequence
          Edit_In_Progress := True;
          Next_In := Sequence_Range'First;
+         Is_In_Sequence := (others => False);
       end if;
 
       if Next_In in Sequence_Range'Range then
          Sequence_Of_Pattern (Sequence_Range (Next_In)) := Pattern;
+         Is_In_Sequence (Pattern) := True;
          Last_In_Sequence := Next_In;
          Next_In := Next_In + 1;
       end if;
@@ -46,6 +52,13 @@ package body WNM.Pattern_Sequencer is
    begin
       return Sequence_Of_Pattern (Current_Pattern_Index);
    end Current_Pattern;
+
+   ----------------------------
+   -- Is_In_Pattern_Sequence --
+   ----------------------------
+
+   function Is_In_Pattern_Sequence (Pattern : Patterns) return Boolean
+     is (Is_In_Sequence (Pattern));
 
    ---------------------------
    -- Signal_End_Of_Pattern --
