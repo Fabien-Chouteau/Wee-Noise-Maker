@@ -35,8 +35,8 @@ package body WNM.GUI.Bitmap_Fonts is
       X_Offset    : in out Integer;
       Y_Offset    : Integer;
       C           : Character;
-      Invert_From : Integer := 95;
-      Invert_To   : Integer := 95)
+      Invert_From : Integer := 96;
+      Invert_To   : Integer := 96)
    is
       Index : constant Integer := Character'Pos (C) - Character'Pos ('!');
       Bitmap_Offset : constant Integer := Index * 5;
@@ -52,9 +52,9 @@ package body WNM.GUI.Bitmap_Fonts is
          Giza_Color : Giza.Colors.Color;
          use type Giza.Colors.RGB_Component;
       begin
-         if Index in 0 .. 93 and then X in 0 .. 4 and then Y in 1 .. 7 then
+         if Index in 0 .. 93 and then X in 0 .. 4 and then Y in 0 .. 6 then
             Giza_Color := Giza.Bitmaps.Indexed_1bit.Get_Pixel
-              (font_5x7.Data, (X + Bitmap_Offset, Y - 1));
+              (font_5x7.Data, (X + Bitmap_Offset, Y));
             return Giza_Color.R /= 0;
          else
             return False;
@@ -70,17 +70,19 @@ package body WNM.GUI.Bitmap_Fonts is
 
    begin
       Draw_Loop : for X in 0 .. 5 loop
-         for Y in 0 .. 7 loop
+         for Y in 0 .. 6 loop
 
-            if X + X_Offset > Buffer.Width - 1 then
-               exit Draw_Loop;
-            elsif X + X_Offset >= 0
-              and then
-                Y + Y_Offset in 0 .. Buffer.Height - 1
-            then
-               Buffer.Set_Pixel ((X + X_Offset, Y + Y_Offset),
-                                 (if Color (X, Y) xor Invert (X + X_Offset)
-                                  then White else Black));
+            if Y + Y_Offset in 0 .. 15 then
+               if X + X_Offset > Buffer.Width - 1 then
+                  exit Draw_Loop;
+               elsif X + X_Offset >= 0
+                 and then
+                   Y + Y_Offset in 0 .. Buffer.Height - 1
+               then
+                  Buffer.Set_Pixel ((X + X_Offset, Y + Y_Offset),
+                                    (if Color (X, Y) xor Invert (X + X_Offset)
+                                     then White else Black));
+               end if;
             end if;
          end loop;
       end loop Draw_Loop;
@@ -97,8 +99,8 @@ package body WNM.GUI.Bitmap_Fonts is
       X_Offset    : in out Integer;
       Y_Offset    : Integer;
       Str         : String;
-      Invert_From : Integer := 95;
-      Invert_To   : Integer := 95)
+      Invert_From : Integer := 96;
+      Invert_To   : Integer := 96)
    is
       Stop  : Integer;
       Start : Integer;
@@ -109,7 +111,7 @@ package body WNM.GUI.Bitmap_Fonts is
          Buffer.Set_Source (White);
          Buffer.Fill_Rect ((Position => (Invert_From, Y_Offset),
                             Width    => Stop - Invert_From,
-                            Height   => 8));
+                            Height   => 7));
       end if;
 
       for C of Str loop
@@ -124,13 +126,13 @@ package body WNM.GUI.Bitmap_Fonts is
                 Invert_To);
       end loop;
 
-      if X_Offset < Invert_To then
+      if Invert_From < 96 and then X_Offset < Invert_To then
          Start :=  Integer'Max (X_Offset, Invert_From);
 
          Buffer.Set_Source (White);
          Buffer.Fill_Rect ((Position => (Start, Y_Offset),
                             Width    => Invert_To - Start,
-                            Height   => 8));
+                            Height   => 7));
       end if;
    end Print;
 
