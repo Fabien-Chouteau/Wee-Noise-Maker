@@ -21,7 +21,7 @@
 
 package WNM.GUI.Menu.Text_Dialog is
 
-   function Text_Dialog_Singleton return not null Any_Menu_Window;
+   procedure Push_Text_Dialog_Window;
 
 private
 

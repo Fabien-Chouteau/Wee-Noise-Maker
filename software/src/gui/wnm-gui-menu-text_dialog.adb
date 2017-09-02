@@ -26,12 +26,14 @@ package body WNM.GUI.Menu.Text_Dialog is
 
    Text_Dialog : aliased Text_Dialog_Window;
 
-   ---------------------------
-   -- Text_Dialog_Singleton --
-   ---------------------------
+   -----------------------------
+   -- Push_Text_Dialog_Window --
+   -----------------------------
 
-   function Text_Dialog_Singleton return not null Any_Menu_Window
-   is (Text_Dialog'Access);
+   procedure Push_Text_Dialog_Window is
+   begin
+      Push (Text_Dialog'Access);
+   end Push_Text_Dialog_Window;
 
    ----------
    -- Draw --
@@ -46,32 +48,30 @@ package body WNM.GUI.Menu.Text_Dialog is
    begin
       case This.Mode is
          when Text_Mode =>
-            Screen.Set_Source (White);
-            Screen.Draw_Line (Start     => (Select_X, 2),
-                              Stop      => (Select_X + 5, 2),
-                              Thickness => 1,
-                              Fast      => True);
-            Screen.Draw_Line (Start     => (Select_X, 13),
-                              Stop      => (Select_X + 5, 13),
-                              Thickness => 1,
-                              Fast      => True);
-
             Print (Buffer      => Screen.all,
                    X_Offset    => X,
-                   Y_Offset    => 3,
-                   Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1));
+                   Y_Offset    => 0,
+                   Str         => "Enter text:");
+
+            X := 1;
+            Print (Buffer      => Screen.all,
+                   X_Offset    => X,
+                   Y_Offset    => 9,
+                   Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1),
+                   Invert_From => (Select_X - 1),
+                   Invert_To   => (Select_X + 5));
+
          when Confirm_Mode =>
             X := 1;
             Print (Buffer      => Screen.all,
                    X_Offset    => X,
                    Y_Offset    => 0,
-                   Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1));
-
+                   Str         => "Confirm? : " & (if This.Confirm then "Yes" else "No"));
             X := 1;
             Print (Buffer      => Screen.all,
                    X_Offset    => X,
-                   Y_Offset    => 8,
-                   Str         => "Confirm? : " & (if This.Confirm then "yes" else "no"));
+                   Y_Offset    => 9,
+                   Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1));
       end case;
    end Draw;
 
