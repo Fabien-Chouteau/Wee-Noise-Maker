@@ -80,6 +80,7 @@ package body WNM.GUI.Menu.Drawing is
              Str         => Text);
 
       if Bottom then
+         Screen.Set_Source (White);
          Screen.Set_Pixel ((0, 15));
          Screen.Set_Pixel ((0, 14));
          Screen.Set_Pixel ((1, 13));
