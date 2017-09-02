@@ -32,7 +32,7 @@ with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
 with WNM.Sample_Stream;           use WNM.Sample_Stream;
 with WNM.GUI.Menu;
-with WNM.GUI.Menu.Text_Dialog;
+with WNM.GUI.Menu.Root;
 
 package body WNM.UI is
 
@@ -95,7 +95,9 @@ package body WNM.UI is
                      when Track_C =>
                         Current_Input_Mode := Pattern_Select;
                      when Track_E =>
-                        GUI.Menu.Push (GUI.Menu.Text_Dialog.Text_Dialog_Singleton);
+                        if not GUI.Menu.In_Menu then
+                           GUI.Menu.Root.Push_Root_Window;
+                        end if;
                      when others => null;
                   end case;
                when On_Long_Press =>
