@@ -105,7 +105,7 @@ private
       Col : Col_Index;
    end record;
 
-   Key_To_LED : constant array (LEDs) of LED_Address :=
+   LED_To_Address : constant array (LEDs) of LED_Address :=
      (B1      => (Row => 2, Col => 1),
       B2      => (Row => 2, Col => 2),
       B3      => (Row => 2, Col => 3),
@@ -130,15 +130,6 @@ private
       Track_C  => (Row => 3, Col => 6),
       Track_D  => (Row => 3, Col => 7),
       Track_E  => (Row => 3, Col => 8));
-
-   Row_1_LEDs : constant array (1 .. 9) of LEDs :=
-     (B9, B10, B11, B12, B13, B14, B15, B16, Rec);
-
-   Row_2_LEDs : constant array (1 .. 9) of LEDs :=
-     (B1, B2, B3, B4, B5, B6, B7, B8, Play);
-
-   Row_3_LEDs : constant array (1 .. 6) of LEDs :=
-     (FX, Track_A, Track_B, Track_C, Track_D, Track_E);
 
    LED_State : array (Buttons) of UInt8 := (others => 0);
 
@@ -165,6 +156,7 @@ private
    private
 
       Current_LED : LEDs := Buttons'First;
+
       procedure IRQ_Handler;
       pragma Attach_Handler (IRQ_Handler, Ada.Interrupts.Names.TIM7_Interrupt);
 

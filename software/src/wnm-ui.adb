@@ -40,6 +40,9 @@ package body WNM.UI is
 
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
 
+   procedure Turn_On (LED_Addr : LED_Address);
+   procedure Turn_Off (LED_Addr : LED_Address);
+
    procedure Set_FX (B : Buttons);
 
    Default_Input_Mode : constant Input_Mode_Type := Note;
@@ -245,7 +248,7 @@ package body WNM.UI is
 
       Reset (LED_Timer);
 
-      Configure (LED_Timer, Prescaler => 100, Period => 400);
+      Configure (LED_Timer, Prescaler => 100, Period => 100);
 
       Enable_Interrupt (LED_Timer, Timer_Update_Interrupt);
 
@@ -518,8 +521,8 @@ package body WNM.UI is
             --  Volume and BPM mode --
             when Volume_BPM =>
                for B in B1 .. B16 loop
-                  if Quick_Synth.Muted (B) then
-                     Turn_Off (B);
+                  if not Quick_Synth.Muted (B) then
+                     Turn_On (B);
                   end if;
                end loop;
 
@@ -550,15 +553,32 @@ package body WNM.UI is
    end UI_Task;
 
 
+   -------------
+   -- Turn_On --
+   -------------
+
+   procedure Turn_On (LED_Addr : LED_Address)
+   is
+   begin
+      Row_To_Point (LED_Addr.Row).Clear;
+      Col_To_Point (LED_Addr.Col).Set;
+   end Turn_On;
+
+   --------------
+   -- Turn_Off --
+   --------------
+
+   procedure Turn_Off (LED_Addr : LED_Address)
+   is
+   begin
+      Row_To_Point (LED_Addr.Row).Set;
+      Col_To_Point (LED_Addr.Col).Clear;
+   end Turn_Off;
+
    -----------------------
    -- LED_Timer_Handler --
    -----------------------
 
-   Current_LED_Row : Row_Index := Row_Index'First;
-
-   subtype LED_Microstep_Type is UInt8 range 1 .. 4;
-
-   LED_Microstep : LED_Microstep_Type := LED_Microstep_Type'First;
 
    protected body LED_Timer_Handler is
 
@@ -573,55 +593,30 @@ package body WNM.UI is
                Clear_Pending_Interrupt (LED_Timer, Timer_Update_Interrupt);
             end if;
 
+            Turn_Off (LED_To_Address (Current_LED));
 
-            for Pt of Col_To_Point loop
-               Pt.Clear;
-            end loop;
-
-            Row_To_Point (Current_LED_Row).Set;
-
-            if LED_Microstep = LED_Microstep_Type'Last then
-               LED_Microstep := LED_Microstep_Type'First;
+            if Current_LED = LEDs'Last then
+               Current_LED := LEDs'First;
             else
-               LED_Microstep := LED_Microstep + 1;
+               Current_LED := LEDs'Succ (Current_LED);
             end if;
 
-            if LED_Microstep >= 3 then
-               --  Do nothing...
-               return;
-            end if;
-
-            if Current_LED_Row = Row_Index'Last then
-               Current_LED_Row := Row_Index'First;
+            if LED_State (Current_LED) > 0 then
+               Turn_On (LED_To_Address (Current_LED));
+               Configure (LED_Timer,
+                          Prescaler => 100,
+                          Period => (case LED_State (Current_LED) is
+                                        when 1      => 50,
+                                        when 2      => 600,
+                                        when others => 1700));
             else
-               Current_LED_Row := Row_Index'Succ (Current_LED_Row);
+               Configure (LED_Timer,
+                          Prescaler => 100,
+                          Period => 700);
             end if;
 
-            Row_To_Point (Current_LED_Row).Clear;
-
-            case Current_LED_Row is
-               when 1 =>
-                  for LED of Row_1_LEDs loop
-                     if LED_State (LED) >= LED_Microstep then
-                        Col_To_Point (Key_To_LED (LED).Col).Set;
-                     end if;
-                  end loop;
-               when 2 =>
-                  for LED of Row_2_LEDs loop
-                     if LED_State (LED) >= LED_Microstep then
-                        Col_To_Point (Key_To_LED (LED).Col).Set;
-                     end if;
-                  end loop;
-               when 3 =>
-                  for LED of Row_3_LEDs loop
-                     if LED_State (LED) >= LED_Microstep then
-                        Col_To_Point (Key_To_LED (LED).Col).Set;
-                     end if;
-                  end loop;
-            end case;
          end if;
       end IRQ_Handler;
-
    end LED_Timer_Handler;
 
 end WNM.UI;
