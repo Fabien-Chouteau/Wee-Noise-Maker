@@ -23,8 +23,7 @@ with WNM.Sample_Library; use WNM.Sample_Library;
 
 package WNM.GUI.Menu.Sample_Select is
 
-   function Folder_Select_Window_Singleton return not null Any_Menu_Window;
-   function Sample_Select_Window_Singleton return not null Any_Menu_Window;
+   procedure Push_Folder_Select_Window;
 
 private
 

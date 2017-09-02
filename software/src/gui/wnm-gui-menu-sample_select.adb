@@ -27,19 +27,14 @@ package body WNM.GUI.Menu.Sample_Select is
    Folder_Select : aliased Folder_Select_Window;
    Sample_Select : aliased Sample_Select_Window;
 
-   ------------------------------------
-   -- Folder_Select_Window_Singleton --
-   ------------------------------------
+   -------------------------------
+   -- Push_Folder_Select_Window --
+   -------------------------------
 
-   function Folder_Select_Window_Singleton return not null Any_Menu_Window
-   is (Folder_Select'Access);
-
-   ------------------------------------
-   -- Sample_Select_Window_Singleton --
-   ------------------------------------
-
-   function Sample_Select_Window_Singleton return not null Any_Menu_Window
-   is (Sample_Select'Access);
+   procedure Push_Folder_Select_Window is
+   begin
+      Push (Folder_Select'Access);
+   end Push_Folder_Select_Window;
 
    ----------
    -- Draw --
@@ -67,11 +62,8 @@ package body WNM.GUI.Menu.Sample_Select is
    begin
       case Event.Kind is
          when Left_Press =>
-            Menu.Push (new Sample_Select_Window'
-                         (Folder => This.Current_Folder,
-                          Index  => 1,
-                          Rang   => (0, 0)));
-            null;
+            Sample_Select.Folder := This.Current_Folder;
+            Menu.Push (Sample_Select'Access);
          when Right_Press =>
             Menu.Pop;
          when Encoder_Right =>
