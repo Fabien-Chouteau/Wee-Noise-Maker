@@ -38,8 +38,6 @@ package body WNM.UI is
 
    UI_Task_Start   : Suspension_Object;
 
-   procedure Turn_On (LED_Addr : LED_Address);
-   procedure Turn_Off (LED_Addr : LED_Address);
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
 
    procedure Set_FX (B : Buttons);
@@ -247,7 +245,7 @@ package body WNM.UI is
 
       Reset (LED_Timer);
 
-      Configure (LED_Timer, Prescaler => 100, Period => 700);
+      Configure (LED_Timer, Prescaler => 100, Period => 400);
 
       Enable_Interrupt (LED_Timer, Timer_Update_Interrupt);
 
@@ -267,7 +265,7 @@ package body WNM.UI is
 
    procedure Turn_On (B : LEDs) is
    begin
-      LED_State (B) := True;
+      LED_State (B) := LED_State (B) + 1;
    end Turn_On;
 
    --------------
@@ -276,30 +274,17 @@ package body WNM.UI is
 
    procedure Turn_Off (B : LEDs) is
    begin
-      LED_State (B) := False;
+      LED_State (B) := 0;
    end Turn_Off;
 
-   -------------
-   -- Turn_On --
-   -------------
+   ------------------
+   -- Turn_Off_All --
+   ------------------
 
-   procedure Turn_On (LED_Addr : LED_Address)
-   is
+   procedure Turn_Off_All is
    begin
-      Row_To_Point (LED_Addr.Row).Clear;
-      Col_To_Point (LED_Addr.Col).Set;
-   end Turn_On;
-
-   --------------
-   -- Turn_Off --
-   --------------
-
-   procedure Turn_Off (LED_Addr : LED_Address)
-   is
-   begin
-      Row_To_Point (LED_Addr.Row).Set;
-      Col_To_Point (LED_Addr.Col).Clear;
-   end Turn_Off;
+      LED_State := (others => 0);
+   end Turn_Off_All;
 
    ---------------------------
    -- Current_Editting_Trig --
@@ -466,11 +451,14 @@ package body WNM.UI is
          -- Set LEDs --
          --------------
 
+         Turn_Off_All;
+
          -- Play LED --
          if Sequencer.State not in Pause | Edit then
             Turn_On (Play);
-         else
-            Turn_Off (Play);
+            if Sequencer.Step in 1 | 5 | 9 | 13 then
+               Turn_On (Play);
+            end if;
          end if;
 
          -- Rec LED --
@@ -481,8 +469,6 @@ package body WNM.UI is
               Sequencer.Step in 1 | 5 | 9 | 13)
          then
             Turn_On (Rec);
-         else
-            Turn_Off (Rec);
          end if;
 
          --  B1 .. B16 LEDs --
@@ -490,7 +476,6 @@ package body WNM.UI is
 
             -- FX selection mode --
             when FX_Select =>
-               Turn_Off (FX);
                --  The FX LED will be on if there's at least one FX enabled
 
                for B in B4 .. B8 loop
@@ -508,8 +493,6 @@ package body WNM.UI is
                   if FX_Is_On (B) then
                      Turn_On (B);
                      Turn_On (FX);
-                  else
-                     Turn_Off (B);
                   end if;
                end loop;
 
@@ -518,17 +501,17 @@ package body WNM.UI is
                for B in B1 .. B16 loop
                   if Sequencer.Track = B then
                      Turn_On (B);
-                  else
-                     Turn_Off (B);
                   end if;
                end loop;
 
+            --  Pattern select --
             when Pattern_Select =>
                for B in B1 .. B16 loop
                   if Pattern_Sequencer.Current_Pattern = B then
                      Turn_On (B);
-                  else
-                     Turn_Off (B);
+                  end if;
+                  if Pattern_Sequencer.Is_In_Pattern_Sequence (B) then
+                     Turn_On (B);
                   end if;
                end loop;
 
@@ -537,8 +520,6 @@ package body WNM.UI is
                for B in B1 .. B16 loop
                   if Quick_Synth.Muted (B) then
                      Turn_Off (B);
-                  else
-                     Turn_On (B);
                   end if;
                end loop;
 
@@ -549,22 +530,16 @@ package body WNM.UI is
                         for B in B1 .. B16 loop
                            if Sequencer.Set (To_Value (B)) then
                               Turn_On (B);
-                           else
-                              Turn_Off (B);
                            end if;
                         end loop;
                   when Play | Play_And_Rec =>
                      for B in B1 .. B16 loop
                         if Sequencer.Set (B, Sequencer.Step) then
                            Turn_On (B);
-                        else
-                           Turn_Off (B);
                         end if;
                      end loop;
                   when others =>
-                     for B in B1 .. B16 loop
-                        Turn_Off (B);
-                     end loop;
+                     null;
                end case;
          end case;
 
@@ -579,6 +554,12 @@ package body WNM.UI is
    -- LED_Timer_Handler --
    -----------------------
 
+   Current_LED_Row : Row_Index := Row_Index'First;
+
+   subtype LED_Microstep_Type is UInt8 range 1 .. 4;
+
+   LED_Microstep : LED_Microstep_Type := LED_Microstep_Type'First;
+
    protected body LED_Timer_Handler is
 
       -----------------
@@ -592,17 +573,52 @@ package body WNM.UI is
                Clear_Pending_Interrupt (LED_Timer, Timer_Update_Interrupt);
             end if;
 
-            Turn_Off (Key_To_LED (Current_LED));
 
-            if Current_LED = LEDs'Last then
-               Current_LED := LEDs'First;
+            for Pt of Col_To_Point loop
+               Pt.Clear;
+            end loop;
+
+            Row_To_Point (Current_LED_Row).Set;
+
+            if LED_Microstep = LED_Microstep_Type'Last then
+               LED_Microstep := LED_Microstep_Type'First;
             else
-               Current_LED := LEDs'Succ (Current_LED);
+               LED_Microstep := LED_Microstep + 1;
             end if;
 
-            if LED_State (Current_LED) then
-               Turn_On (Key_To_LED (Current_LED));
+            if LED_Microstep >= 3 then
+               --  Do nothing...
+               return;
             end if;
+
+            if Current_LED_Row = Row_Index'Last then
+               Current_LED_Row := Row_Index'First;
+            else
+               Current_LED_Row := Row_Index'Succ (Current_LED_Row);
+            end if;
+
+            Row_To_Point (Current_LED_Row).Clear;
+
+            case Current_LED_Row is
+               when 1 =>
+                  for LED of Row_1_LEDs loop
+                     if LED_State (LED) >= LED_Microstep then
+                        Col_To_Point (Key_To_LED (LED).Col).Set;
+                     end if;
+                  end loop;
+               when 2 =>
+                  for LED of Row_2_LEDs loop
+                     if LED_State (LED) >= LED_Microstep then
+                        Col_To_Point (Key_To_LED (LED).Col).Set;
+                     end if;
+                  end loop;
+               when 3 =>
+                  for LED of Row_3_LEDs loop
+                     if LED_State (LED) >= LED_Microstep then
+                        Col_To_Point (Key_To_LED (LED).Col).Set;
+                     end if;
+                  end loop;
+            end case;
          end if;
       end IRQ_Handler;
 

@@ -25,6 +25,7 @@ with STM32.Device; use STM32.Device;
 with STM32.GPIO;   use STM32.GPIO;
 with STM32.Timers; use STM32.Timers;
 with STM32.PWM;    use STM32.PWM;
+with HAL;          use HAL;
 
 package WNM.UI is
 
@@ -43,6 +44,7 @@ package WNM.UI is
 
    procedure Turn_On (B : LEDs);
    procedure Turn_Off (B : LEDs);
+   procedure Turn_Off_All;
 
    function Current_Editting_Trig return Sequencer_Steps
      with Pre => Input_Mode = Trig_Edit;
@@ -129,7 +131,16 @@ private
       Track_D  => (Row => 3, Col => 7),
       Track_E  => (Row => 3, Col => 8));
 
-   LED_State : array (Buttons) of Boolean := (others => False);
+   Row_1_LEDs : constant array (1 .. 9) of LEDs :=
+     (B9, B10, B11, B12, B13, B14, B15, B16, Rec);
+
+   Row_2_LEDs : constant array (1 .. 9) of LEDs :=
+     (B1, B2, B3, B4, B5, B6, B7, B8, Play);
+
+   Row_3_LEDs : constant array (1 .. 6) of LEDs :=
+     (FX, Track_A, Track_B, Track_C, Track_D, Track_E);
+
+   LED_State : array (Buttons) of UInt8 := (others => 0);
 
    type Buttton_Event is (On_Press,
                           On_Long_Press,
