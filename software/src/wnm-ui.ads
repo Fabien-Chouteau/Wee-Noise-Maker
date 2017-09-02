@@ -19,12 +19,9 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Interrupts.Names;
 
 with STM32.Device; use STM32.Device;
 with STM32.GPIO;   use STM32.GPIO;
-with STM32.Timers; use STM32.Timers;
-with STM32.PWM;    use STM32.PWM;
 with HAL;          use HAL;
 
 package WNM.UI is
@@ -41,10 +38,6 @@ package WNM.UI is
    function Input_Mode return Input_Mode_Type;
 
    function Is_Pressed (B : Buttons) return Boolean;
-
-   procedure Turn_On (B : LEDs);
-   procedure Turn_Off (B : LEDs);
-   procedure Turn_Off_All;
 
    function Current_Editting_Trig return Sequencer_Steps
      with Pre => Input_Mode = Trig_Edit;
@@ -81,58 +74,6 @@ private
 
    Wakeup : GPIO_Point renames PA0;
 
-   type Row_Index is range 1 .. 3;
-   type Col_Index is range 1 .. 9;
-
-   Row_To_Point : array (Row_Index) of GPIO_Point :=
-     (1 => PD13,
-      2 => PD12,
-      3 => PD11);
-
-   Col_To_Point : array (Col_Index) of GPIO_Point :=
-     (1 => PC0,
-      2 => PC2,
-      3 => PA4,
-      4 => PB0,
-      5 => PE9,
-      6 => PE13,
-      7 => PB11,
-      8 => PB15,
-      9 => PD14);
-
-   type LED_Address is record
-      Row : Row_Index;
-      Col : Col_Index;
-   end record;
-
-   LED_To_Address : constant array (LEDs) of LED_Address :=
-     (B1      => (Row => 2, Col => 1),
-      B2      => (Row => 2, Col => 2),
-      B3      => (Row => 2, Col => 3),
-      B4      => (Row => 2, Col => 4),
-      B5      => (Row => 2, Col => 5),
-      B6      => (Row => 2, Col => 6),
-      B7      => (Row => 2, Col => 7),
-      B8      => (Row => 2, Col => 8),
-      B9      => (Row => 1, Col => 1),
-      B10     => (Row => 1, Col => 2),
-      B11     => (Row => 1, Col => 3),
-      B12     => (Row => 1, Col => 4),
-      B13     => (Row => 1, Col => 5),
-      B14     => (Row => 1, Col => 6),
-      B15     => (Row => 1, Col => 7),
-      B16     => (Row => 1, Col => 8),
-      Rec     => (Row => 1, Col => 9),
-      Play    => (Row => 2, Col => 9),
-      FX      => (Row => 3, Col => 9),
-      Track_A  => (Row => 3, Col => 4),
-      Track_B  => (Row => 3, Col => 5),
-      Track_C  => (Row => 3, Col => 6),
-      Track_D  => (Row => 3, Col => 7),
-      Track_E  => (Row => 3, Col => 8));
-
-   LED_State : array (Buttons) of UInt8 := (others => 0);
-
    type Buttton_Event is (On_Press,
                           On_Long_Press,
                           On_Release,
@@ -146,20 +87,5 @@ private
 
    function Has_Long_Press (Button : Buttons) return Boolean;
    --  Can this button trigger a On_Long_Press event?
-
-   LED_Timer : STM32.Timers.Timer renames Timer_7;
-   LED_Timer_Control : PWM_Modulator;
-
-   protected LED_Timer_Handler is
-      pragma Interrupt_Priority;
-
-   private
-
-      Current_LED : LEDs := Buttons'First;
-
-      procedure IRQ_Handler;
-      pragma Attach_Handler (IRQ_Handler, Ada.Interrupts.Names.TIM7_Interrupt);
-
-   end LED_Timer_Handler;
 
 end WNM.UI;

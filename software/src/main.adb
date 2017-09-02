@@ -23,6 +23,7 @@ with Ada.Real_Time; use Ada.Real_Time;
 
 with WNM.Sequencer;
 with WNM.UI;
+with WNM.LED;
 with WNM.GUI.Update;
 with WNM.Master_Volume;
 with WNM.SDCard;
@@ -37,6 +38,7 @@ begin
    WNM.Sample_Library.Load;
 
    WNM.Sample_Stream.Start_Sample_Stream_Task;
+   WNM.LED.Start;
    WNM.UI.Start;
    WNM.Sequencer.Start;
 

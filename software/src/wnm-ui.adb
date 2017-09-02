@@ -33,15 +33,13 @@ with WNM.Pattern_Sequencer;
 with WNM.Sample_Stream;           use WNM.Sample_Stream;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
+with WNM.LED;
 
 package body WNM.UI is
 
    UI_Task_Start   : Suspension_Object;
 
    procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
-
-   procedure Turn_On (LED_Addr : LED_Address);
-   procedure Turn_Off (LED_Addr : LED_Address);
 
    procedure Set_FX (B : Buttons);
 
@@ -218,41 +216,7 @@ package body WNM.UI is
       Wakeup.Configure_IO (Config);
       Wakeup.Clear;
 
-      -- LEDs --
-
-      Config.Mode := Mode_Out;
-      Config.Output_Type := Push_Pull;
-      Config.Resistors := Floating;
-
-      for Pt of Row_To_Point loop
-         Enable_Clock (Pt);
-         Pt.Configure_IO (Config);
-         Pt.Set;
-      end loop;
-
-      for Pt of Col_To_Point loop
-         Enable_Clock (Pt);
-         Pt.Configure_IO (Config);
-         Pt.Clear;
-      end loop;
-
-      for B in LEDs loop
-         Turn_Off (B);
-      end loop;
-
       Set_True (UI_Task_Start);
-
-      --  LED Timer --
-
-      Enable_Clock (LED_Timer);
-
-      Reset (LED_Timer);
-
-      Configure (LED_Timer, Prescaler => 100, Period => 100);
-
-      Enable_Interrupt (LED_Timer, Timer_Update_Interrupt);
-
-      Enable (LED_Timer);
    end Start;
 
    ----------------
@@ -261,33 +225,6 @@ package body WNM.UI is
 
    function Is_Pressed (B : Buttons) return Boolean is
       (Key_State (B) = Down);
-
-   -------------
-   -- Turn_On --
-   -------------
-
-   procedure Turn_On (B : LEDs) is
-   begin
-      LED_State (B) := LED_State (B) + 1;
-   end Turn_On;
-
-   --------------
-   -- Turn_Off --
-   --------------
-
-   procedure Turn_Off (B : LEDs) is
-   begin
-      LED_State (B) := 0;
-   end Turn_Off;
-
-   ------------------
-   -- Turn_Off_All --
-   ------------------
-
-   procedure Turn_Off_All is
-   begin
-      LED_State := (others => 0);
-   end Turn_Off_All;
 
    ---------------------------
    -- Current_Editting_Trig --
@@ -454,13 +391,13 @@ package body WNM.UI is
          -- Set LEDs --
          --------------
 
-         Turn_Off_All;
+         LED.Turn_Off_All;
 
          -- Play LED --
          if Sequencer.State not in Pause | Edit then
-            Turn_On (Play);
+            LED.Turn_On (Play);
             if Sequencer.Step in 1 | 5 | 9 | 13 then
-               Turn_On (Play);
+               LED.Turn_On (Play);
             end if;
          end if;
 
@@ -471,7 +408,7 @@ package body WNM.UI is
               and then
               Sequencer.Step in 1 | 5 | 9 | 13)
          then
-            Turn_On (Rec);
+            LED.Turn_On (Rec);
          end if;
 
          --  B1 .. B16 LEDs --
@@ -494,8 +431,8 @@ package body WNM.UI is
 
                for B in B1 .. B16 loop
                   if FX_Is_On (B) then
-                     Turn_On (B);
-                     Turn_On (FX);
+                     LED.Turn_On (B);
+                     LED.Turn_On (FX);
                   end if;
                end loop;
 
@@ -503,7 +440,7 @@ package body WNM.UI is
             when Track_Select =>
                for B in B1 .. B16 loop
                   if Sequencer.Track = B then
-                     Turn_On (B);
+                     LED.Turn_On (B);
                   end if;
                end loop;
 
@@ -511,10 +448,10 @@ package body WNM.UI is
             when Pattern_Select =>
                for B in B1 .. B16 loop
                   if Pattern_Sequencer.Current_Pattern = B then
-                     Turn_On (B);
+                     LED.Turn_On (B);
                   end if;
                   if Pattern_Sequencer.Is_In_Pattern_Sequence (B) then
-                     Turn_On (B);
+                     LED.Turn_On (B);
                   end if;
                end loop;
 
@@ -522,7 +459,7 @@ package body WNM.UI is
             when Volume_BPM =>
                for B in B1 .. B16 loop
                   if not Quick_Synth.Muted (B) then
-                     Turn_On (B);
+                     LED.Turn_On (B);
                   end if;
                end loop;
 
@@ -532,13 +469,13 @@ package body WNM.UI is
                   when Edit | Play_And_Edit =>
                         for B in B1 .. B16 loop
                            if Sequencer.Set (To_Value (B)) then
-                              Turn_On (B);
+                              LED.Turn_On (B);
                            end if;
                         end loop;
                   when Play | Play_And_Rec =>
                      for B in B1 .. B16 loop
                         if Sequencer.Set (B, Sequencer.Step) then
-                           Turn_On (B);
+                           LED.Turn_On (B);
                         end if;
                      end loop;
                   when others =>
@@ -547,76 +484,9 @@ package body WNM.UI is
          end case;
 
          if Sequencer.State in Play_And_Edit | Play_And_Rec | Play then
-            Turn_On (To_Button (Sequencer.Step));
+            LED.Turn_On (To_Button (Sequencer.Step));
          end if;
       end loop;
    end UI_Task;
-
-
-   -------------
-   -- Turn_On --
-   -------------
-
-   procedure Turn_On (LED_Addr : LED_Address)
-   is
-   begin
-      Row_To_Point (LED_Addr.Row).Clear;
-      Col_To_Point (LED_Addr.Col).Set;
-   end Turn_On;
-
-   --------------
-   -- Turn_Off --
-   --------------
-
-   procedure Turn_Off (LED_Addr : LED_Address)
-   is
-   begin
-      Row_To_Point (LED_Addr.Row).Set;
-      Col_To_Point (LED_Addr.Col).Clear;
-   end Turn_Off;
-
-   -----------------------
-   -- LED_Timer_Handler --
-   -----------------------
-
-
-   protected body LED_Timer_Handler is
-
-      -----------------
-      -- IRQ_Handler --
-      -----------------
-
-      procedure IRQ_Handler is
-      begin
-         if Status (LED_Timer, Timer_Update_Indicated) then
-            if Interrupt_Enabled (LED_Timer, Timer_Update_Interrupt) then
-               Clear_Pending_Interrupt (LED_Timer, Timer_Update_Interrupt);
-            end if;
-
-            Turn_Off (LED_To_Address (Current_LED));
-
-            if Current_LED = LEDs'Last then
-               Current_LED := LEDs'First;
-            else
-               Current_LED := LEDs'Succ (Current_LED);
-            end if;
-
-            if LED_State (Current_LED) > 0 then
-               Turn_On (LED_To_Address (Current_LED));
-               Configure (LED_Timer,
-                          Prescaler => 100,
-                          Period => (case LED_State (Current_LED) is
-                                        when 1      => 50,
-                                        when 2      => 600,
-                                        when others => 1700));
-            else
-               Configure (LED_Timer,
-                          Prescaler => 100,
-                          Period => 700);
-            end if;
-
-         end if;
-      end IRQ_Handler;
-   end LED_Timer_Handler;
 
 end WNM.UI;
