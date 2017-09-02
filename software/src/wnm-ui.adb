@@ -130,6 +130,10 @@ package body WNM.UI is
                Current_Input_Mode := Default_Input_Mode;
                WNM.Pattern_Sequencer.End_Sequence_Edit;
             end if;
+
+            if B in B1 .. B16 and Evt = On_Press then
+               Quick_Synth.Toggle_Mute (B);
+            end if;
          when FX_Select =>
             case Evt is
                when On_Press =>
@@ -525,6 +529,16 @@ package body WNM.UI is
                      Turn_On (B);
                   else
                      Turn_Off (B);
+                  end if;
+               end loop;
+
+            --  Volume and BPM mode --
+            when Volume_BPM =>
+               for B in B1 .. B16 loop
+                  if Quick_Synth.Muted (B) then
+                     Turn_Off (B);
+                  else
+                     Turn_On (B);
                   end if;
                end loop;
 
