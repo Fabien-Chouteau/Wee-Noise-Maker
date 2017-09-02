@@ -28,8 +28,8 @@ package Quick_Synth is
    procedure Trig (Track : WNM.Tracks);
 
    procedure Event (Msg : MIDI.Message);
-   procedure Fill (Input  :     HAL.Audio.Audio_Buffer;
-                   Output : out HAL.Audio.Audio_Buffer);
+   procedure Fill (Stereo_Input  :     HAL.Audio.Audio_Buffer;
+                   Stereo_Output : out HAL.Audio.Audio_Buffer);
 
    procedure Mute (Track : WNM.Tracks);
    procedure Unmute (Track : WNM.Tracks);

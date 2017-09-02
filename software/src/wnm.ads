@@ -74,4 +74,9 @@ package WNM is
    --  How much time users have to press a button to get the alternative
    --  function.
 
+   Samples_Per_Mono_Buffer     : constant := 512;
+   Samples_Per_Stereo_Buffer   : constant := 2 * Samples_Per_Mono_Buffer;
+   Mono_Buffer_Size_In_Bytes   : constant := Samples_Per_Mono_Buffer * 2;
+   Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Stereo_Buffer * 2;
+
 end WNM;

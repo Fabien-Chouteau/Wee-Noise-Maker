@@ -31,7 +31,7 @@ with WNM.Buffer_Allocation; use WNM.Buffer_Allocation;
 package body Quick_Synth is
 
    My_Synths : array (WNM.Tracks) of  Simple_Synthesizer.Synthesizer
-     (Stereo    => True,
+     (Stereo    => False,
       Amplitude => Natural (Unsigned_16'Last / 10));
 
    Time_To_Live : array (WNM.Tracks) of Natural := (others => 0);
@@ -184,57 +184,87 @@ package body Quick_Synth is
    -- Fill --
    ----------
 
-   procedure Fill (Input  :     HAL.Audio.Audio_Buffer;
-                   Output : out HAL.Audio.Audio_Buffer)
+   procedure Fill (Stereo_Input  :     HAL.Audio.Audio_Buffer;
+                   Stereo_Output : out HAL.Audio.Audio_Buffer)
    is
 
-      procedure Mix (Samples : HAL.Audio.Audio_Buffer);
+      procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
+                     Volume       : Float;
+                     Pan          : Float);
 
       ---------
       -- Mix --
       ---------
 
-      procedure Mix (Samples : HAL.Audio.Audio_Buffer) is
-         Val : Integer_32;
+      procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
+                     Volume       : Float;
+                     Pan          : Float)
+      is
+         Val         : Integer_32;
+         In_Index    : Natural;
+         Out_Index   : Natural;
+
+         Sample, Left, Right : Float;
       begin
-         if Samples'Length /= Output'Length then
+         if Mono_Samples'Length * 2 /= Stereo_Output'Length then
             raise Program_Error with "Invalid audio buffer";
          end if;
 
-         for Index in Output'Range loop
-            Val := Integer_32 (Output (Index)) + Integer_32 (Samples (Index));
+         In_Index  := Mono_Samples'First;
+         Out_Index := Stereo_Output'First;
+
+         while In_Index /= Mono_Samples'Last loop
+
+            Sample := Float (Mono_Samples (In_Index));
+            Sample := Sample * Volume;
+
+            Right := Sample * (1.0 - Pan);
+            Left  := Sample * (1.0 + Pan);
+
+            Val := Integer_32 (Stereo_Output (Out_Index)) + Integer_32 (Left);
             if Val > Integer_32 (Integer_16'Last) then
-               Output (Index) := Integer_16'Last;
+               Stereo_Output (Out_Index) := Integer_16'Last;
             elsif Val < Integer_32 (Integer_16'First) then
-               Output (Index) := Integer_16'First;
+               Stereo_Output (Out_Index) := Integer_16'First;
             else
-               Output (Index) := Integer_16 (Val);
+               Stereo_Output (Out_Index) := Integer_16 (Val);
             end if;
+
+            Val := Integer_32 (Stereo_Output (Out_Index + 1)) + Integer_32 (Right);
+            if Val > Integer_32 (Integer_16'Last) then
+               Stereo_Output (Out_Index + 1) := Integer_16'Last;
+            elsif Val < Integer_32 (Integer_16'First) then
+               Stereo_Output (Out_Index + 1) := Integer_16'First;
+            else
+               Stereo_Output (Out_Index + 1) := Integer_16 (Val);
+            end if;
+
+            In_Index  := In_Index + 1;
+            Out_Index := Out_Index + 2;
          end loop;
       end Mix;
 
-      Tmp      : HAL.Audio.Audio_Buffer (Output'Range);
+      Mono_Tmp : HAL.Audio.Audio_Buffer (1 .. Samples_Per_Mono_Buffer);
       Buf      : Any_Managed_Buffer;
       On_Track : Tracks;
    begin
 
       -- Audio in --
-
-      for Index in Output'Range loop
-         Output (Index) := Input (Index);
-      end loop;
+      Stereo_Output := Stereo_Input;
 
       -- Synths --
 
       for Track in WNM.Tracks loop
-         My_Synths (Track).Receive (Tmp);
+         My_Synths (Track).Receive (Mono_Tmp);
          Time_To_Live (Track) :=  (if Time_To_Live (Track) /= 0 then
                                       Time_To_Live (Track) - 1
                                    else
                                       0);
 
          if Time_To_Live (Track) /= 0 and then Is_It_On (Track) then
-            Mix (Tmp);
+            Mix (Mono_Tmp,
+                 Volume => Float (Volume_For_Track (Track)) / 100.0,
+                 Pan    => Float (Pan_For_Track (Track)) / 100.0);
          end if;
       end loop;
 
@@ -244,8 +274,10 @@ package body Quick_Synth is
          Next_Buffer (ID, Buf, On_Track);
          if Buf /= null then
             if Is_It_On (On_Track) then
-               Copy (Buf, Tmp);
-               Mix (Tmp);
+               Copy (Buf, Mono_Tmp);
+               Mix (Mono_Tmp,
+                    Volume => Float (Volume_For_Track (On_Track)) / 100.0,
+                    Pan    => Float (Pan_For_Track (On_Track)) / 100.0);
             end if;
             Release_Buffer (Buf);
          end if;
@@ -264,7 +296,7 @@ package body Quick_Synth is
                   raise Program_Error with "Cannot allocate...";
                end if;
 
-               Copy (Input, Buffer);
+               Copy (Stereo_Input, Buffer);
                WNM.Sample_Stream.Push_Record_Buffer (Buffer);
             end;
          when WNM.Sample_Stream.Master_Output =>
@@ -276,7 +308,7 @@ package body Quick_Synth is
                   raise Program_Error with "Cannot allocate...";
                end if;
 
-               Copy (Output, Buffer);
+               Copy (Stereo_Output, Buffer);
                WNM.Sample_Stream.Push_Record_Buffer (Buffer);
             end;
       end case;

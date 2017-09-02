@@ -35,7 +35,6 @@ with System;                       use System;
 
 with Ada.Synchronous_Task_Control;
 with Ada.Interrupts.Names;
-with Sound_Gen_Interfaces;         use Sound_Gen_Interfaces;
 with Quick_Synth;
 
 with WNM.I2C;
@@ -78,10 +77,10 @@ package body WNM.Audio_DAC is
 
    -- Buffers --
 
-   TX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Generator_Buffer_Length * 2);
-   TX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Generator_Buffer_Length * 2);
-   RX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Generator_Buffer_Length * 2);
-   RX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Generator_Buffer_Length * 2);
+   TX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
+   TX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
+   RX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
+   RX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
 
    ----------
    -- MCLK --

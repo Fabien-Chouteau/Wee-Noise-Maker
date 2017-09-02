@@ -23,9 +23,9 @@ with WNM.Buffer_FIFO; use WNM.Buffer_FIFO;
 
 package body WNM.Buffer_Allocation is
 
-   Buffer_Size : constant := 2 * 512;
+   Buffer_Size : constant := Mono_Buffer_Size_In_Bytes;
    Number_Of_RAM_Buffers : constant := 60;
-   Number_Of_CCM_Buffers : constant := 60;
+   Number_Of_CCM_Buffers : constant := 1;
 
    RAM_Buffers : array (1 .. Number_Of_RAM_Buffers) of
      aliased RAM_Managed_Buffer (Buffer_Size);
