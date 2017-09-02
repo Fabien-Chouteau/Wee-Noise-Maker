@@ -67,12 +67,9 @@ package body WNM.GUI.Update is
                                           Max   => 200);
          when WNM.UI.Track_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
-            B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => String'(WNM.Sequencer.Track'Img),
-                                        Invert_From => 0);
+            WNM.GUI.Parameters.Print_Percentage (Slot  => WNM.GUI.Parameters.Up,
+                                                 Name  => "Volume",
+                                                 Value => Quick_Synth.Volume (WNM.Sequencer.Track));
             WNM.GUI.Parameters.Print_Pan (Slot  => WNM.GUI.Parameters.Down,
                                           Name  => "PAN",
                                           Value => Quick_Synth.Pan (WNM.Sequencer.Track));

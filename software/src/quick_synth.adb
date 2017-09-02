@@ -40,6 +40,7 @@ package body Quick_Synth is
    Solo_Track : WNM.Tracks := B1;
 
    Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0);
+   Volume_For_Track : array (WNM.Tracks) of Integer := (others => 100);
 
    procedure Copy (Src : not null Any_Managed_Buffer;
                    Dst : out HAL.Audio.Audio_Buffer);
@@ -369,6 +370,29 @@ package body Quick_Synth is
 
    function Pan (Track : WNM.Tracks) return Integer
    is (Pan_For_Track (Track));
+
+   -------------------
+   -- Change_Volume --
+   -------------------
+
+   procedure Change_Volume (Track  : WNM.Tracks;
+                            Volume : Integer)
+   is
+   begin
+      Volume_For_Track (Track) := Volume_For_Track (Track) + Volume;
+      if Volume_For_Track (Track) > 100 then
+         Volume_For_Track (Track) := 100;
+      elsif Volume_For_Track (Track) < 0 then
+         Volume_For_Track (Track) := 0;
+      end if;
+   end Change_Volume;
+
+   ------------
+   -- Volume --
+   ------------
+
+   function Volume (Track : WNM.Tracks) return Natural
+   is (Natural (Volume_For_Track (Track)));
 
 begin
    for Synth of My_Synths loop

@@ -44,4 +44,8 @@ package Quick_Synth is
                          Pan   : Integer);
    function Pan (Track : WNM.Tracks) return Integer;
 
+   procedure Change_Volume (Track  : WNM.Tracks;
+                            Volume : Integer);
+   function Volume (Track : WNM.Tracks) return Natural;
+
 end Quick_Synth;
