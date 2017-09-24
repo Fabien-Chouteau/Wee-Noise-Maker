@@ -33,11 +33,59 @@ package body WNM.Sample_Stream is
      with Priority     => Sample_Task_Priority,
           Storage_Size => Sample_Taks_Stack_Size;
 
-   Start_Task : Suspension_Object;
+   Start_Task      : Suspension_Object;
+   Log_Record_Size : Natural := 0;
 
-   procedure Close_Stream (ID : Valid_Stream_ID);
+   procedure Close_Stream (ID             : Valid_Stream_ID;
+                           Keep_Allocated : Boolean);
    procedure Process_Request;
    procedure Process_Record_Request (FD  : in out File_Descriptor);
+
+   ---------------------
+   -- To_Stream_Track --
+   ---------------------
+
+   function To_Stream_Track (T : Tracks) return Stream_Track
+   is (case T is
+          when B1 => ST_1,
+          when B2 => ST_2,
+          when B3 => ST_3,
+          when B4 => ST_4,
+          when B5 => ST_5,
+          when B6 => ST_6,
+          when B7 => ST_7,
+          when B8 => ST_8,
+          when B9 => ST_9,
+          when B10 => ST_10,
+          when B11 => ST_11,
+          when B12 => ST_12,
+          when B13 => ST_13,
+          when B14 => ST_14,
+          when B15 => ST_15,
+          when B16 => ST_16);
+
+   --------------
+   -- To_Track --
+   --------------
+
+   function To_Track (ST : Stream_Track) return Tracks
+   is (case ST is
+          when ST_1   => B1,
+          when ST_2   => B2,
+          when ST_3   => B3,
+          when ST_4   => B4,
+          when ST_5   => B5,
+          when ST_6   => B6,
+          when ST_7   => B7,
+          when ST_8   => B8,
+          when ST_9   => B9,
+          when ST_10  => B10,
+          when ST_11  => B11,
+          when ST_12  => B12,
+          when ST_13  => B13,
+          when ST_14  => B14,
+          when ST_15  => B15,
+          when others => B16);
 
    ------------------
    -- Streams_Prot --
@@ -51,7 +99,7 @@ package body WNM.Sample_Stream is
 
       procedure Next_Buffer (ID     : Valid_Stream_ID;
                              Buffer : out Any_Managed_Buffer;
-                             Track  : out Tracks)
+                             Track  : out Stream_Track)
       is
       begin
          Pop (FIFOs (ID), Buffer);
@@ -73,10 +121,12 @@ package body WNM.Sample_Stream is
       end Push;
 
       -----------
-      -- Close --
+      -- Flush --
       -----------
 
-      procedure Close (ID : Valid_Stream_ID) is
+      procedure Flush (ID      : Valid_Stream_ID;
+                       Free_It : Boolean)
+      is
          Buf : Any_Managed_Buffer;
       begin
 
@@ -86,8 +136,10 @@ package body WNM.Sample_Stream is
             Release_Buffer (Buf);
          end loop;
 
-         Is_Free (ID) := True;
-      end Close;
+         if Free_It then
+            Is_Free (ID) := True;
+         end if;
+      end Flush;
 
       ----------------------
       -- Need_More_Buffer --
@@ -140,20 +192,48 @@ package body WNM.Sample_Stream is
       --------------
 
       procedure Allocate (ID    : out Stream_ID;
-                          Track : Tracks) is
+                          Track : Stream_Track;
+                          Reuse : Boolean) is
+         Ret : Stream_ID;
       begin
          ID := Valid_Stream_ID'First;
 
-         loop
-            exit when Is_Free (ID);
+         if Reuse then
 
-            if ID = Valid_Stream_ID'Last then
-               ID := Invalid_Stream;
+            Ret := Invalid_Stream;
+
+            loop
+               if Is_Free (ID) then
+                  Ret := ID;
+               elsif On_Track (ID) = Track then
+                  --  Reuse the stream allocated for this channel
+                  Ret := ID;
+                  exit;
+               end if;
+
+               if ID = Valid_Stream_ID'Last then
+                  exit;
+               end if;
+               ID := ID + 1;
+            end loop;
+
+            if Ret = Invalid_Stream then
                return;
             else
-               ID := ID + 1;
+               ID := Ret;
             end if;
-         end loop;
+         else
+            loop
+               exit when Is_Free (ID);
+
+               if ID = Valid_Stream_ID'Last then
+                  ID := Invalid_Stream;
+                  return;
+               else
+                  ID := ID + 1;
+               end if;
+            end loop;
+         end if;
 
          Is_Free (ID)    := False;
          On_Track (ID)   := Track;
@@ -250,6 +330,7 @@ package body WNM.Sample_Stream is
          end loop;
 
          Rec_Src := None;
+         Something_To_Do := True;
       end Stop_Recording;
 
       ------------------------
@@ -293,8 +374,9 @@ package body WNM.Sample_Stream is
    procedure Start (Filepath    : String;
                     Start_Point : Natural;
                     End_Point   : Natural;
-                    Track       : Tracks;
-                    Looping     : Boolean)
+                    Track       : Stream_Track;
+                    Looping     : Boolean;
+                    Poly        : Boolean)
    is
       Req : Sample_Request;
    begin
@@ -302,6 +384,7 @@ package body WNM.Sample_Stream is
       Req.End_Point   := File_Size (End_Point);
       Req.Track       := Track;
       Req.Looping     := Looping;
+      Req.Poly        := Poly;
       Req.Filepath    := new String'(Filepath);
       Streams_Prot.Push_Request (Req);
    end Start;
@@ -312,7 +395,7 @@ package body WNM.Sample_Stream is
 
    procedure Next_Buffer (ID     : Stream_ID;
                           Buffer : out Any_Managed_Buffer;
-                          Track  : out Tracks)
+                          Track  : out Stream_Track)
    is
    begin
       if ID = Invalid_Stream then
@@ -357,6 +440,15 @@ package body WNM.Sample_Stream is
       Streams_Prot.Stop_Recording;
    end Stop_Recording;
 
+   -----------------
+   -- Record_Size --
+   -----------------
+
+   function Record_Size return Natural is
+   begin
+      return Log_Record_Size;
+   end Record_Size;
+
    ------------------------
    -- Push_Record_Buffer --
    ------------------------
@@ -370,9 +462,10 @@ package body WNM.Sample_Stream is
    -- Close_Stream --
    ------------------
 
-   procedure Close_Stream (ID : Valid_Stream_ID) is
+   procedure Close_Stream (ID             : Valid_Stream_ID;
+                           Keep_Allocated : Boolean) is
    begin
-      Streams_Prot.Close (ID);
+      Streams_Prot.Flush (ID, Free_It => not Keep_Allocated);
       Close (Streams (ID).FD);
       Streams (ID).State := Unused;
    end Close_Stream;
@@ -390,11 +483,11 @@ package body WNM.Sample_Stream is
 
       Streams_Prot.Pop_Request (Req);
       if Req.Filepath /= null then
-         Streams_Prot.Allocate (ID, Req.Track);
+         Streams_Prot.Allocate (ID, Req.Track, Reuse => not Req.Poly);
          if ID /= Invalid_Stream then
 
             if Streams (ID).State /= Unused then
-               Close_Stream (ID);
+               Close_Stream (ID, Keep_Allocated => True);
             end if;
 
             Streams (ID).Start_Point := Req.Start_Point;
@@ -413,7 +506,7 @@ package body WNM.Sample_Stream is
             Streams (ID).Size := Size (Streams (ID).FD);
 
             if Streams (ID).Start_Point >= Streams (ID).Size then
-               Close_Stream (ID);
+               Close_Stream (ID, Keep_Allocated => False);
             else
                Amount := Streams (ID).Start_Point;
                Status := Seek (Streams (ID).FD, From_Start, Amount);
@@ -450,6 +543,7 @@ package body WNM.Sample_Stream is
 
          Streams_Prot.Start_Recording (Req.Src);
          Free (Req.Filepath);
+         Log_Record_Size := 0;
       end if;
    end Process_Record_Request;
 
@@ -502,7 +596,7 @@ package body WNM.Sample_Stream is
                            raise Program_Error with "Seek error";
                         end if;
                      else
-                        Close_Stream (ID);
+                        Close_Stream (ID, Keep_Allocated => False);
                      end if;
                      Release_Buffer (Buffer);
                   else
@@ -534,6 +628,10 @@ package body WNM.Sample_Stream is
                      then
                         raise Program_Error with "Record Write failure";
                      end if;
+
+                     Log_Record_Size := Log_Record_Size +
+                       Natural (Buffer.Buffer_Length);
+
                      Release_Buffer (Buffer);
                   end if;
                end;
