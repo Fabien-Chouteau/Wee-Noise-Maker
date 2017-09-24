@@ -49,7 +49,9 @@ package body WNM.SDCard is
    begin
       SDCard_Device.Initialize;
 
-      if Mount_Drive ("sdcard", SDCard_Device'Access) /= OK then
+      BD_Monitor.Disable;
+
+      if Mount_Drive ("sdcard", BD_Monitor'Access) /= OK then
          raise Program_Error with "No file system...";
       end if;
    end Initialize;
@@ -61,6 +63,23 @@ package body WNM.SDCard is
    function Mount_Dir return String
    is ("/sdcard/");
 
+   ----------------
+   -- Mon_Enable --
+   ----------------
+
+   procedure Mon_Enable is
+   begin
+      BD_Monitor.Enable;
+   end Mon_Enable;
+
+   -----------------
+   -- Mon_Disable --
+   -----------------
+
+   procedure Mon_Disable is
+   begin
+      BD_Monitor.Disable;
+   end Mon_Disable;
 
    ----------------
    -- Initialize --

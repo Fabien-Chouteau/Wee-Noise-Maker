@@ -35,21 +35,26 @@
 with HAL.SDMMC;
 with STM32.SDMMC;
 
-with HAL;                  use HAL;
-with HAL.Block_Drivers;    use HAL.Block_Drivers;
-with STM32.GPIO;           use STM32.GPIO;
-with STM32.Device;         use STM32.Device;
-with STM32;                use STM32;
-with STM32.DMA;            use STM32.DMA;
-with STM32.DMA.Interrupts; use STM32.DMA.Interrupts;
+with HAL;                   use HAL;
+with HAL.Block_Drivers;     use HAL.Block_Drivers;
+with STM32.GPIO;            use STM32.GPIO;
+with STM32.Device;          use STM32.Device;
+with STM32;                 use STM32;
+with STM32.DMA;             use STM32.DMA;
+with STM32.DMA.Interrupts;  use STM32.DMA.Interrupts;
 with Ada.Interrupts;
 with Ada.Interrupts.Names;
+with Monitor.Block_Drivers;
+with Semihosting;
 
 package WNM.SDCard is
 
    procedure Initialize;
 
    function Mount_Dir return String;
+
+   procedure Mon_Enable;
+   procedure Mon_Disable;
 
 private
 
@@ -109,5 +114,8 @@ private
    SD_Tx_DMA_Int     : DMA_Interrupt_Controller renames DMA2_Stream6;
 
    SDCard_Device : aliased SDCard.SDCard_Controller (SDIO'Access);
+   BD_Monitor    : aliased Monitor.Block_Drivers.Block_Driver_Monitor
+     (Driver_Under_Monitoring => SDCard_Device'Access,
+      Put_Line                => Semihosting.Log_Line'Access);
 end WNM.SDCard;
 
