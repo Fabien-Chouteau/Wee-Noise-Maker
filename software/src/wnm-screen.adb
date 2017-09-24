@@ -62,21 +62,26 @@ package body WNM.Screen is
    -- Copy_Bitmap --
    -----------------
 
-   procedure Copy_Bitmap (Bmp  : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
-                          X, Y : Integer)
+   procedure Copy_Bitmap (Bmp          : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
+                          X, Y         : Integer;
+                          Invert_Color : Boolean := False)
    is
       use type Giza.Colors.RGB_Component;
 
       Giza_Color : Giza.Colors.Color;
+      On         : Boolean;
    begin
       for W in 0 .. Bmp.W - 1 loop
          for H in 0 .. Bmp.H - 1 loop
             Giza_Color := Giza.Bitmaps.Indexed_1bit.Get_Pixel (Bmp, (W, H));
+            On := Giza_Color.R /= 0;
+
+            if Invert_Color then
+               On := not On;
+            end if;
+
             Screen.Hidden_Buffer (1).Set_Pixel ((X + W, Y + H),
-                                                (if Giza_Color.R /= 0 then
-                                                    White
-                                                 else
-                                                    Black));
+                                                (if On then White else Black));
          end loop;
       end loop;
 

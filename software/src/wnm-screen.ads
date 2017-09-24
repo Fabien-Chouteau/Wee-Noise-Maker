@@ -28,8 +28,9 @@ package WNM.Screen is
 
    function Buffer return not null HAL.Bitmap.Any_Bitmap_Buffer;
 
-   procedure Copy_Bitmap (Bmp  : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
-                          X, Y : Integer);
+   procedure Copy_Bitmap (Bmp          : Giza.Bitmaps.Indexed_1bit.Bitmap_Indexed;
+                          X, Y         : Integer;
+                          Invert_Color : Boolean := False);
 
    procedure Sleep;
    procedure Wakeup;
