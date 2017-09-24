@@ -21,3 +21,6 @@ _autosave-*
 *.csv
 
 *.cgpr
+
+*.stderr
+*.stdout
