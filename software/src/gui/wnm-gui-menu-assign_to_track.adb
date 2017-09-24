@@ -19,73 +19,82 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package body WNM.GUI.Menu is
+with WNM.GUI.Bitmap_Fonts;   use WNM.GUI.Bitmap_Fonts;
+with Enum_Next;
 
-   subtype Stack_Index is Natural range 1 .. 10;
+package body WNM.GUI.Menu.Assign_To_Track is
 
-   Stack : array (Stack_Index) of Any_Menu_Window := (others => null);
-   Stack_Cnt : Natural;
+   package Tracks_Enum_Next is new Enum_Next (Tracks);
+   use Tracks_Enum_Next;
 
-   -------------
-   -- In_Menu --
-   -------------
+   Assign_To_Track_Singleton : aliased Assign_To_Track_Window;
 
-   function In_Menu return Boolean
-   is (Stack_Cnt /= 0);
+   -----------------
+   -- Push_Window --
+   -----------------
+
+   procedure Push_Window is
+   begin
+      Push (Assign_To_Track_Singleton'Access);
+   end Push_Window;
 
    ----------
    -- Draw --
    ----------
 
-   procedure Draw (Screen : not null HAL.Bitmap.Any_Bitmap_Buffer) is
+   overriding procedure Draw
+     (This   : in out Assign_To_Track_Window;
+      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+   is
+      X : Integer;
    begin
-      if Stack_Cnt /= 0 then
-         Stack (Stack_Cnt).Draw (Screen);
-      else
-         raise Program_Error with "We are not in the menu...";
-      end if;
+      X := 5;
+      Print (Buffer      => Screen.all,
+             X_Offset    => X,
+             Y_Offset    => 0,
+             Str         => "Assign to track:");
+
+      X := 5;
+      Print (Buffer      => Screen.all,
+             X_Offset    => X,
+             Y_Offset    => 9,
+             Str         => This.Track'Img);
    end Draw;
 
    --------------
    -- On_Event --
    --------------
 
-   procedure On_Event (Event : Menu_Event) is
+   overriding procedure On_Event
+     (This  : in out Assign_To_Track_Window;
+      Event : Menu_Event)
+   is
    begin
-      if Stack_Cnt /= 0 then
-         Stack (Stack_Cnt).On_Event (Event);
-      end if;
+      case Event.Kind is
+         when Left_Press =>
+            Pop (Exit_Value => Success);
+         when Right_Press =>
+            Pop (Exit_Value => Failure);
+         when Encoder_Right =>
+            null;
+         when Encoder_Left =>
+            if Event.Value > 0 then
+               This.Track := Next (This.Track);
+            elsif Event.Value < 0 then
+               This.Track := Prev (This.Track);
+            end if;
+      end case;
    end On_Event;
 
-   ----------
-   -- Push --
-   ----------
+   ---------------
+   -- On_Pushed --
+   ---------------
 
-   procedure Push (Window : not null Any_Menu_Window) is
+   overriding procedure On_Pushed (This  : in out Assign_To_Track_Window)
+   is
    begin
-      if Stack_Cnt = Stack_Index'Last then
-         raise Program_Error with "No more room in the windows stack";
-      end if;
+      This.Track := Tracks'First;
+   end On_Pushed;
 
-      Stack_Cnt := Stack_Cnt + 1;
-      Stack (Stack_Cnt) := Window;
-      Window.On_Pushed;
-   end Push;
 
-   ---------
-   -- Pop --
-   ---------
-
-   procedure Pop (Exit_Value : Window_Exit_Value) is
-   begin
-      if Stack_Cnt = 0 then
-         raise Program_Error with "No window in the stack";
-      end if;
-
-      Stack_Cnt := Stack_Cnt - 1;
-      if Stack_Cnt /= 0 then
-         Stack (Stack_Cnt).On_Focus (Exit_Value);
-      end if;
-   end Pop;
-
-end WNM.GUI.Menu;
+end WNM.GUI.Menu.Assign_To_Track;

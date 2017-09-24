@@ -19,46 +19,48 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.GUI.Menu.Drawing;           use WNM.GUI.Menu.Drawing;
-with WNM.GUI.Menu.Sample_Select;     use WNM.GUI.Menu.Sample_Select;
-with WNM.GUI.Menu.Text_Dialog;       use WNM.GUI.Menu.Text_Dialog;
-with WNM.GUI.Menu.Create_Sample;
+with WNM.Sample_Stream;      use WNM.Sample_Stream;
+with WNM.GUI.Bitmap_Fonts;   use WNM.GUI.Bitmap_Fonts;
+with Enum_Next;
 
-package body WNM.GUI.Menu.Root is
+package body WNM.GUI.Menu.Sample_Src_Select is
 
-   Root_Window_Singleton : aliased Root_Menu;
+   package Rec_Src_Enum_Next is new Enum_Next (Rec_Src);
+   use Rec_Src_Enum_Next;
 
-   function Menu_Item_Text (Item : Menu_Items) return String
-   is (case Item is
-          when Create_Sample   => "Create sample",
-          when Change_Sample   => "Change sample",
-          when Test_Text_Input => "Test text input",
-          when Load            => "Load",
-          when Save            => "Save",
-          when Settings        => "Settings");
+   Src_Select_Window_Singleton : aliased Src_Select_Menu;
 
-   ----------------------
-   -- Push_Root_Window --
-   ----------------------
+   -----------------
+   -- Push_Window --
+   -----------------
 
-   procedure Push_Root_Window is
+   procedure Push_Window is
    begin
-      Push (Root_Window_Singleton'Access);
-   end Push_Root_Window;
+      Push (Src_Select_Window_Singleton'Access);
+   end Push_Window;
 
    ----------
    -- Draw --
    ----------
 
    overriding procedure Draw
-     (This   : in out Root_Menu;
+     (This   : in out Src_Select_Menu;
       Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
    is
+      X : Integer := 5;
    begin
-      Draw_Menu_Box (Screen,
-                     Menu_Item_Text (This.Item),
-                     Top => This.Item /= Menu_Items'First,
-                     Bottom => This.Item /= Menu_Items'Last);
+      Print (Buffer      => Screen.all,
+             X_Offset    => X,
+             Y_Offset    => 0,
+             Str         => "Source:");
+
+      X := 5;
+      Print (Buffer      => Screen.all,
+             X_Offset    => X,
+             Y_Offset    => 9,
+             Str         => This.Src'Img);
+
+      --  Print_Percentage (Down, "Volume", This.Volume);
    end Draw;
 
    --------------
@@ -66,36 +68,34 @@ package body WNM.GUI.Menu.Root is
    --------------
 
    overriding procedure On_Event
-     (This  : in out Root_Menu;
+     (This  : in out Src_Select_Menu;
       Event : Menu_Event)
    is
+      Tmp : Integer;
    begin
       case Event.Kind is
          when Left_Press =>
-            case This.Item is
-               when Create_Sample =>
-                  Menu.Create_Sample.Push_Window;
-               when Change_Sample =>
-                  Push_Folder_Select_Window;
-               when Test_Text_Input =>
-                  Text_Dialog.Set_Title ("Enter some text");
-                  Text_Dialog.Push_Window;
-               when others =>
-                  null;
-            end case;
+            Sample_Stream.Start_Recording
+              (Filename => Sample_Rec_Filepath,
+               Source   => This.Src,
+               Max_Size => 332000 * 10 * 2);
+            Menu.Pop (Exit_Value => Success);
          when Right_Press =>
-            Menu.Pop (Exit_Value => None);
+            Menu.Pop (Exit_Value => Failure);
          when Encoder_Right =>
-            null;
+            Tmp := This.Volume + Event.Value;
+            if Tmp < 0 then
+               This.Volume := 0;
+            elsif Tmp > 100 then
+               This.Volume := 100;
+            else
+               This.Volume := Natural (Tmp);
+            end if;
          when Encoder_Left =>
             if Event.Value > 0 then
-               if This.Item /= Menu_Items'Last then
-                  This.Item := Menu_Items'Succ (This.Item);
-               end if;
+               This.Src := Next (This.Src);
             elsif Event.Value < 0 then
-               if This.Item /= Menu_Items'First then
-                  This.Item := Menu_Items'Pred (This.Item);
-               end if;
+               This.Src := Prev (This.Src);
             end if;
       end case;
    end On_Event;
@@ -105,10 +105,11 @@ package body WNM.GUI.Menu.Root is
    ---------------
 
    overriding procedure On_Pushed
-     (This  : in out Root_Menu)
+     (This  : in out Src_Select_Menu)
    is
+      pragma Unreferenced (This);
    begin
-      This.Item := Menu_Items'First;
+      null;
    end On_Pushed;
 
    --------------
@@ -116,11 +117,12 @@ package body WNM.GUI.Menu.Root is
    --------------
 
    overriding procedure On_Focus
-     (This       : in out Root_Menu;
+     (This       : in out Src_Select_Menu;
       Exit_Value : Window_Exit_Value)
    is
+      pragma Unreferenced (This);
    begin
       null;
    end On_Focus;
 
-end WNM.GUI.Menu.Root;
+end WNM.GUI.Menu.Sample_Src_Select;

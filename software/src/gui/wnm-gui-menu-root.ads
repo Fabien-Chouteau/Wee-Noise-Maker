@@ -25,12 +25,12 @@ package WNM.GUI.Menu.Root is
 
 private
 
-   type Menu_Items is (Change_Sample,
+   type Menu_Items is (Create_Sample,
+                       Change_Sample,
                        Test_Text_Input,
                        Load,
                        Save,
                        Settings);
-
 
    type Root_Menu is new Menu_Window with record
       Item : Menu_Items;
@@ -48,6 +48,7 @@ private
    procedure On_Pushed (This  : in out Root_Menu);
 
    overriding
-   procedure On_Focus (This  : in out Root_Menu);
+   procedure On_Focus (This       : in out Root_Menu;
+                       Exit_Value : Window_Exit_Value);
 
 end WNM.GUI.Menu.Root;

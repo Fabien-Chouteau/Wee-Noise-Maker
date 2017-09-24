@@ -21,7 +21,14 @@
 
 package WNM.GUI.Menu.Text_Dialog is
 
-   procedure Push_Text_Dialog_Window;
+   procedure Push_Window;
+
+   Title_Max_Len : constant := 15;
+
+   procedure Set_Title (Title : String)
+     with Pre => Title'Length <= Title_Max_Len;
+
+   function Value return String;
 
 private
 
@@ -49,6 +56,8 @@ private
    procedure On_Pushed (This  : in out Text_Dialog_Window);
 
    overriding
-   procedure On_Focus (This  : in out Text_Dialog_Window);
+   procedure On_Focus (This       : in out Text_Dialog_Window;
+                       Exit_Value : Window_Exit_Value)
+   is null;
 
 end WNM.GUI.Menu.Text_Dialog;

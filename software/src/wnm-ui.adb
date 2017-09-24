@@ -30,7 +30,6 @@ with WNM.Encoders;                 use WNM.Encoders;
 with Quick_Synth;                  use Quick_Synth;
 with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
-with WNM.Sample_Stream;           use WNM.Sample_Stream;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
 with WNM.LED;
@@ -137,16 +136,7 @@ package body WNM.UI is
             case Evt is
                when On_Press =>
                   case B is
-                     when B1 =>
-                        if Sample_Stream.Now_Recording = Sample_Stream.None then
-                           Sample_Stream.Start_Recording
-                             (Filename => "/sdcard/test_rec.raw",
-                              Source   => Sample_Stream.Input,
-                              Max_Size => 1024 * 1024);
-                        else
-                           Sample_Stream.Stop_Recording;
-                        end if;
-                     when  B2 .. B3 | B9 .. B16 =>
+                     when B1 .. B16 =>
                         Set_FX (B);
                      when others =>
                         null;

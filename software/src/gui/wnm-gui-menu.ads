@@ -42,6 +42,8 @@ package WNM.GUI.Menu is
 
    procedure On_Event (Event : Menu_Event);
 
+   type Window_Exit_Value is (None, Success, Failure);
+
    type Menu_Window is interface;
 
    type Any_Menu_Window is access all Menu_Window'Class;
@@ -56,10 +58,11 @@ package WNM.GUI.Menu is
 
    procedure On_Pushed (This  : in out Menu_Window)
    is abstract;
-   procedure On_Focus (This  : in out Menu_Window)
+   procedure On_Focus (This       : in out Menu_Window;
+                       Exit_Value : Window_Exit_Value)
    is abstract;
 
    procedure Push (Window : not null Any_Menu_Window);
-   procedure Pop;
+   procedure Pop (Exit_Value : Window_Exit_Value);
 
 end WNM.GUI.Menu;

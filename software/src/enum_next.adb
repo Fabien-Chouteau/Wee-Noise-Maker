@@ -19,52 +19,32 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sample_Library; use WNM.Sample_Library;
+package body Enum_Next is
 
-package WNM.GUI.Menu.Sample_Select is
+   ----------
+   -- Next --
+   ----------
 
-   procedure Push_Folder_Select_Window;
+   function Next (Elt : T) return T is
+   begin
+      if Elt = T'Last then
+         return T'First;
+      else
+         return T'Succ (Elt);
+      end if;
+   end Next;
 
-private
+   ----------
+   -- Prev --
+   ----------
 
-   type Folder_Select_Window is new Menu_Window with record
-      Current_Folder : WNM.Sample_Library.Sample_Folders;
-   end record;
+   function Prev (Elt : T) return T is
+   begin
+      if Elt = T'First then
+         return T'Last;
+      else
+         return T'Pred (Elt);
+      end if;
+   end Prev;
 
-   overriding
-   procedure Draw (This   : in out Folder_Select_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Folder_Select_Window;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Folder_Select_Window);
-
-   overriding
-   procedure On_Focus (This       : in out Folder_Select_Window;
-                       Exit_Value : Window_Exit_Value);
-
-   type Sample_Select_Window is new Menu_Window with record
-      Rang   : WNM.Sample_Library.Sample_Folder_Range;
-      Folder : WNM.Sample_Library.Sample_Folders;
-      Index  : WNM.Sample_Library.Sample_Entry_Index;
-   end record;
-
-   overriding
-   procedure Draw (This   : in out Sample_Select_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Sample_Select_Window;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Sample_Select_Window);
-
-   overriding
-   procedure On_Focus (This       : in out Sample_Select_Window;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Sample_Select;
+end Enum_Next;

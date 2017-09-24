@@ -65,7 +65,7 @@ package body WNM.GUI.Menu.Sample_Select is
             Sample_Select.Folder := This.Current_Folder;
             Menu.Push (Sample_Select'Access);
          when Right_Press =>
-            Menu.Pop;
+            Menu.Pop (Exit_Value => None);
          when Encoder_Right =>
             null;
          when Encoder_Left =>
@@ -97,7 +97,8 @@ package body WNM.GUI.Menu.Sample_Select is
    --------------
 
    overriding procedure On_Focus
-     (This  : in out Folder_Select_Window)
+     (This       : in out Folder_Select_Window;
+      Exit_Value : Window_Exit_Value)
    is
    begin
       null;
@@ -146,7 +147,7 @@ package body WNM.GUI.Menu.Sample_Select is
          when Left_Press =>
             null;
          when Right_Press =>
-            Menu.Pop;
+            Menu.Pop (Exit_Value => None);
          when Encoder_Right =>
             null;
          when Encoder_Left =>
@@ -183,7 +184,8 @@ package body WNM.GUI.Menu.Sample_Select is
    --------------
 
    overriding procedure On_Focus
-     (This  : in out Sample_Select_Window)
+     (This       : in out Sample_Select_Window;
+      Exit_Value : Window_Exit_Value)
    is
    begin
       null;

@@ -19,52 +19,32 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sample_Library; use WNM.Sample_Library;
+package WNM.GUI.Menu.Sample_Trim is
 
-package WNM.GUI.Menu.Sample_Select is
-
-   procedure Push_Folder_Select_Window;
+   procedure Push_Window;
 
 private
 
-   type Folder_Select_Window is new Menu_Window with record
-      Current_Folder : WNM.Sample_Library.Sample_Folders;
+   type Trim_Window is new Menu_Window with record
+      Start, Stop, Size, Increment : Natural;
    end record;
 
    overriding
-   procedure Draw (This   : in out Folder_Select_Window;
+   procedure Draw (This   : in out Trim_Window;
                    Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
 
    overriding
-   procedure On_Event (This  : in out Folder_Select_Window;
+   procedure On_Event (This  : in out Trim_Window;
                        Event : Menu_Event);
 
    overriding
-   procedure On_Pushed (This  : in out Folder_Select_Window);
+   procedure On_Pushed (This  : in out Trim_Window);
 
    overriding
-   procedure On_Focus (This       : in out Folder_Select_Window;
-                       Exit_Value : Window_Exit_Value);
+   procedure On_Focus (This       : in out Trim_Window;
+                       Exit_Value : Window_Exit_Value)
+   is null;
 
-   type Sample_Select_Window is new Menu_Window with record
-      Rang   : WNM.Sample_Library.Sample_Folder_Range;
-      Folder : WNM.Sample_Library.Sample_Folders;
-      Index  : WNM.Sample_Library.Sample_Entry_Index;
-   end record;
+   procedure Preview_Sample (This : Trim_Window);
 
-   overriding
-   procedure Draw (This   : in out Sample_Select_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Sample_Select_Window;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Sample_Select_Window);
-
-   overriding
-   procedure On_Focus (This       : in out Sample_Select_Window;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Sample_Select;
+end WNM.GUI.Menu.Sample_Trim;

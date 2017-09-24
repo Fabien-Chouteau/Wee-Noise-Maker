@@ -24,16 +24,37 @@ with HAL.Bitmap;           use HAL.Bitmap;
 
 package body WNM.GUI.Menu.Text_Dialog is
 
-   Text_Dialog : aliased Text_Dialog_Window;
+   Text_Dialog  : aliased Text_Dialog_Window;
+   Dialog_Title : String (1 .. Title_Max_Len) := (others => ' ');
 
-   -----------------------------
-   -- Push_Text_Dialog_Window --
-   -----------------------------
+   -----------------
+   -- Push_Window --
+   -----------------
 
-   procedure Push_Text_Dialog_Window is
+   procedure Push_Window is
    begin
       Push (Text_Dialog'Access);
-   end Push_Text_Dialog_Window;
+   end Push_Window;
+
+   ---------------
+   -- Set_Title --
+   ---------------
+
+   procedure Set_Title (Title : String) is
+   begin
+      if Title'Length <= Title_Max_Len then
+         Dialog_Title (Dialog_Title'First .. Dialog_Title'First + Title'Length - 1) := Title;
+         Dialog_Title (Dialog_Title'First + Title'Length .. Dialog_Title'Last) := (others => ' ');
+      end if;
+   end Set_Title;
+
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value return String
+   is (Text_Dialog.Text (Text_Dialog.Text'First .. Text_Dialog.Text'First + Text_Dialog.Len - 1));
 
    ----------
    -- Draw --
@@ -51,7 +72,7 @@ package body WNM.GUI.Menu.Text_Dialog is
             Print (Buffer      => Screen.all,
                    X_Offset    => X,
                    Y_Offset    => 0,
-                   Str         => "Enter text:");
+                   Str         => Dialog_Title);
 
             X := 1;
             Print (Buffer      => Screen.all,
@@ -89,9 +110,9 @@ package body WNM.GUI.Menu.Text_Dialog is
             case Event.Kind is
             when Left_Press =>
                if This.Confirm then
-                  Menu.Pop;
+                  Menu.Pop (Exit_Value => Success);
                else
-                  This.Mode := Text_Mode;
+                  Menu.Pop (Exit_Value => Failure);
                end if;
             when Right_Press =>
                This.Mode := Text_Mode;
@@ -154,16 +175,5 @@ package body WNM.GUI.Menu.Text_Dialog is
       This.Text (This.Text'First) := 'A';
       This.Mode := Text_Mode;
    end On_Pushed;
-
-   --------------
-   -- On_Focus --
-   --------------
-
-   overriding procedure On_Focus
-     (This  : in out Text_Dialog_Window)
-   is
-   begin
-      null;
-   end On_Focus;
 
 end WNM.GUI.Menu.Text_Dialog;
