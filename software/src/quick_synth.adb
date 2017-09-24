@@ -45,8 +45,11 @@ package body Quick_Synth is
    procedure Copy (Src : not null Any_Managed_Buffer;
                    Dst : out HAL.Audio.Audio_Buffer);
    procedure Copy (Src : HAL.Audio.Audio_Buffer;
-                   Dst : not null Any_Managed_Buffer);
-   function Is_It_On (Track : Tracks) return Boolean;
+                   Dst : not null Any_Managed_Buffer)
+     with Unreferenced;
+   procedure Copy_Stereo_To_Mono (Src : HAL.Audio.Audio_Buffer;
+                                  Dst : not null Any_Managed_Buffer);
+   function Is_It_On (Track : Stream_Track) return Boolean;
 
    ----------
    -- Copy --
@@ -84,16 +87,40 @@ package body Quick_Synth is
       Data := Src;
    end Copy;
 
+   -------------------------
+   -- Copy_Stereo_To_Mono --
+   -------------------------
+
+   procedure Copy_Stereo_To_Mono (Src : HAL.Audio.Audio_Buffer;
+                                  Dst : not null Any_Managed_Buffer)
+   is
+      Data : HAL.Audio.Audio_Buffer (1 .. Integer (Dst.Buffer_Length / 2))
+        with Address => Dst.Buffer_Address;
+      Index : Natural := 0;
+   begin
+
+      if Data'Length /= (Src'Length / 2) then
+         raise Program_Error with "WTF!?!";
+      end if;
+
+      while  Index < Data'Length loop
+         Data (Data'First + Index) := Src (Src'First + Index * 2);
+         Index := Index + 1;
+      end loop;
+   end Copy_Stereo_To_Mono;
+
    --------------
    -- Is_It_On --
    --------------
 
-   function Is_It_On (Track : Tracks) return Boolean
-   is ((not Track_Muted (Track) and then not Solo_Mode_Enabled)
+   function Is_It_On (Track : Stream_Track) return Boolean
+   is (Track = Always_On
        or else
-         (not Track_Muted (Track) and then Solo_Track = Track)
+         (not Track_Muted (To_Track (Track)) and then not Solo_Mode_Enabled)
        or else
-         (Solo_Mode_Enabled and then Solo_Track = Track));
+         (not Track_Muted (To_Track (Track)) and then Solo_Track = To_Track (Track))
+       or else
+         (Solo_Mode_Enabled and then Solo_Track = To_Track (Track)));
 
    -----------
    -- Event --
@@ -135,8 +162,9 @@ package body Quick_Synth is
                                          when others   => "/sdcard/test.raw"),
                       Start_Point => 0,
                       End_Point   => Natural'Last,
-                      Track       => Track,
-                      Looping     => False);
+                      Track       => To_Stream_Track (Track),
+                      Looping     => False,
+                      Poly        => True);
             else
                Time_To_Live (Track) := 50;
                My_Synths (Track).Set_Note_Frequency
@@ -173,11 +201,12 @@ package body Quick_Synth is
                                 when B13 => "/sdcard/samples/vocals/darkside.raw",
                                 when B14 => "/sdcard/samples/vocals/failure2_x.raw",
                                 when B15 => "/sdcard/samples/vocals/halbye.raw",
-                                when B16 => "/sdcard/samples/vocals/trap.raw"),
+                                when B16 => "/sdcard/test_rec.raw"),
              Start_Point => 0,
              End_Point   => Natural'Last,
-             Track       => Track,
-             Looping     => False);
+             Track       => To_Stream_Track (Track),
+             Looping     => False,
+             Poly        => True);
    end Trig;
 
    ----------
@@ -189,23 +218,32 @@ package body Quick_Synth is
    is
 
       procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
-                     Volume       : Float;
-                     Pan          : Float);
+                     ST           : Stream_Track);
 
       ---------
       -- Mix --
       ---------
 
       procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
-                     Volume       : Float;
-                     Pan          : Float)
+                     ST           : Stream_Track)
       is
          Val         : Integer_32;
          In_Index    : Natural;
          Out_Index   : Natural;
 
          Sample, Left, Right : Float;
+
+         Volume       : Float;
+         Pan          : Float;
       begin
+         if ST = Always_On then
+            Volume := 1.0;
+            Pan    := 0.0;
+         else
+            Volume := Float (Volume_For_Track (To_Track (ST))) / 100.0;
+            Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
+         end if;
+
          if Mono_Samples'Length * 2 /= Stereo_Output'Length then
             raise Program_Error with "Invalid audio buffer";
          end if;
@@ -246,7 +284,7 @@ package body Quick_Synth is
 
       Mono_Tmp : HAL.Audio.Audio_Buffer (1 .. Samples_Per_Mono_Buffer);
       Buf      : Any_Managed_Buffer;
-      On_Track : Tracks;
+      On_Track : Stream_Track;
    begin
 
       -- Audio in --
@@ -261,10 +299,8 @@ package body Quick_Synth is
                                    else
                                       0);
 
-         if Time_To_Live (Track) /= 0 and then Is_It_On (Track) then
-            Mix (Mono_Tmp,
-                 Volume => Float (Volume_For_Track (Track)) / 100.0,
-                 Pan    => Float (Pan_For_Track (Track)) / 100.0);
+         if Time_To_Live (Track) /= 0 and then Is_It_On (To_Stream_Track (Track)) then
+            Mix (Mono_Tmp, To_Stream_Track (Track));
          end if;
       end loop;
 
@@ -275,9 +311,7 @@ package body Quick_Synth is
          if Buf /= null then
             if Is_It_On (On_Track) then
                Copy (Buf, Mono_Tmp);
-               Mix (Mono_Tmp,
-                    Volume => Float (Volume_For_Track (On_Track)) / 100.0,
-                    Pan    => Float (Pan_For_Track (On_Track)) / 100.0);
+               Mix (Mono_Tmp, On_Track);
             end if;
             Release_Buffer (Buf);
          end if;
@@ -289,26 +323,28 @@ package body Quick_Synth is
             null;
          when WNM.Sample_Stream.Input =>
             declare
-               Buffer : constant Any_Managed_Buffer := Allocate (Kind => RAM,
-                                                                 Size => 1024);
+               Buffer : constant Any_Managed_Buffer :=
+                 Allocate (Kind => RAM,
+                           Size => Mono_Buffer_Size_In_Bytes);
             begin
                if Buffer = null then
-                  raise Program_Error with "Cannot allocate...";
+                  raise Program_Error with "Cannot allocate buffer...";
                end if;
 
-               Copy (Stereo_Input, Buffer);
+               Copy_Stereo_To_Mono (Stereo_Input, Buffer);
                WNM.Sample_Stream.Push_Record_Buffer (Buffer);
             end;
          when WNM.Sample_Stream.Master_Output =>
             declare
-               Buffer : constant Any_Managed_Buffer := Allocate (Kind => RAM,
-                                                                 Size => 1024);
+               Buffer : constant Any_Managed_Buffer :=
+                 Allocate (Kind => RAM,
+                           Size => Mono_Buffer_Size_In_Bytes);
             begin
                if Buffer = null then
-                  raise Program_Error with "Cannot allocate...";
+                  raise Program_Error with "Cannot allocate buffer...";
                end if;
 
-               Copy (Stereo_Output, Buffer);
+               Copy_Stereo_To_Mono (Stereo_Output, Buffer);
                WNM.Sample_Stream.Push_Record_Buffer (Buffer);
             end;
       end case;
