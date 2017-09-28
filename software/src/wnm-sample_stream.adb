@@ -24,6 +24,7 @@ with File_IO;                      use File_IO;
 with WNM.Buffer_Allocation;        use WNM.Buffer_Allocation;
 with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 with Ada.Unchecked_Deallocation;
+with WNM.File_Utils;               use WNM.File_Utils;
 
 package body WNM.Sample_Stream is
 
@@ -378,7 +379,8 @@ package body WNM.Sample_Stream is
                     Looping     : Boolean;
                     Poly        : Boolean)
    is
-      Req : Sample_Request;
+      Req : Sample_Request := (Kind   => Sample_Play,
+                               others => <>);
    begin
       Req.Start_Point := File_Size (Start_Point);
       Req.End_Point   := File_Size (End_Point);
@@ -404,6 +406,24 @@ package body WNM.Sample_Stream is
          Streams_Prot.Next_Buffer (ID, Buffer, Track);
       end if;
    end Next_Buffer;
+
+   ---------------
+   -- Copy_File --
+   ---------------
+
+   procedure Copy_File (Srcpath  : String;
+                        From, To : Natural;
+                        Dstpath  : String)
+   is
+      Req : Sample_Request := (Kind   => Copy_File,
+                               others => <>);
+   begin
+      Req.Srcpath := new String'(Srcpath);
+      Req.Dstpath := new String'(Dstpath);
+      Req.From    := From;
+      Req.To      := To;
+      Streams_Prot.Push_Request (Req);
+   end Copy_File;
 
    -------------------
    -- Now_Recording --
@@ -482,45 +502,68 @@ package body WNM.Sample_Stream is
    begin
 
       Streams_Prot.Pop_Request (Req);
-      if Req.Filepath /= null then
-         Streams_Prot.Allocate (ID, Req.Track, Reuse => not Req.Poly);
-         if ID /= Invalid_Stream then
 
-            if Streams (ID).State /= Unused then
-               Close_Stream (ID, Keep_Allocated => True);
-            end if;
-
-            Streams (ID).Start_Point := Req.Start_Point;
-            Streams (ID).End_Point   := Req.End_Point;
-            Streams (ID).Track       := Req.Track;
-            Streams (ID).Looping     := Req.Looping;
-
-            --  Open File
-            Status := Open (Streams (ID).FD, Req.Filepath.all, Read_Only);
-
-            if Status /= OK then
-               raise Program_Error with "Cannot open '" & Req.Filepath.all &
-                 "': " & Status'Img;
-            end if;
-
-            Streams (ID).Size := Size (Streams (ID).FD);
-
-            if Streams (ID).Start_Point >= Streams (ID).Size then
-               Close_Stream (ID, Keep_Allocated => False);
-            else
-               Amount := Streams (ID).Start_Point;
-               Status := Seek (Streams (ID).FD, From_Start, Amount);
-               if Status /= OK then
-                  raise Program_Error with "Seek error";
-               end if;
-
-               Streams (ID).Offset := Amount;
-               Streams (ID).State := In_Progress;
-            end if;
-
-         end if;
-         Free (Req.Filepath);
+      if Req = No_Request then
+         return;
       end if;
+
+      case Req.Kind is
+         when Copy_File =>
+            if Req.Srcpath = null or else Req.Dstpath = null then
+               raise Program_Error with "Copy_File null path";
+            end if;
+
+            Status := File_IO.Unlink (Req.Dstpath.all);
+            Status := Copy_File_Slice (Req.Srcpath.all,
+                                       Req.From,
+                                       Req.To,
+                                       Req.Dstpath.all);
+            if Status /= OK then
+               raise Program_Error with "Cannot copy file '" & Req.Srcpath.all &
+                 "' to '" & Req.Dstpath.all & "': " & Status'Img;
+            end if;
+         when Sample_Play =>
+            if Req.Filepath /= null then
+               Streams_Prot.Allocate (ID, Req.Track, Reuse => not Req.Poly);
+               if ID /= Invalid_Stream then
+
+                  if Streams (ID).State /= Unused then
+                     Close_Stream (ID, Keep_Allocated => True);
+                  end if;
+
+                  Streams (ID).Start_Point := Req.Start_Point;
+                  Streams (ID).End_Point   := Req.End_Point;
+                  Streams (ID).Track       := Req.Track;
+                  Streams (ID).Looping     := Req.Looping;
+
+                  --  Open File
+                  Status := Open (Streams (ID).FD, Req.Filepath.all, Read_Only);
+
+                  if Status /= OK then
+                     raise Program_Error with "Cannot open '" & Req.Filepath.all &
+                       "': " & Status'Img;
+                  end if;
+
+                  Streams (ID).Size := Size (Streams (ID).FD);
+
+                  if Streams (ID).Start_Point >= Streams (ID).Size then
+                     Close_Stream (ID, Keep_Allocated => False);
+                  else
+                     Amount := Streams (ID).Start_Point;
+                     Status := Seek (Streams (ID).FD, From_Start, Amount);
+                     if Status /= OK then
+                        raise Program_Error with "Seek error";
+                     end if;
+
+                     Streams (ID).Offset := Amount;
+                     Streams (ID).State := In_Progress;
+                  end if;
+
+               end if;
+               Free (Req.Filepath);
+
+            end if;
+      end case;
    end Process_Request;
 
    ----------------------------

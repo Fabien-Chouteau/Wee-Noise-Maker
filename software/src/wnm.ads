@@ -79,4 +79,6 @@ package WNM is
    Mono_Buffer_Size_In_Bytes   : constant := Samples_Per_Mono_Buffer * 2;
    Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Stereo_Buffer * 2;
 
+
+   Sample_Rec_Filepath : constant String := "/sdcard/sample_rec.raw";
 end WNM;

@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2017 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,35 +19,11 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI.Menu.Sample_Trim is
+with File_IO; use File_IO;
+package WNM.File_Utils is
 
-   procedure Push_Window;
-
-   function Start return Natural;
-   function Stop return Natural;
-
-private
-
-   type Trim_Window is new Menu_Window with record
-      Start, Stop, Size, Increment : Natural;
-   end record;
-
-   overriding
-   procedure Draw (This   : in out Trim_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Trim_Window;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Trim_Window);
-
-   overriding
-   procedure On_Focus (This       : in out Trim_Window;
-                       Exit_Value : Window_Exit_Value)
-   is null;
-
-   procedure Preview_Sample (This : Trim_Window);
-
-end WNM.GUI.Menu.Sample_Trim;
+   function Copy_File_Slice (Srcpath  : String;
+                             From, To : Natural;
+                             Dstpath  : String)
+                             return Status_Code;
+end WNM.File_Utils;

@@ -31,7 +31,8 @@ package WNM.Sample_Library is
                            Drums_Clap,
                            Drums_Misc,
                            Vocals,
-                           Misc);
+                           Misc,
+                           User);
 
    Root_Samples_Path : constant String := "/sdcard/samples/";
 
@@ -45,7 +46,8 @@ package WNM.Sample_Library is
           when Drums_Clap   => "drums/clap/",
           when Drums_Misc   => "drums/misc/",
           when Vocals       => "vocals/",
-          when Misc         => "misc/");
+          when Misc         => "misc/",
+          when User         => "user/");
 
    type Sample_Folder_Range is record
       From, To : Natural;

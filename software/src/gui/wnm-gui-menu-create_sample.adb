@@ -24,6 +24,7 @@ with WNM.GUI.Menu.Recording;
 with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
+with WNM.Sample_Stream;
 
 package body WNM.GUI.Menu.Create_Sample is
 
@@ -92,7 +93,11 @@ package body WNM.GUI.Menu.Create_Sample is
 
             if Exit_Value = Success then
                --  Copy sample file to a user directory with it's new name
-               --  Text_Dialog.Value
+               WNM.Sample_Stream.Copy_File
+                 (Sample_Rec_Filepath,
+                  Menu.Sample_Trim.Start,
+                  Menu.Sample_Trim.Stop,
+                  "/sdcard/samples/user/" & Text_Dialog.Value & ".raw");
 
                New_State := Assign_To_Track;
             else

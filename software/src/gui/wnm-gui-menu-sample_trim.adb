@@ -35,6 +35,20 @@ package body WNM.GUI.Menu.Sample_Trim is
       Push (Sample_Trim_Singleton'Access);
    end Push_Window;
 
+   -----------
+   -- Start --
+   -----------
+
+   function Start return Natural
+   is (Sample_Trim_Singleton.Start);
+
+   ----------
+   -- Stop --
+   ----------
+
+   function Stop return Natural
+   is (Sample_Trim_Singleton.Stop);
+
    --------------------
    -- Preview_Sample --
    --------------------

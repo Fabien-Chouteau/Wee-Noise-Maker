@@ -58,6 +58,10 @@ package WNM.Sample_Stream is
                           Buffer : out Any_Managed_Buffer;
                           Track  : out Stream_Track);
 
+   procedure Copy_File (Srcpath  : String;
+                        From, To : Natural;
+                        Dstpath  : String);
+
    ---------------
    -- Recording --
    ---------------
@@ -82,16 +86,26 @@ private
 
    type String_Access is access all String;
 
-   type Sample_Request is record
-      Filepath    : String_Access := null;
-      Track       : Stream_Track;
-      Start_Point : File_IO.File_Size;
-      End_Point   : File_IO.File_Size;
-      Looping     : Boolean;
-      Poly        : Boolean;
+   type Request_Kind is (Sample_Play, Copy_File);
+
+   type Sample_Request (Kind : Request_Kind := Sample_Play) is record
+      case Kind is
+         when Sample_Play =>
+            Filepath    : String_Access := null;
+            Track       : Stream_Track;
+            Start_Point : File_IO.File_Size;
+            End_Point   : File_IO.File_Size;
+            Looping     : Boolean;
+            Poly        : Boolean;
+         when Copy_File =>
+            Srcpath     : String_Access := null;
+            Dstpath     : String_Access := null;
+            From, To    : Natural;
+      end case;
    end record;
 
-   No_Request : constant Sample_Request := (Filepath    => null,
+   No_Request : constant Sample_Request := (Kind        => Sample_Play,
+                                            Filepath    => null,
                                             Track       => Always_On,
                                             Start_Point => 0,
                                             End_Point   => 0,
