@@ -22,6 +22,7 @@
 with HAL.Audio;
 with MIDI;
 with WNM;
+with WNM.Sample_Library;
 
 package Quick_Synth is
 
@@ -48,4 +49,7 @@ package Quick_Synth is
                             Volume : Integer);
    function Volume (Track : WNM.Tracks) return Natural;
 
+   procedure Load_Samples;
+   procedure Assign_Sample (Track  : WNM.Tracks;
+                            Sample : WNM.Sample_Library.Sample_Entry_Index);
 end Quick_Synth;

@@ -19,14 +19,15 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Audio;             use HAL.Audio;
-with Interfaces;            use Interfaces;
+with HAL.Audio;                  use HAL.Audio;
+with Interfaces;                 use Interfaces;
 with Simple_Synthesizer;
-with HAL;                   use HAL;
-with WNM.Sample_Stream;     use WNM.Sample_Stream;
-with Managed_Buffers;       use Managed_Buffers;
-with WNM;                   use WNM;
-with WNM.Buffer_Allocation; use WNM.Buffer_Allocation;
+with HAL;                        use HAL;
+with WNM.Sample_Stream;          use WNM.Sample_Stream;
+with Managed_Buffers;            use Managed_Buffers;
+with WNM;                        use WNM;
+with WNM.Buffer_Allocation;      use WNM.Buffer_Allocation;
+with WNM.Sample_Library;         use WNM.Sample_Library;
 
 package body Quick_Synth is
 
@@ -39,8 +40,13 @@ package body Quick_Synth is
    Solo_Mode_Enabled : Boolean := False;
    Solo_Track : WNM.Tracks := B1;
 
-   Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0);
-   Volume_For_Track : array (WNM.Tracks) of Integer := (others => 100);
+   Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0)
+     with Atomic_Components;
+   Volume_For_Track : array (WNM.Tracks) of Integer := (others => 100)
+     with Atomic_Components;
+   Sample_For_Track : array (WNM.Tracks) of Sample_Entry_Index :=
+     (others => Invalid_Sample_Entry)
+     with Atomic_Components;
 
    procedure Copy (Src : not null Any_Managed_Buffer;
                    Dst : out HAL.Audio.Audio_Buffer);
@@ -185,29 +191,54 @@ package body Quick_Synth is
 
    procedure Trig (Track : WNM.Tracks) is
    begin
-      Start (Filepath    => (case Track is
-                                when B1 => "/sdcard/samples/drums/clap/Clap.raw",
-                                when B6 => "/sdcard/samples/drums/hat/Hat_closed.raw",
-                                when B2 => "/sdcard/samples/drums/kick/Kick_short.raw",
-                                when B3 => "/sdcard/samples/drums/misc/Rim_Shot.raw",
-                                when B4 => "/sdcard/samples/drums/snare/Snare_lo1.raw",
-                                when B5 => "/sdcard/samples/drums/snare/Snare_lo2.raw",
-                                when B7 => "/sdcard/samples/misc/Cowbell.raw",
-                                when B8 => "/sdcard/samples/drums/tom/Md_Tom.raw",
-                                when B9  => "/sdcard/samples/vocals/the_way_news_goes.raw",
-                                when B10 => "/sdcard/samples/vocals/show_me_what_you_got.raw",
-                                when B11 => "/sdcard/samples/vocals/pickle_rick.raw",
-                                when B12 => "/sdcard/samples/vocals/wake.raw",
-                                when B13 => "/sdcard/samples/vocals/darkside.raw",
-                                when B14 => "/sdcard/samples/vocals/failure2_x.raw",
-                                when B15 => "/sdcard/samples/vocals/halbye.raw",
-                                when B16 => "/sdcard/test_rec.raw"),
-             Start_Point => 0,
-             End_Point   => Natural'Last,
-             Track       => To_Stream_Track (Track),
-             Looping     => False,
-             Poly        => True);
+      if Sample_For_Track (Track) /= Invalid_Sample_Entry then
+         Start (Filepath    => Entry_Path (Sample_For_Track (Track)),
+                Start_Point => 0,
+                End_Point   => Natural'Last,
+                Track       => To_Stream_Track (Track),
+                Looping     => False,
+                Poly        => True);
+      end if;
    end Trig;
+
+   ------------------
+   -- Load_Samples --
+   ------------------
+
+   procedure Load_Samples is
+   begin
+      for Track in Tracks loop
+         Assign_Sample (Track,
+                        Entry_From_Path ((case Track is
+                             when B1 => "/sdcard/samples/drums/clap/Clap.raw",
+                             when B6 => "/sdcard/samples/drums/hat/Hat_closed.raw",
+                             when B2 => "/sdcard/samples/drums/kick/Kick_short.raw",
+                             when B3 => "/sdcard/samples/drums/misc/Rim_Shot.raw",
+                             when B4 => "/sdcard/samples/drums/snare/Snare_lo1.raw",
+                             when B5 => "/sdcard/samples/drums/snare/Snare_lo2.raw",
+                             when B7 => "/sdcard/samples/misc/Cowbell.raw",
+                             when B8 => "/sdcard/samples/drums/tom/Md_Tom.raw",
+                             when B9  => "/sdcard/samples/vocals/the_way_news_goes.raw",
+                             when B10 => "/sdcard/samples/vocals/show_me_what_you_got.raw",
+                             when B11 => "/sdcard/samples/vocals/pickle_rick.raw",
+                             when B12 => "/sdcard/samples/vocals/wake.raw",
+                             when B13 => "/sdcard/samples/vocals/darkside.raw",
+                             when B14 => "/sdcard/samples/vocals/failure2_x.raw",
+                             when B15 => "/sdcard/samples/vocals/halbye.raw",
+                             when B16 => "/sdcard/samples/user/AAA.raw")));
+      end loop;
+   end Load_Samples;
+
+   -------------------
+   -- Assign_Sample --
+   -------------------
+
+   procedure Assign_Sample (Track  : WNM.Tracks;
+                            Sample : WNM.Sample_Library.Sample_Entry_Index)
+   is
+   begin
+      Sample_For_Track (Track) := Sample;
+   end Assign_Sample;
 
    ----------
    -- Fill --

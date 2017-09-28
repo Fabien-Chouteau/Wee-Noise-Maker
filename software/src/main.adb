@@ -29,6 +29,7 @@ with WNM.Master_Volume;
 with WNM.SDCard;
 with WNM.Sample_Stream;
 with WNM.Sample_Library;
+with Quick_Synth;
 
 procedure Main is
 begin
@@ -36,6 +37,8 @@ begin
    WNM.SDCard.Initialize;
 
    WNM.Sample_Library.Load;
+
+   Quick_Synth.Load_Samples;
 
    WNM.Sample_Stream.Start_Sample_Stream_Task;
    WNM.LED.Start;
