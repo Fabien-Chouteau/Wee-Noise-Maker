@@ -25,6 +25,7 @@ with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
 with WNM.Sample_Stream;
+with WNM.Sample_Library;              use WNM.Sample_Library;
 
 package body WNM.GUI.Menu.Create_Sample is
 
@@ -92,14 +93,21 @@ package body WNM.GUI.Menu.Create_Sample is
          when Enter_Name =>
 
             if Exit_Value = Success then
-               --  Copy sample file to a user directory with it's new name
-               WNM.Sample_Stream.Copy_File
-                 (Sample_Rec_Filepath,
-                  Menu.Sample_Trim.Start,
-                  Menu.Sample_Trim.Stop,
-                  "/sdcard/samples/user/" & Text_Dialog.Value & ".raw");
+               declare
+                  New_Sample_Path : constant String :=
+                    Folder_Full_Path (User) & Text_Dialog.Value & ".raw";
+                  Unref : Boolean with Unreferenced;
+               begin
+                  --  Copy sample file to a user directory with it's new name
+                  WNM.Sample_Stream.Copy_File (Sample_Rec_Filepath,
+                                               Menu.Sample_Trim.Start,
+                                               Menu.Sample_Trim.Stop,
+                                               New_Sample_Path);
 
-               New_State := Assign_To_Track;
+                  --  Add it to the library
+                  Unref := Add_User_Sample (New_Sample_Path);
+                  New_State := Assign_To_Track;
+               end;
             else
                New_State := Trim;
             end if;
