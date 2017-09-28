@@ -394,9 +394,7 @@ package body WNM.UI is
          -- Rec LED --
          if Sequencer.State = Edit
            or else
-             (Sequencer.State in Play_And_Rec | Play_And_Edit
-              and then
-              Sequencer.Step in 1 | 5 | 9 | 13)
+            Sequencer.State in Play_And_Rec | Play_And_Edit
          then
             LED.Turn_On (Rec);
          end if;
