@@ -21,6 +21,8 @@
 
 with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
+with Quick_Synth;
+with WNM.Sequencer;
 
 package body WNM.GUI.Menu.Sample_Select is
 
@@ -151,14 +153,18 @@ package body WNM.GUI.Menu.Sample_Select is
          when Encoder_Right =>
             null;
          when Encoder_Left =>
-            if Event.Value > 0 then
-               if This.Index /= This.Rang.To then
-                  This.Index := This.Index + 1;
+            if This.Index /= Invalid_Sample_Entry then
+               if Event.Value > 0 then
+                  if This.Index /= This.Rang.To then
+                     This.Index := This.Index + 1;
+                  end if;
+               elsif Event.Value < 0 then
+                  if This.Index /= This.Rang.From then
+                     This.Index := This.Index - 1;
+                  end if;
                end if;
-            elsif Event.Value < 0 then
-               if This.Index /= This.Rang.From then
-                  This.Index := This.Index - 1;
-               end if;
+               Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
+                                          This.Index);
             end if;
       end case;
    end On_Event;
@@ -172,10 +178,10 @@ package body WNM.GUI.Menu.Sample_Select is
    is
    begin
       This.Rang := Sample_Library.Folder_Range (This.Folder);
-      if This.Rang.From /= 0 then
-         This.Index := This.Rang.From;
-      else
-         This.Index := Sample_Entry_Index'First;
+      This.Index := This.Rang.From;
+      if This.Index /= Invalid_Sample_Entry then
+         Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
+                                    This.Index);
       end if;
    end On_Pushed;
 

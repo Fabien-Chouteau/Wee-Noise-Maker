@@ -35,7 +35,8 @@ package body WNM.Sample_Library is
    function Valid_Entry (Index : Sample_Entry_Index) return Boolean
      is (Index /= Invalid_Sample_Entry and then Index <= Last_Entry);
 
-   function Add_Sample (Folder : Sample_Folders; Name : String) return Boolean;
+   function Add_Sample (Folder : Sample_Folders; Name : String)
+                        return Sample_Entry_Index;
 
    -----------------
    -- Starts_With --
@@ -59,7 +60,9 @@ package body WNM.Sample_Library is
    -- Add_Sample --
    ----------------
 
-   function Add_Sample (Folder : Sample_Folders; Name : String) return Boolean is
+   function Add_Sample (Folder : Sample_Folders; Name : String)
+                        return Sample_Entry_Index
+   is
    begin
       --  Is there enough room to store the name?
       if Name_Buffer'Length - Name_Buffer_Cnt >= Name'Length then
@@ -85,9 +88,9 @@ package body WNM.Sample_Library is
 
          Folder_Ranges (Folder).To := Last_Entry;
 
-         return True;
+         return Last_Entry;
       end if;
-      return False;
+      return Invalid_Sample_Entry;
    end Add_Sample;
 
    ------------------
@@ -189,7 +192,7 @@ package body WNM.Sample_Library is
    -- Add_User_Sample --
    ---------------------
 
-   function Add_User_Sample (Path : String) return Boolean is
+   function Add_User_Sample (Path : String) return Sample_Entry_Index is
    begin
       if Starts_With (Path, Folder_Full_Path (User))
         and then
@@ -202,7 +205,7 @@ package body WNM.Sample_Library is
             return Add_Sample (User, Name);
          end;
       end if;
-      return False;
+      return Invalid_Sample_Entry;
    end Add_User_Sample;
 
    -----------------
@@ -214,7 +217,7 @@ package body WNM.Sample_Library is
       Path   : constant String := Folder_Full_Path (Folder);
       DD     : Directory_Descriptor;
       Status : Status_Code;
-      Unref  : Boolean with Unreferenced;
+      Unref  : Sample_Entry_Index with Unreferenced;
    begin
       Status := Open (DD, Path);
 

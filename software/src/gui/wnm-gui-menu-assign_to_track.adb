@@ -38,6 +38,13 @@ package body WNM.GUI.Menu.Assign_To_Track is
       Push (Assign_To_Track_Singleton'Access);
    end Push_Window;
 
+   --------------------
+   -- Selected_Track --
+   --------------------
+
+   function Selected_Track return Tracks
+   is (Assign_To_Track_Singleton.Track);
+
    ----------
    -- Draw --
    ----------

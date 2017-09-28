@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Sample_Library; use WNM.Sample_Library;
+
 package WNM.GUI.Menu.Create_Sample is
 
    procedure Push_Window;
@@ -32,7 +34,8 @@ private
                                 Assign_To_Track);
 
    type Create_Sample_Menu is new Menu_Window with record
-      State : Create_Sample_State;
+      State        : Create_Sample_State;
+      Sample_Entry : Sample_Entry_Index := Invalid_Sample_Entry;
    end record;
 
    overriding

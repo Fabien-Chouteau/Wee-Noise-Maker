@@ -21,7 +21,7 @@
 
 package WNM.Sample_Library is
 
-   subtype Sample_Entry_Index is Natural range 1 .. 256;
+   subtype Sample_Entry_Index is Natural range 0 .. 256;
    Invalid_Sample_Entry : constant Sample_Entry_Index := Sample_Entry_Index'First;
 
    type Sample_Folders is (Drums_Kick,
@@ -63,7 +63,7 @@ package WNM.Sample_Library is
    function Entry_From_Path (Path : String) return Sample_Entry_Index;
 
    function User_Sample_Exists (Name : String) return Boolean;
-   function Add_User_Sample (Path : String) return Boolean;
+   function Add_User_Sample (Path : String) return Sample_Entry_Index;
 
    procedure Load;
 

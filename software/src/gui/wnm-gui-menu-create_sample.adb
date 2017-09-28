@@ -25,7 +25,7 @@ with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
 with WNM.Sample_Stream;
-with WNM.Sample_Library;              use WNM.Sample_Library;
+with Quick_Synth;
 
 package body WNM.GUI.Menu.Create_Sample is
 
@@ -49,6 +49,7 @@ package body WNM.GUI.Menu.Create_Sample is
    is
    begin
       This.State := Select_Source;
+      This.Sample_Entry := Invalid_Sample_Entry;
       Sample_Src_Select.Push_Window;
    end On_Pushed;
 
@@ -105,7 +106,7 @@ package body WNM.GUI.Menu.Create_Sample is
                                                New_Sample_Path);
 
                   --  Add it to the library
-                  Unref := Add_User_Sample (New_Sample_Path);
+                  This.Sample_Entry := Add_User_Sample (New_Sample_Path);
                   New_State := Assign_To_Track;
                end;
             else
@@ -113,6 +114,13 @@ package body WNM.GUI.Menu.Create_Sample is
             end if;
 
          when Assign_To_Track =>
+            if Exit_Value = Success
+              and then
+                This.Sample_Entry /= Invalid_Sample_Entry
+            then
+               Quick_Synth.Assign_Sample (Menu.Assign_To_Track.Selected_Track,
+                                          This.Sample_Entry);
+            end if;
             Pop (Exit_Value);
             return;
       end case;

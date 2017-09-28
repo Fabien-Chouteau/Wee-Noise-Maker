@@ -23,6 +23,8 @@ package WNM.GUI.Menu.Assign_To_Track is
 
    procedure Push_Window;
 
+   function Selected_Track return Tracks;
+
 private
 
    type Assign_To_Track_Window is new Menu_Window with record
