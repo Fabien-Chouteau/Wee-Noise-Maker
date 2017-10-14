@@ -156,7 +156,19 @@ package body WNM.UI is
                Current_Input_Mode := Default_Input_Mode;
             end if;
          when Pattern_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
+            if B = Rec and then Evt in On_Press | On_Long_Press then
+               Current_Input_Mode := Pattern_Copy;
+            elsif B in B1 .. B16 and then Evt = On_Press then
+               Pattern_Sequencer.Add_To_Sequence (B);
+            elsif B = Track_C and then Evt = On_Release then
+               Pattern_Sequencer.End_Sequence_Edit;
+               Current_Input_Mode := Default_Input_Mode;
+            end if;
+         when Pattern_Copy =>
+            if B = Rec and then Evt = On_Release then
+               Current_Input_Mode := Pattern_Select;
+            elsif B in B1 .. B16 and then Evt = On_Press then
+               Sequencer.Copy_Current_Patern (To => B);
                Pattern_Sequencer.Add_To_Sequence (B);
             elsif B = Track_C and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
@@ -228,7 +240,11 @@ package body WNM.UI is
    --------------------
 
    function Has_Long_Press (Button : Buttons) return Boolean is
+
       In_Edit : constant Boolean := Sequencer.State in Play_And_Edit | Edit;
+
+      In_Pattern_Select : constant Boolean :=
+        Current_Input_Mode in Pattern_Select | Pattern_Copy;
    begin
       return (case Button is
               when B1        => In_Edit,
@@ -247,7 +263,7 @@ package body WNM.UI is
               when B14       => In_Edit,
               when B15       => In_Edit,
               when B16       => In_Edit,
-              when Rec       => True,
+              when Rec       => not In_Pattern_Select,
               when Play      => True,
               when FX        => False,
               when Track_A   => False,
@@ -433,7 +449,7 @@ package body WNM.UI is
                end loop;
 
             --  Pattern select --
-            when Pattern_Select =>
+            when Pattern_Select | Pattern_Copy =>
                for B in B1 .. B16 loop
                   if Pattern_Sequencer.Current_Pattern = B then
                      LED.Turn_On (B);

@@ -33,6 +33,7 @@ package WNM.UI is
                             FX_Select,
                             Track_Select,
                             Pattern_Select,
+                            Pattern_Copy,
                             Trig_Edit);
 
    function Input_Mode return Input_Mode_Type;

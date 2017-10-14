@@ -81,7 +81,14 @@ package body WNM.GUI.Update is
             WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
                                         X_Offset    => B,
                                         Y_Offset    => 0,
-                                        Str         => "Pattern select");
+                                        Str         => "Select pattern");
+         when WNM.UI.Pattern_Copy =>
+            WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
+            B := 1;
+            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
+                                        X_Offset    => B,
+                                        Y_Offset    => 0,
+                                        Str         => "Copy pattern");
          when WNM.UI.Note =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;

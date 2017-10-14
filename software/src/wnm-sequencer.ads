@@ -50,6 +50,8 @@ package WNM.Sequencer is
    procedure Select_Track (Track : Tracks);
    --  Select the current track
 
+   procedure Copy_Current_Patern (To : Patterns);
+
    function Track return Tracks;
 
    procedure Set_Instrument (Val : Keyboard_Value);

@@ -29,7 +29,8 @@ package body WNM.Sequencer is
 
    use type MIDI.Octaves;
 
-   Sequences : array (Patterns, Tracks) of WNM.Sequence.Instance;
+   type Pattern is array (Tracks) of WNM.Sequence.Instance;
+   Sequences : array (Patterns) of Pattern;
 
    Sequencer_BPM : Beat_Per_Minute := 90;
 
@@ -131,6 +132,7 @@ package body WNM.Sequencer is
       Current_Seq_State := Transition (Current_Seq_State, Play_Event);
       if Current_Seq_State in Play | Play_And_Rec then
          Current_Step := Sequencer_Steps'First;
+         Microstep := 0;
       end if;
    end Play_Pause;
 
@@ -172,7 +174,7 @@ package body WNM.Sequencer is
             Quick_Synth.Trig (Button);
             Current_Track := Button;
          when Play_And_Rec =>
-            Set (Sequences (Pattern_Sequencer.Current_Pattern, Button),
+            Set (Sequences (Pattern_Sequencer.Current_Pattern)(Button),
                  Current_Step);
             Current_Track := Button;
 
@@ -180,7 +182,7 @@ package body WNM.Sequencer is
                Quick_Synth.Trig (Button);
             end if;
          when Play_And_Edit | Edit =>
-            Toggle (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+            Toggle (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
                     To_Value (Button));
       end case;
    end On_Press;
@@ -202,6 +204,15 @@ package body WNM.Sequencer is
    begin
       Current_Track := Track;
    end Select_Track;
+
+   -------------------------
+   -- Copy_Current_Patern --
+   -------------------------
+
+   procedure Copy_Current_Patern (To : Patterns) is
+   begin
+      Sequences (To) := Sequences (Pattern_Sequencer.Current_Pattern);
+   end Copy_Current_Patern;
 
    -----------
    -- Track --
@@ -242,7 +253,7 @@ package body WNM.Sequencer is
    procedure Change_BPM (BPM_Delta : Integer) is
       Res : Integer;
    begin
-      Res := Sequencer_BPM + BPM_Delta;
+      Res := Integer (Sequencer_BPM) + BPM_Delta;
       if Res in Beat_Per_Minute then
          Sequencer_BPM := Res;
       end if;
@@ -281,7 +292,7 @@ package body WNM.Sequencer is
    procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps) is
    begin
       for Track in Tracks loop
-         case Trig (Sequences (Pattern, Track), Step) is
+         case Trig (Sequences (Pattern)(Track), Step) is
             when None =>
                null;
             when Always =>
@@ -347,7 +358,7 @@ package body WNM.Sequencer is
 
       for Pattern in Patterns loop
          for Track in Tracks loop
-            Clear (Sequences (Pattern, Track));
+            Clear (Sequences (Pattern)(Track));
          end loop;
       end loop;
       Next_Start := Clock + Milliseconds (100);
@@ -359,7 +370,7 @@ package body WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
                    Step) /= None;
    end Set;
 
@@ -369,7 +380,7 @@ package body WNM.Sequencer is
 
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Track), Step) /= None;
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Track), Step) /= None;
    end Set;
 
    ----------
@@ -378,7 +389,7 @@ package body WNM.Sequencer is
 
    function Trig (Step : Sequencer_Steps) return Trigger is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track),
+      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
                    Step);
    end Trig;
 
@@ -388,7 +399,7 @@ package body WNM.Sequencer is
 
    procedure Trig_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track), Step);
+      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track), Step);
    end Trig_Next;
 
    ---------------
@@ -397,8 +408,7 @@ package body WNM.Sequencer is
 
    procedure Trig_Prev (Step : Sequencer_Steps) is
    begin
-      Previous (Sequences (Pattern_Sequencer.Current_Pattern, Current_Track), Step);
+      Previous (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track), Step);
    end Trig_Prev;
-
 
 end WNM.Sequencer;
