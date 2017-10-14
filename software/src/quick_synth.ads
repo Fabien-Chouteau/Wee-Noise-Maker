@@ -52,4 +52,6 @@ package Quick_Synth is
    procedure Load_Samples;
    procedure Assign_Sample (Track  : WNM.Tracks;
                             Sample : WNM.Sample_Library.Sample_Entry_Index);
+   function Sample_Of_Track (Track : WNM.Tracks)
+                             return WNM.Sample_Library.Sample_Entry_Index;
 end Quick_Synth;

@@ -22,14 +22,16 @@
 with HAL;                  use HAL;
 with HAL.Bitmap;
 with WNM.GUI.Bitmap_Fonts;
-with WNM.GUI.Logo;
 with WNM.GUI.Parameters;
 with WNM.Screen;
 with WNM.UI;
 with WNM.Sequencer;
+use WNM.Sequencer;
 with WNM.Master_Volume;
 with WNM.GUI.Menu;
 with Quick_Synth;
+use Quick_Synth;
+with WNM.Sample_Library; use WNM.Sample_Library;
 
 package body WNM.GUI.Update is
 
@@ -79,16 +81,26 @@ package body WNM.GUI.Update is
             WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
                                         X_Offset    => B,
                                         Y_Offset    => 0,
-                                        Str         => String'("Pattern select"));
+                                        Str         => "Pattern select");
          when WNM.UI.Note =>
-            WNM.GUI.Logo.Draw_On_Screen (HAL.UInt2 (Anim_Step mod 4));
+            WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
+            B := 1;
+            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
+                                        X_Offset    => B,
+                                        Y_Offset    => 0,
+                                        Str         => Image (Track));
+            B := 1;
+            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
+                                        X_Offset    => B,
+                                        Y_Offset    => 8,
+                                        Str         => Entry_Name (Sample_Of_Track (Track)));
          when WNM.UI.FX_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
             WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
                                         X_Offset    => B,
                                         Y_Offset    => 0,
-                                        Str         => String'("Enable FX"),
+                                        Str         => "Enable FX",
                                         Invert_From => 0);
          when WNM.UI.Trig_Edit =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);

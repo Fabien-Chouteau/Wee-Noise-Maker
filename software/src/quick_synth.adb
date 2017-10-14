@@ -240,6 +240,17 @@ package body Quick_Synth is
       Sample_For_Track (Track) := Sample;
    end Assign_Sample;
 
+   ---------------------
+   -- Sample_Of_Track --
+   ---------------------
+
+   function Sample_Of_Track (Track : WNM.Tracks)
+                             return WNM.Sample_Library.Sample_Entry_Index
+   is
+   begin
+      return Sample_For_Track (Track);
+   end Sample_Of_Track;
+
    ----------
    -- Fill --
    ----------
