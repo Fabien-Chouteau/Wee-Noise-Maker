@@ -41,7 +41,7 @@ with WNM.I2C;
 
 package body WNM.Audio_DAC is
 
-   type Audio_Buffer_Access is access all HAL.Audio.Audio_Buffer;
+   type Stereo_Buffer_Access is access all Quick_Synth.Stereo_Buffer;
 
    Task_Start : Ada.Synchronous_Task_Control.Suspension_Object;
 
@@ -77,10 +77,10 @@ package body WNM.Audio_DAC is
 
    -- Buffers --
 
-   TX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
-   TX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
-   RX0 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
-   RX1 : constant Audio_Buffer_Access := new Audio_Buffer (1 .. Samples_Per_Stereo_Buffer);
+   TX0 : constant Stereo_Buffer_Access := new Quick_Synth.Stereo_Buffer;
+   TX1 : constant Stereo_Buffer_Access := new Quick_Synth.Stereo_Buffer;
+   RX0 : constant Stereo_Buffer_Access := new Quick_Synth.Stereo_Buffer;
+   RX1 : constant Stereo_Buffer_Access := new Quick_Synth.Stereo_Buffer;
 
    ----------
    -- MCLK --
@@ -349,26 +349,20 @@ package body WNM.Audio_DAC is
    end I2S_Stream;
 
    task body I2S_Stream is
-      Unused_TX : Audio_Buffer_Access;
-      Unused_RX : Audio_Buffer_Access;
+      Unused_TX : Stereo_Buffer_Access;
+      Unused_RX : Stereo_Buffer_Access;
    begin
       Ada.Synchronous_Task_Control.Suspend_Until_True (Task_Start);
-
-      TX0.all := (others => 0);
-      TX1.all := (others => 0);
-
-      RX0.all := (others => 0);
-      RX1.all := (others => 0);
 
       Audio_TX_DMA_Int.Start_Mem_To_Periph (Audio_I2S_TX.Data_Register_Address,
                                             TX0.all'Address,
                                             TX1.all'Address,
-                                            TX0.all'Length);
+                                            Stereo_Buffer_Size_In_Bytes / 2);
 
       Audio_RX_DMA_Int.Start_Periph_To_Mem (Audio_I2S_RX.Data_Register_Address,
                                             RX0.all'Address,
                                             RX1.all'Address,
-                                            RX0.all'Length);
+                                            Stereo_Buffer_Size_In_Bytes / 2);
 
       loop
          Audio_TX_DMA_Int.Wait_For_Interrupt;

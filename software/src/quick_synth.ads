@@ -19,18 +19,29 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Audio;
 with MIDI;
 with WNM;
 with WNM.Sample_Library;
+with Interfaces;         use Interfaces;
 
 package Quick_Synth is
+
+   type Mono_Sample is new Integer_16 with Size => 16;
+   type Stereo_Sample is record
+      L, R : Mono_Sample;
+   end record with Pack, Size => 32;
+
+   type Mono_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Mono_Sample
+     with Pack, Size => WNM.Mono_Buffer_Size_In_Bytes * 8;
+
+   type Stereo_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Stereo_Sample
+     with Pack, Size => WNM.Stereo_Buffer_Size_In_Bytes * 8;
 
    procedure Trig (Track : WNM.Tracks);
 
    procedure Event (Msg : MIDI.Message);
-   procedure Fill (Stereo_Input  :     HAL.Audio.Audio_Buffer;
-                   Stereo_Output : out HAL.Audio.Audio_Buffer);
+   procedure Fill (Stereo_Input  :     Stereo_Buffer;
+                   Stereo_Output : out Stereo_Buffer);
 
    procedure Mute (Track : WNM.Tracks);
    procedure Unmute (Track : WNM.Tracks);

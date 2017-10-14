@@ -20,98 +20,97 @@
 -------------------------------------------------------------------------------
 
 with HAL.Audio;                  use HAL.Audio;
-with Interfaces;                 use Interfaces;
-with Simple_Synthesizer;
 with HAL;                        use HAL;
 with WNM.Sample_Stream;          use WNM.Sample_Stream;
 with Managed_Buffers;            use Managed_Buffers;
 with WNM;                        use WNM;
 with WNM.Buffer_Allocation;      use WNM.Buffer_Allocation;
 with WNM.Sample_Library;         use WNM.Sample_Library;
+with Hex_Dump;
+with Semihosting;
 
 package body Quick_Synth is
 
-   My_Synths : array (WNM.Tracks) of  Simple_Synthesizer.Synthesizer
-     (Stereo    => False,
-      Amplitude => Natural (Unsigned_16'Last / 10));
-
-   Time_To_Live : array (WNM.Tracks) of Natural := (others => 0);
    Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
    Solo_Mode_Enabled : Boolean := False;
    Solo_Track : WNM.Tracks := B1;
 
    Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0)
      with Atomic_Components;
-   Volume_For_Track : array (WNM.Tracks) of Integer := (others => 100)
+   Volume_For_Track : array (WNM.Tracks) of Integer := (others => 50)
      with Atomic_Components;
    Sample_For_Track : array (WNM.Tracks) of Sample_Entry_Index :=
      (others => Invalid_Sample_Entry)
      with Atomic_Components;
 
    procedure Copy (Src : not null Any_Managed_Buffer;
-                   Dst : out HAL.Audio.Audio_Buffer);
-   procedure Copy (Src : HAL.Audio.Audio_Buffer;
-                   Dst : not null Any_Managed_Buffer)
-     with Unreferenced;
-   procedure Copy_Stereo_To_Mono (Src : HAL.Audio.Audio_Buffer;
+                   Dst : out Mono_Buffer);
+   procedure Copy_Stereo_To_Mono (Src : Stereo_Buffer;
                                   Dst : not null Any_Managed_Buffer);
    function Is_It_On (Track : Stream_Track) return Boolean;
+   procedure Audio_Hex_Dump (Info : String;
+                             Buffer : HAL.Audio.Audio_Buffer);
+   pragma Unreferenced (Audio_Hex_Dump);
+
+   --------------------
+   -- Audio_Hex_Dump --
+   --------------------
+
+   procedure Audio_Hex_Dump (Info : String;
+                             Buffer : HAL.Audio.Audio_Buffer)
+   is
+      Data : HAL.UInt8_Array (1 .. Buffer'Length / 2)
+        with Address => Buffer'Address;
+   begin
+      Semihosting.Log_Line (Info);
+      Hex_Dump.Hex_Dump (Data,
+                         Put_Line  => Semihosting.Log_Line'Access,
+                         Base_Addr => 0);
+   end Audio_Hex_Dump;
 
    ----------
    -- Copy --
    ----------
 
    procedure Copy (Src : not null Any_Managed_Buffer;
-                   Dst : out HAL.Audio.Audio_Buffer)
+                   Dst : out Mono_Buffer)
    is
-      Data : HAL.Audio.Audio_Buffer (1 .. Integer (Src.Buffer_Length / 2))
-        with Address => Src.Buffer_Address;
+      Data : Mono_Buffer with Address => Src.Buffer_Address;
    begin
 
-      if Data'Length /= Dst'Length then
+      if Src.Buffer_Length /= Mono_Buffer_Size_In_Bytes then
          raise Program_Error with "WTF!?!";
       end if;
 
       Dst := Data;
    end Copy;
 
-   ----------
-   -- Copy --
-   ----------
-
-   procedure Copy (Src : HAL.Audio.Audio_Buffer;
-                   Dst : not null Any_Managed_Buffer)
-   is
-      Data : HAL.Audio.Audio_Buffer (1 .. Integer (Dst.Buffer_Length / 2))
-        with Address => Dst.Buffer_Address;
-   begin
-
-      if Data'Length /= Src'Length then
-         raise Program_Error with "WTF!?!";
-      end if;
-
-      Data := Src;
-   end Copy;
-
    -------------------------
    -- Copy_Stereo_To_Mono --
    -------------------------
 
-   procedure Copy_Stereo_To_Mono (Src : HAL.Audio.Audio_Buffer;
+   procedure Copy_Stereo_To_Mono (Src : Stereo_Buffer;
                                   Dst : not null Any_Managed_Buffer)
    is
-      Data : HAL.Audio.Audio_Buffer (1 .. Integer (Dst.Buffer_Length / 2))
-        with Address => Dst.Buffer_Address;
-      Index : Natural := 0;
+      Data : Mono_Buffer with Address => Dst.Buffer_Address;
+      Tmp  : Integer_32;
    begin
 
-      if Data'Length /= (Src'Length / 2) then
+      if Dst.Buffer_Length /= Mono_Buffer_Size_In_Bytes then
          raise Program_Error with "WTF!?!";
       end if;
 
-      while  Index < Data'Length loop
-         Data (Data'First + Index) := Src (Src'First + Index * 2);
-         Index := Index + 1;
+      for Index in Data'Range loop
+         Tmp := Integer_32 (Src (Index).L) + Integer_32 (Src (Index).R);
+         Tmp := Tmp / 2;
+
+         if Tmp > Integer_32 (Mono_Sample'Last) then
+            Data (Index) := Mono_Sample'Last;
+         elsif Tmp < Integer_32 (Integer_16'First) then
+            Data (Index) := Mono_Sample'First;
+         else
+            Data (Index) := Mono_Sample (Tmp);
+         end if;
       end loop;
    end Copy_Stereo_To_Mono;
 
@@ -171,15 +170,9 @@ package body Quick_Synth is
                       Track       => To_Stream_Track (Track),
                       Looping     => False,
                       Poly        => True);
-            else
-               Time_To_Live (Track) := 50;
-               My_Synths (Track).Set_Note_Frequency
-                 (MIDI.Key_To_Frequency (Msg.Cmd.Key));
             end if;
          when  MIDI.Note_Off =>
-            if My_Synths (Track).Note_Frequency = MIDI.Key_To_Frequency (Msg.Cmd.Key) then
-               My_Synths (Track).Set_Note_Frequency (0.0);
-            end if;
+            null;
          when others =>
             null;
       end case;
@@ -255,23 +248,21 @@ package body Quick_Synth is
    -- Fill --
    ----------
 
-   procedure Fill (Stereo_Input  :     HAL.Audio.Audio_Buffer;
-                   Stereo_Output : out HAL.Audio.Audio_Buffer)
+   procedure Fill (Stereo_Input  :     Stereo_Buffer;
+                   Stereo_Output : out Stereo_Buffer)
    is
 
-      procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
+      procedure Mix (Mono_Samples : Mono_Buffer;
                      ST           : Stream_Track);
 
       ---------
       -- Mix --
       ---------
 
-      procedure Mix (Mono_Samples : HAL.Audio.Audio_Buffer;
+      procedure Mix (Mono_Samples : Mono_Buffer;
                      ST           : Stream_Track)
       is
          Val         : Integer_32;
-         In_Index    : Natural;
-         Out_Index   : Natural;
 
          Sample, Left, Right : Float;
 
@@ -282,69 +273,51 @@ package body Quick_Synth is
             Volume := 1.0;
             Pan    := 0.0;
          else
-            Volume := Float (Volume_For_Track (To_Track (ST))) / 100.0;
-            Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
+            Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
+
+            --  FIXME: Hack to fix the panning problem
+            Pan    := Float (Pan_For_Track (To_Track (ST)) + 100) / 200.0;
+            --  Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
          end if;
 
-         if Mono_Samples'Length * 2 /= Stereo_Output'Length then
-            raise Program_Error with "Invalid audio buffer";
-         end if;
+--           Audio_Hex_Dump ("Stereo_Output before mix:", Stereo_Output);
 
-         In_Index  := Mono_Samples'First;
-         Out_Index := Stereo_Output'First;
+         for Index in Mono_Samples'Range loop
 
-         while In_Index /= Mono_Samples'Last loop
-
-            Sample := Float (Mono_Samples (In_Index));
+            Sample := Float (Mono_Samples (Index));
             Sample := Sample * Volume;
 
             Right := Sample * (1.0 - Pan);
             Left  := Sample * (1.0 + Pan);
 
-            Val := Integer_32 (Stereo_Output (Out_Index)) + Integer_32 (Left);
-            if Val > Integer_32 (Integer_16'Last) then
-               Stereo_Output (Out_Index) := Integer_16'Last;
+            Val := Integer_32 (Stereo_Output (Index).L) + Integer_32 (Left);
+            if Val > Integer_32 (Mono_Sample'Last) then
+               Stereo_Output (Index).L := Mono_Sample'Last;
             elsif Val < Integer_32 (Integer_16'First) then
-               Stereo_Output (Out_Index) := Integer_16'First;
+               Stereo_Output (Index).L := Mono_Sample'First;
             else
-               Stereo_Output (Out_Index) := Integer_16 (Val);
+               Stereo_Output (Index).L := Mono_Sample (Val);
             end if;
 
-            Val := Integer_32 (Stereo_Output (Out_Index + 1)) + Integer_32 (Right);
-            if Val > Integer_32 (Integer_16'Last) then
-               Stereo_Output (Out_Index + 1) := Integer_16'Last;
+            Val := Integer_32 (Stereo_Output (Index).R) + Integer_32 (Right);
+            if Val > Integer_32 (Mono_Sample'Last) then
+               Stereo_Output (Index).R := Mono_Sample'Last;
             elsif Val < Integer_32 (Integer_16'First) then
-               Stereo_Output (Out_Index + 1) := Integer_16'First;
+               Stereo_Output (Index).R := Mono_Sample'First;
             else
-               Stereo_Output (Out_Index + 1) := Integer_16 (Val);
+               Stereo_Output (Index).R := Mono_Sample (Val);
             end if;
-
-            In_Index  := In_Index + 1;
-            Out_Index := Out_Index + 2;
          end loop;
+--           Audio_Hex_Dump ("Stereo_Output after mix:", Stereo_Output);
       end Mix;
 
-      Mono_Tmp : HAL.Audio.Audio_Buffer (1 .. Samples_Per_Mono_Buffer);
+      Mono_Tmp : Mono_Buffer;
       Buf      : Any_Managed_Buffer;
       On_Track : Stream_Track;
    begin
 
       -- Audio in --
       Stereo_Output := Stereo_Input;
-
-      -- Synths --
-
-      for Track in WNM.Tracks loop
-         My_Synths (Track).Receive (Mono_Tmp);
-         Time_To_Live (Track) :=  (if Time_To_Live (Track) /= 0 then
-                                      Time_To_Live (Track) - 1
-                                   else
-                                      0);
-
-         if Time_To_Live (Track) /= 0 and then Is_It_On (To_Stream_Track (Track)) then
-            Mix (Mono_Tmp, To_Stream_Track (Track));
-         end if;
-      end loop;
 
       -- Samples streams --
 
@@ -504,9 +477,4 @@ package body Quick_Synth is
    function Volume (Track : WNM.Tracks) return Natural
    is (Natural (Volume_For_Track (Track)));
 
-begin
-   for Synth of My_Synths loop
-      Synth.Set_Frequency (Audio_Freq_48kHz);
-      Synth.Set_Note_Frequency (0.0);
-   end loop;
 end Quick_Synth;
