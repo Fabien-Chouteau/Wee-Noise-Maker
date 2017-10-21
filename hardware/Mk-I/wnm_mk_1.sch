@@ -634,7 +634,7 @@ F 3 "" H 4250 3050 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text Notes 4250 6200 0    79   ~ 0
-TODO:\n - Different SD card slot\n - SMD crystal\n - SMD battery connector\n - Change button layout and labels (smaller distance between button rows?)\n - Encoders filtering?\n - Different screen (bigger, e-paper?)\n - Fold screen connector under the screen\n - resistor network for the sd card\n - Wake up circuit\n - remove bottom-right hole\n - Add test points (I2S, SD card, I2C)\n - Lower the number of different values of capas and resistors\nDONE:\n\n - I2C extension port
+TODO:\n - Different SD card slot\n - SMD battery connector\n - Change button layout and labels (smaller distance between button rows?)\n - Encoders filtering?\n - Different screen (bigger, e-paper?)\n - Fold screen connector under the screen\n - resistor network for the sd card\n - Wake up circuit\n - remove bottom-right hole\n - Add test points (I2S, SD card, I2C)\n - Lower the number of different values of capas and resistors\n\nDONE:\n - I2C extension port\n - SMD crystal\n
 Text Notes 650  5200 0    79   ~ 0
 Known problems:\n\nFixed:\n - DAC 1.8V VDDD\n - DAC couplings caps are in series with the chip \n   instead of going to GND\n - Voltage regulator footprint\n - Encoders footprints and hole size\n
 $EndSCHEMATC
