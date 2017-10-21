@@ -64,7 +64,7 @@ encoding utf-8
 Sheet 3 6
 Title "Wee Noise Maker - Mk-I"
 Date ""
-Rev "C"
+Rev "D"
 Comp "Fabien Chouteau"
 Comment1 ""
 Comment2 ""
@@ -511,30 +511,6 @@ Text GLabel 12850 3600 2    60   Input ~ 0
 COL6
 Text GLabel 12850 3200 2    60   Input ~ 0
 COL5
-$Comp
-L MOLEX_microSD_47219-2001 U8
-U 1 1 58639490
-P 7350 9400
-F 0 "U8" H 7350 9400 60  0000 C CNN
-F 1 "47219-2001" V 8350 8500 60  0000 C CNN
-F 2 "POSS:MOLEX_microSD_47219-2001" H 7350 9400 60  0001 C CNN
-F 3 "" H 7350 9400 60  0001 C CNN
-	1    7350 9400
-	1    0    0    -1  
-$EndComp
-$Comp
-L GND-RESCUE-wnm_mk_1 #PWR027
-U 1 1 586394FE
-P 7800 11000
-AR Path="/586394FE" Ref="#PWR027"  Part="1" 
-AR Path="/585DBE08/586394FE" Ref="#PWR021"  Part="1" 
-F 0 "#PWR021" H 7800 11000 30  0001 C CNN
-F 1 "GND" H 7800 10930 30  0001 C CNN
-F 2 "" H 7800 11000 60  0001 C CNN
-F 3 "" H 7800 11000 60  0001 C CNN
-	1    7800 11000
-	1    0    0    -1  
-$EndComp
 Text GLabel 4950 9950 0    60   Input ~ 0
 SD_DAT2
 Text GLabel 4950 9800 0    60   Input ~ 0
@@ -545,8 +521,6 @@ Text GLabel 4950 10250 0    60   Input ~ 0
 SD_DAT0
 Text GLabel 4950 10100 0    60   Input ~ 0
 SD_DAT1
-Text GLabel 7350 9200 1    60   Input ~ 0
-3V3
 Text GLabel 12850 7000 2    60   Input ~ 0
 SD_DAT3
 Text GLabel 12850 6800 2    60   Input ~ 0
@@ -559,19 +533,6 @@ Text GLabel 12850 7100 2    60   Input ~ 0
 SD_CLK
 Text GLabel 12850 4300 2    60   Input ~ 0
 SD_CMD
-$Comp
-L GND-RESCUE-wnm_mk_1 #PWR028
-U 1 1 58631320
-P 6300 10150
-AR Path="/58631320" Ref="#PWR028"  Part="1" 
-AR Path="/585DBE08/58631320" Ref="#PWR022"  Part="1" 
-F 0 "#PWR022" H 6300 10150 30  0001 C CNN
-F 1 "GND" H 6300 10080 30  0001 C CNN
-F 2 "" H 6300 10150 60  0001 C CNN
-F 3 "" H 6300 10150 60  0001 C CNN
-	1    6300 10150
-	1    0    0    -1  
-$EndComp
 Text GLabel 2850 5900 0    60   Input ~ 0
 COL4
 Text GLabel 2850 4500 0    60   Input ~ 0
@@ -649,17 +610,17 @@ F 3 "" H 5200 10250 30  0000 C CNN
 $EndComp
 Text GLabel 5450 9200 1    60   Input ~ 0
 3V3
-Text GLabel 7250 10500 0    60   Input ~ 0
+Text GLabel 6900 9450 0    60   Input ~ 0
 SD_DAT2
-Text GLabel 7250 10350 0    60   Input ~ 0
+Text GLabel 6900 9550 0    60   Input ~ 0
 SD_DAT3
-Text GLabel 7250 10050 0    60   Input ~ 0
+Text GLabel 6900 9650 0    60   Input ~ 0
 SD_CMD
-Text GLabel 7250 10800 0    60   Input ~ 0
+Text GLabel 6900 10050 0    60   Input ~ 0
 SD_DAT0
-Text GLabel 7250 10650 0    60   Input ~ 0
+Text GLabel 6900 10150 0    60   Input ~ 0
 SD_DAT1
-Text GLabel 7250 10200 0    60   Input ~ 0
+Text GLabel 6900 9850 0    60   Input ~ 0
 SD_CLK
 $Comp
 L C-RESCUE-wnm_mk_1 C23
@@ -679,25 +640,12 @@ L GND-RESCUE-wnm_mk_1 #PWR029
 U 1 1 58640311
 P 5450 10725
 AR Path="/58640311" Ref="#PWR029"  Part="1" 
-AR Path="/585DBE08/58640311" Ref="#PWR023"  Part="1" 
-F 0 "#PWR023" H 5450 10725 30  0001 C CNN
+AR Path="/585DBE08/58640311" Ref="#PWR021"  Part="1" 
+F 0 "#PWR021" H 5450 10725 30  0001 C CNN
 F 1 "GND" H 5450 10655 30  0001 C CNN
 F 2 "" H 5450 10725 60  0001 C CNN
 F 3 "" H 5450 10725 60  0001 C CNN
 	1    5450 10725
-	1    0    0    -1  
-$EndComp
-$Comp
-L C-RESCUE-wnm_mk_1 C24
-U 1 1 58640860
-P 6900 9525
-AR Path="/58640860" Ref="C24"  Part="1" 
-AR Path="/585DBE08/58640860" Ref="C24"  Part="1" 
-F 0 "C24" H 6900 9625 40  0000 L CNN
-F 1 "22uF" H 6906 9440 40  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 6938 9375 30  0001 C CNN
-F 3 "" H 6900 9525 60  0000 C CNN
-	1    6900 9525
 	1    0    0    -1  
 $EndComp
 Text GLabel 2850 4600 0    60   Input ~ 0
@@ -730,8 +678,8 @@ L GND-RESCUE-wnm_mk_1 #PWR030
 U 1 1 586649ED
 P 9900 9850
 AR Path="/586649ED" Ref="#PWR030"  Part="1" 
-AR Path="/585DBE08/586649ED" Ref="#PWR024"  Part="1" 
-F 0 "#PWR024" H 9900 9850 30  0001 C CNN
+AR Path="/585DBE08/586649ED" Ref="#PWR022"  Part="1" 
+F 0 "#PWR022" H 9900 9850 30  0001 C CNN
 F 1 "GND" H 9900 9780 30  0001 C CNN
 F 2 "" H 9900 9850 60  0001 C CNN
 F 3 "" H 9900 9850 60  0001 C CNN
@@ -861,26 +809,12 @@ Wire Wire Line
 Wire Wire Line
 	1700 9450 1700 9600
 Wire Wire Line
-	7250 9900 6300 9900
-Wire Wire Line
-	6300 9900 6300 10150
-Wire Wire Line
 	5450 9200 5450 10325
 Connection ~ 5450 9950
 Connection ~ 5450 10100
 Connection ~ 5450 9800
 Connection ~ 5450 9500
 Connection ~ 5450 10250
-Wire Wire Line
-	6900 9725 6900 9900
-Connection ~ 6900 9900
-Wire Wire Line
-	7800 9650 7800 9325
-Wire Wire Line
-	7800 9325 6900 9325
-Wire Wire Line
-	7350 9200 7350 9325
-Connection ~ 7350 9325
 Wire Wire Line
 	9900 9850 9900 9800
 Wire Wire Line
@@ -923,10 +857,10 @@ Wire Wire Line
 Wire Wire Line
 	2050 3000 2050 3050
 $Comp
-L GND-RESCUE-wnm_mk_1 #PWR026
+L GND-RESCUE-wnm_mk_1 #PWR023
 U 1 1 59EB6029
 P 2050 3050
-F 0 "#PWR026" H 2050 3050 30  0001 C CNN
+F 0 "#PWR023" H 2050 3050 30  0001 C CNN
 F 1 "GND" H 2050 2980 30  0001 C CNN
 F 2 "" H 2050 3050 60  0001 C CNN
 F 3 "" H 2050 3050 60  0001 C CNN
@@ -934,14 +868,184 @@ F 3 "" H 2050 3050 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND-RESCUE-wnm_mk_1 #PWR027
+L GND-RESCUE-wnm_mk_1 #PWR024
 U 1 1 59EB60D4
 P 2550 3050
-F 0 "#PWR027" H 2550 3050 30  0001 C CNN
+F 0 "#PWR024" H 2550 3050 30  0001 C CNN
 F 1 "GND" H 2550 2980 30  0001 C CNN
 F 2 "" H 2550 3050 60  0001 C CNN
 F 3 "" H 2550 3050 60  0001 C CNN
 	1    2550 3050
 	1    0    0    -1  
+$EndComp
+$Comp
+L Micro_SD_Card_Det_Hirose_DM3AT U8
+U 1 1 59EDB226
+P 7800 9850
+F 0 "U8" H 7150 10550 50  0000 C CNN
+F 1 "Micro_SD_Card_Det_Hirose_DM3AT" H 8450 10550 50  0000 R CNN
+F 2 "POSS:DM3D" H 9850 10550 50  0001 C CNN
+F 3 "" H 7800 9950 50  0001 C CNN
+	1    7800 9850
+	1    0    0    -1  
+$EndComp
+Text GLabel 6000 9450 1    60   Input ~ 0
+3V3
+$Comp
+L GND-RESCUE-wnm_mk_1 #PWR025
+U 1 1 59EDEF62
+P 6000 10250
+F 0 "#PWR025" H 6000 10250 30  0001 C CNN
+F 1 "GND" H 6000 10180 30  0001 C CNN
+F 2 "" H 6000 10250 60  0001 C CNN
+F 3 "" H 6000 10250 60  0001 C CNN
+	1    6000 10250
+	1    0    0    -1  
+$EndComp
+$Comp
+L C-RESCUE-wnm_mk_1 C24
+U 1 1 59EDEF68
+P 6000 9950
+F 0 "C24" H 6000 10050 40  0000 L CNN
+F 1 "22uF" H 6006 9865 40  0000 L CNN
+F 2 "Capacitors_SMD:C_0805" H 6038 9800 30  0001 C CNN
+F 3 "" H 6000 9950 60  0000 C CNN
+	1    6000 9950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 9750 6000 9750
+Wire Wire Line
+	6000 9750 6000 9450
+Wire Wire Line
+	6900 9950 6250 9950
+Wire Wire Line
+	6250 9950 6250 10150
+Wire Wire Line
+	6250 10150 6000 10150
+Wire Wire Line
+	6000 10150 6000 10250
+$Comp
+L GND-RESCUE-wnm_mk_1 #PWR026
+U 1 1 59EE3B60
+P 8650 10450
+F 0 "#PWR026" H 8650 10450 30  0001 C CNN
+F 1 "GND" H 8650 10380 30  0001 C CNN
+F 2 "" H 8650 10450 60  0001 C CNN
+F 3 "" H 8650 10450 60  0001 C CNN
+	1    8650 10450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8600 10350 8650 10350
+Wire Wire Line
+	8650 10350 8650 10450
+$Comp
+L GND-RESCUE-wnm_mk_1 #PWR027
+U 1 1 59EE3EE8
+P 6850 10450
+F 0 "#PWR027" H 6850 10450 30  0001 C CNN
+F 1 "GND" H 6850 10380 30  0001 C CNN
+F 2 "" H 6850 10450 60  0001 C CNN
+F 3 "" H 6850 10450 60  0001 C CNN
+	1    6850 10450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 10350 6850 10350
+Wire Wire Line
+	6850 10350 6850 10450
+Text GLabel 6900 10250 0    60   Input ~ 0
+SD_DETECT
+Text GLabel 3750 10150 0    60   Input ~ 0
+SD_DAT2
+Text GLabel 3750 10300 0    60   Input ~ 0
+SD_DAT3
+Text GLabel 3750 10450 0    60   Input ~ 0
+SD_CMD
+Text GLabel 3750 10750 0    60   Input ~ 0
+SD_DAT0
+Text GLabel 3750 10900 0    60   Input ~ 0
+SD_DAT1
+Text GLabel 3750 10600 0    60   Input ~ 0
+SD_CLK
+Text GLabel 3750 11050 0    60   Input ~ 0
+SD_DETECT
+$Comp
+L TEST TP_DAT2
+U 1 1 59EE5E47
+P 3750 10150
+F 0 "TP_DAT2" V 3750 10600 50  0000 C BNN
+F 1 "TEST" H 3750 10400 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10150 50  0001 C CNN
+F 3 "" H 3750 10150 50  0001 C CNN
+	1    3750 10150
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DAT3
+U 1 1 59EE61E0
+P 3750 10300
+F 0 "TP_DAT3" V 3800 10750 50  0000 C BNN
+F 1 "TEST" H 3750 10550 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10300 50  0001 C CNN
+F 3 "" H 3750 10300 50  0001 C CNN
+	1    3750 10300
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_CMD1
+U 1 1 59EE6254
+P 3750 10450
+F 0 "TP_CMD1" V 3800 10900 50  0000 C BNN
+F 1 "TEST" H 3750 10700 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10450 50  0001 C CNN
+F 3 "" H 3750 10450 50  0001 C CNN
+	1    3750 10450
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_CLK1
+U 1 1 59EE62C7
+P 3750 10600
+F 0 "TP_CLK1" V 3800 11050 50  0000 C BNN
+F 1 "TEST" H 3750 10850 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10600 50  0001 C CNN
+F 3 "" H 3750 10600 50  0001 C CNN
+	1    3750 10600
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DAT0
+U 1 1 59EE662D
+P 3750 10750
+F 0 "TP_DAT0" V 3800 11200 50  0000 C BNN
+F 1 "TEST" H 3750 11000 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10750 50  0001 C CNN
+F 3 "" H 3750 10750 50  0001 C CNN
+	1    3750 10750
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DAT1
+U 1 1 59EE66AA
+P 3750 10900
+F 0 "TP_DAT1" V 3800 11350 50  0000 C BNN
+F 1 "TEST" H 3750 11150 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10900 50  0001 C CNN
+F 3 "" H 3750 10900 50  0001 C CNN
+	1    3750 10900
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DETECT0
+U 1 1 59EE6726
+P 3750 11050
+F 0 "TP_DETECT0" V 3800 11550 50  0000 C BNN
+F 1 "TEST" H 3750 11300 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 11050 50  0001 C CNN
+F 3 "" H 3750 11050 50  0001 C CNN
+	1    3750 11050
+	0    1    1    0   
 $EndComp
 $EndSCHEMATC
