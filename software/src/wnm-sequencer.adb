@@ -19,6 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Synchronous_Task_Control;
 with MIDI;
 with Quick_Synth;
 with WNM.Sequence;          use WNM.Sequence;
@@ -40,7 +41,13 @@ package body WNM.Sequencer is
    Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
 
-   Next_Start : Time := Time_Last;
+   Task_Start     : Ada.Synchronous_Task_Control.Suspension_Object;
+   Next_Start     : Time := Time_Last;
+
+   task Sequencer_Task
+     with Priority             => Sequencer_Task_Priority,
+          Storage_Size         => Sequencer_Task_Stack_Size,
+          Secondary_Stack_Size => Sequencer_Task_Secondary_Stack_Size;
 
    type Microstep_Cnt is mod 2;
    Microstep : Microstep_Cnt := 1;
@@ -362,7 +369,23 @@ package body WNM.Sequencer is
          end loop;
       end loop;
       Next_Start := Clock + Milliseconds (100);
+
+      Ada.Synchronous_Task_Control.Set_True (Task_Start);
    end Start;
+
+
+   --------------------
+   -- Sequencer_Task --
+   --------------------
+
+   task body Sequencer_Task is
+   begin
+      Ada.Synchronous_Task_Control.Suspend_Until_True (Task_Start);
+      loop
+         delay until Next_Start;
+         Execute_Step;
+      end loop;
+   end Sequencer_Task;
 
    ---------
    -- Set --

@@ -302,9 +302,6 @@ package body WNM.UI is
       Next_Start := Clock;
       loop
 
-         --  Call the sequencer that may have something to do
-         Sequencer.Execute_Step;
-
          Next_Start := Next_Start + Period;
          delay until Next_Start;
 
