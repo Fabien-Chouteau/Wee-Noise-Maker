@@ -61,7 +61,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 5
+Sheet 4 6
 Title "Wee Noise Maker - Mk-I"
 Date ""
 Rev "C"
@@ -254,71 +254,6 @@ F 3 "" H 2000 5250 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LED D25
-U 1 1 585D8AD0
-P 3300 5250
-AR Path="/585D8AD0" Ref="D25"  Part="1" 
-AR Path="/585D6FEE/585D8AD0" Ref="D25"  Part="1" 
-F 0 "D25" H 3300 5350 50  0000 C CNN
-F 1 "150060RS75000" H 3300 5150 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 5250 50  0001 C CNN
-F 3 "" H 3300 5250 50  0000 C CNN
-	1    3300 5250
-	1    0    0    -1  
-$EndComp
-$Comp
-L LED D20
-U 1 1 585D8ADE
-P 3300 3500
-AR Path="/585D8ADE" Ref="D20"  Part="1" 
-AR Path="/585D6FEE/585D8ADE" Ref="D20"  Part="1" 
-F 0 "D20" H 3300 3600 50  0000 C CNN
-F 1 "150060GS75000" H 3300 3400 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 3500 50  0001 C CNN
-F 3 "" H 3300 3500 50  0000 C CNN
-	1    3300 3500
-	1    0    0    -1  
-$EndComp
-$Comp
-L LED D21
-U 1 1 585D8AE5
-P 3300 3850
-AR Path="/585D8AE5" Ref="D21"  Part="1" 
-AR Path="/585D6FEE/585D8AE5" Ref="D21"  Part="1" 
-F 0 "D21" H 3300 3950 50  0000 C CNN
-F 1 "150060GS75000" H 3300 3750 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 3850 50  0001 C CNN
-F 3 "" H 3300 3850 50  0000 C CNN
-	1    3300 3850
-	1    0    0    -1  
-$EndComp
-$Comp
-L LED D22
-U 1 1 585D8AEC
-P 3300 4200
-AR Path="/585D8AEC" Ref="D22"  Part="1" 
-AR Path="/585D6FEE/585D8AEC" Ref="D22"  Part="1" 
-F 0 "D22" H 3300 4300 50  0000 C CNN
-F 1 "150060GS75000" H 3300 4100 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 4200 50  0001 C CNN
-F 3 "" H 3300 4200 50  0000 C CNN
-	1    3300 4200
-	1    0    0    -1  
-$EndComp
-$Comp
-L LED D23
-U 1 1 585D8AF3
-P 3300 4550
-AR Path="/585D8AF3" Ref="D23"  Part="1" 
-AR Path="/585D6FEE/585D8AF3" Ref="D23"  Part="1" 
-F 0 "D23" H 3300 4650 50  0000 C CNN
-F 1 "150060GS75000" H 3300 4450 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 4550 50  0001 C CNN
-F 3 "" H 3300 4550 50  0000 C CNN
-	1    3300 4550
-	1    0    0    -1  
-$EndComp
-$Comp
 L LED D15
 U 1 1 585D8AFA
 P 2650 4200
@@ -370,25 +305,10 @@ F 3 "" H 2650 5250 50  0000 C CNN
 	1    2650 5250
 	1    0    0    -1  
 $EndComp
-$Comp
-L LED D24
-U 1 1 585D8B16
-P 3300 4900
-AR Path="/585D8B16" Ref="D24"  Part="1" 
-AR Path="/585D6FEE/585D8B16" Ref="D24"  Part="1" 
-F 0 "D24" H 3300 5000 50  0000 C CNN
-F 1 "150060GS75000" H 3300 4800 50  0000 C CNN
-F 2 "LEDs:LED_0805" H 3300 4900 50  0001 C CNN
-F 3 "" H 3300 4900 50  0000 C CNN
-	1    3300 4900
-	1    0    0    -1  
-$EndComp
 Text GLabel 2200 1650 2    60   Input ~ 0
 ROW1
 Text GLabel 2850 1650 2    60   Input ~ 0
 ROW2
-Text GLabel 3500 1650 2    60   Input ~ 0
-ROW3
 Text GLabel 1450 2650 0    60   Input ~ 0
 COL1
 Text GLabel 1450 3000 0    60   Input ~ 0
@@ -433,19 +353,6 @@ F 1 "330" V 2857 1901 40  0000 C CNN
 F 2 "Resistors_SMD:R_0805" V 2780 1900 30  0001 C CNN
 F 3 "" H 2850 1900 30  0000 C CNN
 	1    2850 1900
-	1    0    0    -1  
-$EndComp
-$Comp
-L R-RESCUE-wnm_mk_1 R9
-U 1 1 5862A6DA
-P 3500 1900
-AR Path="/5862A6DA" Ref="R9"  Part="1" 
-AR Path="/585D6FEE/5862A6DA" Ref="R9"  Part="1" 
-F 0 "R9" V 3580 1900 40  0000 C CNN
-F 1 "330" V 3507 1901 40  0000 C CNN
-F 2 "Resistors_SMD:R_0805" V 3430 1900 30  0001 C CNN
-F 3 "" H 3500 1900 30  0000 C CNN
-	1    3500 1900
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -499,9 +406,6 @@ Connection ~ 2200 3500
 Connection ~ 2850 2800
 Connection ~ 2850 3150
 Connection ~ 2850 3500
-Connection ~ 3500 3500
-Connection ~ 3500 3850
-Connection ~ 3500 4200
 Connection ~ 2200 4550
 Connection ~ 2200 4900
 Connection ~ 2200 5250
@@ -523,9 +427,6 @@ Wire Wire Line
 	2450 3000 2450 2800
 Connection ~ 2450 3000
 Wire Wire Line
-	3100 3500 3100 3700
-Connection ~ 3100 3700
-Wire Wire Line
 	1800 4550 1800 4750
 Connection ~ 1800 4750
 Wire Wire Line
@@ -535,9 +436,6 @@ Wire Wire Line
 Wire Wire Line
 	2450 3350 2450 3150
 Connection ~ 2450 3350
-Wire Wire Line
-	3100 4050 3100 3850
-Connection ~ 3100 4050
 Wire Wire Line
 	1800 4900 1800 5100
 Connection ~ 1800 5100
@@ -549,9 +447,6 @@ Wire Wire Line
 	2450 3700 2450 3500
 Connection ~ 2450 3700
 Wire Wire Line
-	3100 4400 3100 4200
-Connection ~ 3100 4400
-Wire Wire Line
 	1800 5250 1800 5450
 Connection ~ 1800 5450
 Wire Wire Line
@@ -559,9 +454,6 @@ Wire Wire Line
 Wire Wire Line
 	2450 4050 2450 3850
 Connection ~ 2450 4050
-Wire Wire Line
-	3100 4750 3100 4550
-Connection ~ 3100 4750
 Connection ~ 1800 2650
 Connection ~ 1800 3000
 Connection ~ 1800 3350
@@ -580,29 +472,8 @@ Connection ~ 2200 3850
 Wire Wire Line
 	2850 2150 2850 5250
 Connection ~ 2850 3850
-Wire Wire Line
-	3500 2150 3500 5250
-Connection ~ 3500 4550
-Connection ~ 3500 4900
-Connection ~ 3100 5100
 Connection ~ 2450 4400
-Wire Wire Line
-	3100 5100 3100 4900
 Connection ~ 2450 4750
-Wire Wire Line
-	1450 5100 3100 5100
-Wire Wire Line
-	1450 5450 3100 5450
-Wire Wire Line
-	3100 5450 3100 5250
-Wire Wire Line
-	3100 3700 1450 3700
-Wire Wire Line
-	1450 4050 3100 4050
-Wire Wire Line
-	1450 4400 3100 4400
-Wire Wire Line
-	1450 4750 3100 4750
 Connection ~ 2450 5100
 Connection ~ 2450 5450
 Wire Wire Line
@@ -658,8 +529,8 @@ L GND-RESCUE-wnm_mk_1 #PWR031
 U 1 1 586468A3
 P 6975 5150
 AR Path="/586468A3" Ref="#PWR031"  Part="1" 
-AR Path="/585D6FEE/586468A3" Ref="#PWR034"  Part="1" 
-F 0 "#PWR034" H 6975 5150 30  0001 C CNN
+AR Path="/585D6FEE/586468A3" Ref="#PWR028"  Part="1" 
+F 0 "#PWR028" H 6975 5150 30  0001 C CNN
 F 1 "GND" H 6975 5080 30  0001 C CNN
 F 2 "" H 6975 5150 60  0001 C CNN
 F 3 "" H 6975 5150 60  0001 C CNN
@@ -728,30 +599,6 @@ Text Notes 1650 1000 0    315  ~ 0
 LED matrix
 Text Notes 7050 1100 0    315  ~ 0
 OLED screen
-Wire Wire Line
-	3100 5250 3150 5250
-Wire Wire Line
-	3500 5250 3450 5250
-Wire Wire Line
-	3500 4900 3450 4900
-Wire Wire Line
-	3100 4900 3150 4900
-Wire Wire Line
-	3100 4550 3150 4550
-Wire Wire Line
-	3450 4550 3500 4550
-Wire Wire Line
-	3500 4200 3450 4200
-Wire Wire Line
-	3100 4200 3150 4200
-Wire Wire Line
-	3100 3850 3150 3850
-Wire Wire Line
-	3450 3850 3500 3850
-Wire Wire Line
-	3500 3500 3450 3500
-Wire Wire Line
-	3150 3500 3100 3500
 Wire Wire Line
 	2850 2450 2800 2450
 Wire Wire Line
@@ -824,4 +671,16 @@ Wire Wire Line
 	2450 5250 2500 5250
 Wire Wire Line
 	2850 5250 2800 5250
+Wire Wire Line
+	1450 3700 2450 3700
+Wire Wire Line
+	1450 4050 2450 4050
+Wire Wire Line
+	1450 4400 2450 4400
+Wire Wire Line
+	1450 4750 2450 4750
+Wire Wire Line
+	1450 5100 2450 5100
+Wire Wire Line
+	1450 5450 2450 5450
 $EndSCHEMATC
