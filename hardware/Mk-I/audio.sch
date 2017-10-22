@@ -227,8 +227,8 @@ L 3.5_audio_jack HP_OUT1
 U 1 1 5863AC9E
 P 7100 4425
 F 0 "HP_OUT1" H 7175 3800 60  0000 C CNN
-F 1 "1503 02" H 7100 4425 60  0001 C CNN
-F 2 "POSS:lumberg_3.5_audio_jack_1503_02" H 7100 4425 60  0001 C CNN
+F 1 "SJ-3523-SMT" H 7100 4425 60  0001 C CNN
+F 2 "POSS:SJ-3523-SMT" H 7100 4425 60  0001 C CNN
 F 3 "" H 7100 4425 60  0001 C CNN
 	1    7100 4425
 	-1   0    0    1   
@@ -240,8 +240,8 @@ L 3.5_audio_jack LINE_IN1
 U 1 1 5863B129
 P 7100 3825
 F 0 "LINE_IN1" H 7175 3200 60  0000 C CNN
-F 1 "1503 02" H 6950 3200 60  0001 C CNN
-F 2 "POSS:lumberg_3.5_audio_jack_1503_02" H 7100 3825 60  0001 C CNN
+F 1 "SJ-3523-SMT" H 6950 3200 60  0001 C CNN
+F 2 "POSS:SJ-3523-SMT" H 7100 3825 60  0001 C CNN
 F 3 "" H 7100 3825 60  0001 C CNN
 	1    7100 3825
 	-1   0    0    1   
@@ -322,4 +322,95 @@ $EndComp
 Wire Wire Line
 	4800 2300 4800 2250
 Connection ~ 4800 2250
+$Comp
+L TEST TP_MCLK1
+U 1 1 59ECF1C0
+P 2200 5700
+F 0 "TP_MCLK1" V 2200 6200 50  0000 C BNN
+F 1 "TEST" H 2200 5950 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 5700 50  0001 C CNN
+F 3 "" H 2200 5700 50  0001 C CNN
+	1    2200 5700
+	0    1    1    0   
+$EndComp
+Text GLabel 2200 5700 0    60   Input ~ 0
+I2S_MCLK
+Text GLabel 2200 5450 0    60   Input ~ 0
+I2S_SCLK
+Text GLabel 2200 5200 0    60   Input ~ 0
+I2S_LRCLK
+Text GLabel 2200 4950 0    60   Input ~ 0
+I2S_DIN
+Text GLabel 2200 4700 0    60   Input ~ 0
+I2S_DOUT
+$Comp
+L TEST TP_SCLK1
+U 1 1 59ECF440
+P 2200 5450
+F 0 "TP_SCLK1" V 2200 5950 50  0000 C BNN
+F 1 "TEST" H 2200 5700 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 5450 50  0001 C CNN
+F 3 "" H 2200 5450 50  0001 C CNN
+	1    2200 5450
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_LRCLK1
+U 1 1 59ECF47A
+P 2200 5200
+F 0 "TP_LRCLK1" V 2200 5750 50  0000 C BNN
+F 1 "TEST" H 2200 5450 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 5200 50  0001 C CNN
+F 3 "" H 2200 5200 50  0001 C CNN
+	1    2200 5200
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DIN1
+U 1 1 59ECF4B7
+P 2200 4950
+F 0 "TP_DIN1" V 2200 5450 50  0000 C BNN
+F 1 "TEST" H 2200 5200 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 4950 50  0001 C CNN
+F 3 "" H 2200 4950 50  0001 C CNN
+	1    2200 4950
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_DOUT1
+U 1 1 59ECF4F7
+P 2200 4700
+F 0 "TP_DOUT1" V 2200 5250 50  0000 C BNN
+F 1 "TEST" H 2200 4950 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 4700 50  0001 C CNN
+F 3 "" H 2200 4700 50  0001 C CNN
+	1    2200 4700
+	0    1    1    0   
+$EndComp
+Text GLabel 2200 4350 0    60   Input ~ 0
+Audio_SCL
+Text GLabel 2200 4100 0    60   Input ~ 0
+Audio_SDA
+$Comp
+L TEST TP_SCL1
+U 1 1 59ECF77C
+P 2200 4350
+F 0 "TP_SCL1" V 2200 4850 50  0000 C BNN
+F 1 "TEST" H 2200 4600 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 4350 50  0001 C CNN
+F 3 "" H 2200 4350 50  0001 C CNN
+	1    2200 4350
+	0    1    1    0   
+$EndComp
+$Comp
+L TEST TP_SDA1
+U 1 1 59ECF7C8
+P 2200 4100
+F 0 "TP_SDA1" V 2200 4600 50  0000 C BNN
+F 1 "TEST" H 2200 4350 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 2200 4100 50  0001 C CNN
+F 3 "" H 2200 4100 50  0001 C CNN
+	1    2200 4100
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
