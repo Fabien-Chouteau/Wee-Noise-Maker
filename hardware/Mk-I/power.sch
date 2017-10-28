@@ -350,7 +350,7 @@ F 3 "" H 6500 4950 60  0001 C CNN
 	1    6500 4950
 	1    0    0    -1  
 $EndComp
-Text GLabel 4700 4150 0    60   Input ~ 0
+Text GLabel 4600 4150 0    60   Input ~ 0
 VBUS
 Wire Wire Line
 	5200 4750 5000 4750
@@ -415,12 +415,12 @@ $EndComp
 $Comp
 L INDUCTOR_SMALL L2
 U 1 1 58628564
-P 4950 4150
-F 0 "L2" H 4950 4250 50  0000 C CNN
-F 1 "15Ohm" H 4950 4100 50  0000 C CNN
-F 2 "Capacitors_SMD:C_0805" H 4950 4150 60  0001 C CNN
-F 3 "" H 4950 4150 60  0000 C CNN
-	1    4950 4150
+P 4850 4150
+F 0 "L2" H 4850 4250 50  0000 C CNN
+F 1 "15Ohm" H 4850 4100 50  0000 C CNN
+F 2 "Capacitors_SMD:C_0805" H 4850 4150 60  0001 C CNN
+F 3 "" H 4850 4150 60  0000 C CNN
+	1    4850 4150
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -466,4 +466,8 @@ Wire Wire Line
 Connection ~ 2450 4400
 Text GLabel 2650 4400 2    60   Input ~ 0
 VBAT_SENSE
+Wire Wire Line
+	5200 4150 5100 4150
+Text GLabel 5200 4600 0    60   Input ~ 0
+FS_ID
 $EndSCHEMATC

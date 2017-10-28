@@ -96,7 +96,7 @@ F0 "Audio" 60
 F1 "audio.sch" 60
 $EndSheet
 Text Notes 4250 6200 0    79   ~ 0
-TODO:\n - Different SD card slot\n - Change button layout and labels (smaller distance between button rows?)\n - Encoders filtering?\n - Different screen (bigger, e-paper?)\n - Fold screen connector under the screen\n - resistor network for the sd card\n - Wake up circuit\n - remove bottom-right hole\n - Add test points (I2S, SD card, I2C)\n - Lower the number of different values of capas and resistors\n\nDONE:\n - I2C extension port\n - SMD crystal\n - SMD battery connector\n
+TODO:\n - Different screen (bigger, e-paper?)\n - resistor network for the sd card\n - Lower the number of different values of capas and resistors\n\nDONE:\n - I2C extension port\n - SMD crystal\n - SMD battery connector\n - Different SD card slot\n - Change button layout and labels (smaller distance between button rows?)\n - Fold screen connector under the screen\n - Wake up circuit\n - remove bottom-right hole\n - Add test points (I2S, SD card, I2C)\n - Encoders filtering?\n
 Text Notes 650  5200 0    79   ~ 0
 Known problems:\n\nFixed:\n - DAC 1.8V VDDD\n - DAC couplings caps are in series with the chip \n   instead of going to GND\n - Voltage regulator footprint\n - Encoders footprints and hole size\n
 $Sheet

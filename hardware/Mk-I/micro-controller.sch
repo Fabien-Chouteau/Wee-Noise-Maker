@@ -209,7 +209,7 @@ F 3 "" H 9250 8250 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 2850 4100 0    60   Input ~ 0
-PLAY_WAKEUP
+Play_WKUP
 $Comp
 L C-RESCUE-wnm_mk_1 C12
 U 1 1 585F8833
@@ -497,19 +497,19 @@ Text GLabel 12850 6600 2    60   Input ~ 0
 I2S_MCLK
 Text GLabel 12850 6700 2    60   Input ~ 0
 SD_DAT0
-Text GLabel 12850 5500 2    60   Input ~ 0
+Text GLabel 12850 5200 2    60   Input ~ 0
 COL9
 Text GLabel 12850 5400 2    60   Input ~ 0
 ROW1
 Text GLabel 12850 5300 2    60   Input ~ 0
 ROW2
-Text GLabel 2850 7400 0    60   Input ~ 0
+Text GLabel 2850 7200 0    60   Input ~ 0
 COL8
-Text GLabel 2850 7000 0    60   Input ~ 0
+Text GLabel 2850 6900 0    60   Input ~ 0
 COL7
-Text GLabel 12850 3600 2    60   Input ~ 0
+Text GLabel 12850 3700 2    60   Input ~ 0
 COL6
-Text GLabel 12850 3200 2    60   Input ~ 0
+Text GLabel 12850 3500 2    60   Input ~ 0
 COL5
 Text GLabel 4950 9950 0    60   Input ~ 0
 SD_DAT2
@@ -527,21 +527,17 @@ Text GLabel 12850 6800 2    60   Input ~ 0
 SD_DAT1
 Text GLabel 12850 6900 2    60   Input ~ 0
 SD_DAT2
-Text GLabel 2850 5100 0    60   Input ~ 0
-Write
 Text GLabel 12850 7100 2    60   Input ~ 0
 SD_CLK
 Text GLabel 12850 4300 2    60   Input ~ 0
 SD_CMD
-Text GLabel 2850 5900 0    60   Input ~ 0
+Text GLabel 12850 3300 2    60   Input ~ 0
 COL4
-Text GLabel 2850 4500 0    60   Input ~ 0
+Text GLabel 12850 3100 2    60   Input ~ 0
 COL3
-Text GLabel 2850 4400 0    60   Input ~ 0
-B10
-Text GLabel 12850 6100 2    60   Input ~ 0
+Text GLabel 2850 6000 0    60   Input ~ 0
 COL2
-Text GLabel 12850 5900 2    60   Input ~ 0
+Text GLabel 12850 6400 2    60   Input ~ 0
 COL1
 $Comp
 L R-RESCUE-wnm_mk_1 R10
@@ -648,51 +644,47 @@ F 3 "" H 5450 10725 60  0001 C CNN
 	1    5450 10725
 	1    0    0    -1  
 $EndComp
-Text GLabel 2850 4600 0    60   Input ~ 0
-ENC_1_A
-Text GLabel 2850 4200 0    60   Input ~ 0
-ENC_1_B
-Text GLabel 2850 4700 0    60   Input ~ 0
-ENC_2_A
 Text GLabel 2850 4800 0    60   Input ~ 0
+ENC_1_A
+Text GLabel 2850 4700 0    60   Input ~ 0
+ENC_1_B
+Text GLabel 2850 4200 0    60   Input ~ 0
+ENC_2_A
+Text GLabel 2850 4600 0    60   Input ~ 0
 ENC_2_B
-Text GLabel 12850 7300 2    60   Input ~ 0
-ENC_1_SW
-Text GLabel 12850 7400 2    60   Input ~ 0
-ENC_2_SW
 $Comp
 L STM32_SWD_Connector U10
 U 1 1 58664887
-P 10250 9250
-F 0 "U10" H 10250 9250 60  0000 C CNN
-F 1 "STM32_SWD_Connector" V 10600 8600 60  0000 C CNN
-F 2 "stm32f4-disco:STM32_SWD_Connector_SMD" H 10250 9250 60  0001 C CNN
-F 3 "" H 10250 9250 60  0001 C CNN
-	1    10250 9250
+P 10250 8950
+F 0 "U10" H 10250 8950 60  0000 C CNN
+F 1 "STM32_SWD_Connector" V 10600 8300 60  0000 C CNN
+F 2 "stm32f4-disco:STM32_SWD_Connector_SMD" H 10250 8950 60  0001 C CNN
+F 3 "" H 10250 8950 60  0001 C CNN
+	1    10250 8950
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 9400 0    60   Input ~ 0
+Text GLabel 10000 9100 0    60   Input ~ 0
 3V3
 $Comp
 L GND-RESCUE-wnm_mk_1 #PWR030
 U 1 1 586649ED
-P 9900 9850
+P 9900 9550
 AR Path="/586649ED" Ref="#PWR030"  Part="1" 
 AR Path="/585DBE08/586649ED" Ref="#PWR022"  Part="1" 
-F 0 "#PWR022" H 9900 9850 30  0001 C CNN
-F 1 "GND" H 9900 9780 30  0001 C CNN
-F 2 "" H 9900 9850 60  0001 C CNN
-F 3 "" H 9900 9850 60  0001 C CNN
-	1    9900 9850
+F 0 "#PWR022" H 9900 9550 30  0001 C CNN
+F 1 "GND" H 9900 9480 30  0001 C CNN
+F 2 "" H 9900 9550 60  0001 C CNN
+F 3 "" H 9900 9550 60  0001 C CNN
+	1    9900 9550
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 9600 0    60   Input ~ 0
+Text GLabel 10000 9300 0    60   Input ~ 0
 SWCLK
-Text GLabel 10000 10000 0    60   Input ~ 0
+Text GLabel 10000 9700 0    60   Input ~ 0
 SWDIO
 Text GLabel 2000 2500 1    60   Input ~ 0
 NRST
-Text GLabel 10000 10200 0    60   Input ~ 0
+Text GLabel 10000 9900 0    60   Input ~ 0
 NRST
 Text GLabel 9100 1750 1    60   Input ~ 0
 VBAT_SENSE
@@ -719,7 +711,7 @@ Text GLabel 2100 1800 0    60   Input ~ 0
 BOOT0
 Text GLabel 2300 1800 2    60   Input ~ 0
 3V3
-Text GLabel 12850 7200 2    60   Input ~ 0
+Text GLabel 2850 4500 0    60   Input ~ 0
 Screen_Nreset
 Wire Wire Line
 	1950 2700 2850 2700
@@ -816,9 +808,9 @@ Connection ~ 5450 9800
 Connection ~ 5450 9500
 Connection ~ 5450 10250
 Wire Wire Line
-	9900 9850 9900 9800
+	9900 9550 9900 9500
 Wire Wire Line
-	9900 9800 10000 9800
+	9900 9500 10000 9500
 Wire Wire Line
 	2000 2500 2850 2500
 Wire Wire Line
@@ -957,12 +949,10 @@ Wire Wire Line
 	6850 10350 6850 10450
 Text GLabel 6900 10250 0    60   Input ~ 0
 SD_DETECT
-Text GLabel 3750 10150 0    60   Input ~ 0
-SD_DAT2
-Text GLabel 3750 10300 0    60   Input ~ 0
-SD_DAT3
-Text GLabel 3750 10450 0    60   Input ~ 0
-SD_CMD
+Text GLabel 10150 10650 0    60   Input ~ 0
+DBG_TX
+Text GLabel 10150 10800 0    60   Input ~ 0
+DBG_RX
 Text GLabel 3750 10750 0    60   Input ~ 0
 SD_DAT0
 Text GLabel 3750 10900 0    60   Input ~ 0
@@ -972,36 +962,25 @@ SD_CLK
 Text GLabel 3750 11050 0    60   Input ~ 0
 SD_DETECT
 $Comp
-L TEST TP_DAT2
+L TEST TP_DBG_TX1
 U 1 1 59EE5E47
-P 3750 10150
-F 0 "TP_DAT2" V 3750 10600 50  0000 C BNN
-F 1 "TEST" H 3750 10400 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10150 50  0001 C CNN
-F 3 "" H 3750 10150 50  0001 C CNN
-	1    3750 10150
+P 10150 10650
+F 0 "TP_DBG_TX1" V 10150 11200 50  0000 C BNN
+F 1 "TEST" H 10150 10900 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 10150 10650 50  0001 C CNN
+F 3 "" H 10150 10650 50  0001 C CNN
+	1    10150 10650
 	0    1    1    0   
 $EndComp
 $Comp
-L TEST TP_DAT3
+L TEST TP_DBG_RX1
 U 1 1 59EE61E0
-P 3750 10300
-F 0 "TP_DAT3" V 3800 10750 50  0000 C BNN
-F 1 "TEST" H 3750 10550 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10300 50  0001 C CNN
-F 3 "" H 3750 10300 50  0001 C CNN
-	1    3750 10300
-	0    1    1    0   
-$EndComp
-$Comp
-L TEST TP_CMD1
-U 1 1 59EE6254
-P 3750 10450
-F 0 "TP_CMD1" V 3800 10900 50  0000 C BNN
-F 1 "TEST" H 3750 10700 50  0000 C CNN
-F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 3750 10450 50  0001 C CNN
-F 3 "" H 3750 10450 50  0001 C CNN
-	1    3750 10450
+P 10150 10800
+F 0 "TP_DBG_RX1" V 10200 11350 50  0000 C BNN
+F 1 "TEST" H 10150 11050 50  0000 C CNN
+F 2 "Measurement_Points:Measurement_Point_Round-SMD-Pad_Small" H 10150 10800 50  0001 C CNN
+F 3 "" H 10150 10800 50  0001 C CNN
+	1    10150 10800
 	0    1    1    0   
 $EndComp
 $Comp
@@ -1048,4 +1027,38 @@ F 3 "" H 3750 11050 50  0001 C CNN
 	1    3750 11050
 	0    1    1    0   
 $EndComp
+Text GLabel 12850 5500 2    60   Input ~ 0
+BUTTON_ROW2
+Text GLabel 12850 5100 2    60   Input ~ 0
+BUTTON_COL11
+Text GLabel 2850 7400 0    60   Input ~ 0
+BUTTON_COL10
+Text GLabel 2850 7100 0    60   Input ~ 0
+BUTTON_ROW1
+Text GLabel 2850 7300 0    60   Input ~ 0
+BUTTON_COL9
+Text GLabel 2850 7000 0    60   Input ~ 0
+BUTTON_COL8
+Text GLabel 12850 3800 2    60   Input ~ 0
+BUTTON_COL7
+Text GLabel 12850 3600 2    60   Input ~ 0
+BUTTON_COL6
+Text GLabel 12850 3400 2    60   Input ~ 0
+BUTTON_COL5
+Text GLabel 12850 3200 2    60   Input ~ 0
+BUTTON_COL4
+Text GLabel 12850 6300 2    60   Input ~ 0
+BUTTON_COL1
+Text GLabel 2850 4300 0    60   Input ~ 0
+BUTTON_ROW3
+Text GLabel 12850 3000 2    60   Input ~ 0
+BUTTON_COL3
+Text GLabel 2850 5900 0    60   Input ~ 0
+BUTTON_COL2
+Text GLabel 12850 4900 2    60   Input ~ 0
+DBG_TX
+Text GLabel 12850 5000 2    60   Input ~ 0
+DBG_RX
+Text GLabel 2850 5100 0    60   Input ~ 0
+FS_ID
 $EndSCHEMATC

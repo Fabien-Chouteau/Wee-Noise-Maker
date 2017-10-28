@@ -395,7 +395,7 @@ $EndComp
 Text GLabel 7800 2675 0    60   Input ~ 0
 3V3
 Text GLabel 8850 3825 0    60   Input ~ 0
-Screen_NReset
+Screen_Nreset
 Text GLabel 8850 4025 0    60   Input ~ 0
 Audio_SCL
 Text GLabel 8850 4225 0    60   Input ~ 0
