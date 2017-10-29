@@ -696,20 +696,9 @@ Text Notes 9750 8750 0    157  ~ 0
 Debug port
 Text GLabel 2750 2300 1    60   Input ~ 0
 BOOT0
-$Comp
-L Jumper_NO_Small DFU_MODE1
-U 1 1 587582D9
-P 2200 1800
-F 0 "DFU_MODE1" H 2200 1950 50  0000 C CNN
-F 1 "Jumper_NO_Small" H 2250 1650 50  0000 C CNN
-F 2 "Buttons_Switches_SMD:SW_SPST_EVQP7A" H 2200 1800 50  0001 C CNN
-F 3 "" H 2200 1800 50  0000 C CNN
-	1    2200 1800
-	-1   0    0    1   
-$EndComp
-Text GLabel 2100 1800 0    60   Input ~ 0
+Text GLabel 1900 1750 2    60   Input ~ 0
 BOOT0
-Text GLabel 2300 1800 2    60   Input ~ 0
+Text GLabel 1300 1750 0    60   Input ~ 0
 3V3
 Text GLabel 2850 4500 0    60   Input ~ 0
 Screen_Nreset
@@ -1061,4 +1050,15 @@ Text GLabel 12850 5000 2    60   Input ~ 0
 DBG_RX
 Text GLabel 2850 5100 0    60   Input ~ 0
 FS_ID
+$Comp
+L SW_PUSH DFU_MODE1
+U 1 1 59F72914
+P 1600 1750
+F 0 "DFU_MODE1" H 1750 1860 50  0000 C CNN
+F 1 "SW_PUSH" H 1600 1670 50  0000 C CNN
+F 2 "Buttons_Switches_SMD:SW_SPST_EVQP7A" H 1600 1750 60  0001 C CNN
+F 3 "" H 1600 1750 60  0000 C CNN
+	1    1600 1750
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
