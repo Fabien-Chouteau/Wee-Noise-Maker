@@ -42,6 +42,8 @@ package body WNM.UI is
 
    procedure Set_FX (B : Buttons);
 
+   procedure Scan_Buttons;
+
    Default_Input_Mode : constant Input_Mode_Type := Note;
 
    FX_Is_On : array (Buttons) of Boolean := (others => False);
@@ -79,8 +81,8 @@ package body WNM.UI is
             case Evt is
                when On_Press =>
                   case B is
-                     when FX =>
-                        --  Switch to FX mode
+                     when Func =>
+                        --  Switch to Func mode
                         Current_Input_Mode := FX_Select;
                      when Play =>
                         Sequencer.Play_Pause;
@@ -88,11 +90,11 @@ package body WNM.UI is
                         Sequencer.Rec_Pressed;
                      when Keyboard_Buttons =>
                         Sequencer.On_Press (B);
-                     when Track_B =>
+                     when Track_Button =>
                         Current_Input_Mode := Track_Select;
-                     when Track_C =>
+                     when Pattern =>
                         Current_Input_Mode := Pattern_Select;
-                     when Track_E =>
+                     when Menu =>
                         if not GUI.Menu.In_Menu then
                            GUI.Menu.Root.Push_Root_Window;
                         end if;
@@ -142,7 +144,7 @@ package body WNM.UI is
                         null;
                   end case;
                when On_Release =>
-                  if B = FX then
+                  if B = Func then
                      Current_Input_Mode := Default_Input_Mode;
                   end if;
                when others =>
@@ -152,7 +154,7 @@ package body WNM.UI is
          when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Sequencer.Select_Track (B);
-            elsif B = Track_B and then Evt = On_Release then
+            elsif B = Track_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
          when Pattern_Select =>
@@ -160,7 +162,7 @@ package body WNM.UI is
                Current_Input_Mode := Pattern_Copy;
             elsif B in B1 .. B16 and then Evt = On_Press then
                Pattern_Sequencer.Add_To_Sequence (B);
-            elsif B = Track_C and then Evt = On_Release then
+            elsif B = Pattern and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -170,7 +172,7 @@ package body WNM.UI is
             elsif B in B1 .. B16 and then Evt = On_Press then
                Sequencer.Copy_Current_Patern (To => B);
                Pattern_Sequencer.Add_To_Sequence (B);
-            elsif B = Track_C and then Evt = On_Release then
+            elsif B = Pattern and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -190,6 +192,27 @@ package body WNM.UI is
       FX_Is_On (B) := not FX_Is_On (B);
    end Set_FX;
 
+   ------------------
+   -- Scan_Buttons --
+   ------------------
+
+   procedure Scan_Buttons is
+   begin
+
+      for Row in Row_Index loop
+         Row_To_Point (Row).Set;
+         for B in Buttons loop
+            if B /= Play and then Key_To_Address (B).Row = Row then
+               Key_State (B) :=
+                 (if Col_To_Point (Key_To_Address (B).Col).Set then Down else Up);
+            end if;
+         end loop;
+         Row_To_Point (Row).Clear;
+      end loop;
+
+      Key_State (Play) := (if Wakeup.Set then Down else Up);
+   end Scan_Buttons;
+
    -----------
    -- Start --
    -----------
@@ -202,21 +225,28 @@ package body WNM.UI is
 
       -- Buttons --
 
-      Config.Mode := Mode_In;
+      Config.Mode        := Mode_In;
       Config.Output_Type := Push_Pull;
-      Config.Resistors := Pull_Up;
+      Config.Resistors   := Pull_Down;
 
-      for Pt of Key_To_Point loop
+      for Pt of Col_To_Point loop
          Enable_Clock (Pt);
          Pt.Configure_IO (Config);
       end loop;
 
+      Config.Mode        := Mode_Out;
+      Config.Resistors   := Pull_Up;
+
+      for Pt of Row_To_Point loop
+         Enable_Clock (Pt);
+         Pt.Configure_IO (Config);
+         Pt.Clear;
+      end loop;
+
       Enable_Clock (Wakeup);
-      Config.Mode := Mode_Out;
-      Config.Output_Type := Push_Pull;
-      Config.Resistors := Floating;
+      Config.Mode        := Mode_In;
+      Config.Resistors   := Floating;
       Wakeup.Configure_IO (Config);
-      Wakeup.Clear;
 
       Set_True (UI_Task_Start);
    end Start;
@@ -265,12 +295,10 @@ package body WNM.UI is
               when B16       => In_Edit,
               when Rec       => not In_Pattern_Select,
               when Play      => True,
-              when FX        => False,
-              when Track_A   => False,
-              when Track_B   => False,
-              when Track_C   => False,
-              when Track_D   => False,
-              when Track_E   => False,
+              when Func      => False,
+              when Track_Button     => False,
+              when Pattern   => False,
+              when Menu      => False,
               when Encoder_L => True,
               when Encoder_R => True);
    end Has_Long_Press;
@@ -305,10 +333,9 @@ package body WNM.UI is
          Next_Start := Next_Start + Period;
          delay until Next_Start;
 
+         Scan_Buttons;
          --  Handle buttons
          for B in Buttons loop
-            Key_State (B) := (if Key_To_Point (B).Set then Up else Down);
-
             if Last_State (B) = Key_State (B) then
                --  The button didn't change, let's check if we are waiting for
                --  a long press event.
@@ -419,21 +446,9 @@ package body WNM.UI is
             when FX_Select =>
                --  The FX LED will be on if there's at least one FX enabled
 
-               for B in B4 .. B8 loop
-                  FX_Is_On (B) := (Quick_Synth.In_Solo
-                                   and then
-                                   Quick_Synth.Solo = (case B is
-                                        when B4 => Track_A,
-                                        when B5 => Track_B,
-                                        when B6 => Track_C,
-                                        when B7 => Track_D,
-                                        when others => Track_E));
-               end loop;
-
                for B in B1 .. B16 loop
                   if FX_Is_On (B) then
                      LED.Turn_On (B);
-                     LED.Turn_On (FX);
                   end if;
                end loop;
 

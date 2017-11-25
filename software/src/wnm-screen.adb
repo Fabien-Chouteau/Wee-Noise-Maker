@@ -33,7 +33,7 @@ with Giza.Colors;
 
 package body WNM.Screen is
 
-   Screen_Reset : STM32.GPIO.GPIO_Point renames PC13;
+   Screen_Reset : STM32.GPIO.GPIO_Point renames PA4;
 
    Screen : SSD1306_96x16_Screen (WNM.I2C.Port,
                                   Screen_Reset'Access,

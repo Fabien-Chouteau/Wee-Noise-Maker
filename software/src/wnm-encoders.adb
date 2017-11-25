@@ -33,7 +33,7 @@ package body  WNM.Encoders is
    ----------
 
    function Left_Diff return Integer is
-      Now : constant Integer := Integer (Current_Counter (Timer_L));
+      Now : constant Integer := -Integer (Current_Counter (Timer_L));
       Ret : constant Integer := Now - Last_Count_L;
    begin
       Last_Count_L := Now;
@@ -45,7 +45,7 @@ package body  WNM.Encoders is
    -----------
 
    function Right_Diff return Integer is
-      Now : constant Integer := Integer (Current_Counter (Timer_R));
+      Now : constant Integer := -Integer (Current_Counter (Timer_R));
       Ret : constant Integer := Now - Last_Count_R;
    begin
       Last_Count_R := Now;

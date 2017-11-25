@@ -35,24 +35,23 @@ package WNM.LED is
 
 private
 
-   type Row_Index is range 1 .. 3;
+   type Row_Index is range 1 .. 2;
    type Col_Index is range 1 .. 9;
 
    Row_To_Point : array (Row_Index) of GPIO_Point :=
      (1 => PD13,
-      2 => PD12,
-      3 => PD11);
+      2 => PD12);
 
    Col_To_Point : array (Col_Index) of GPIO_Point :=
-     (1 => PC0,
-      2 => PC2,
-      3 => PA4,
-      4 => PB0,
-      5 => PE9,
-      6 => PE13,
-      7 => PB11,
-      8 => PB15,
-      9 => PD14);
+     (1 => PC5,
+      2 => PB1,
+      3 => PE8,
+      4 => PE10,
+      5 => PE12,
+      6 => PE14,
+      7 => PB10,
+      8 => PB13,
+      9 => PD11);
 
    type LED_Address is record
       Row : Row_Index;
@@ -77,13 +76,7 @@ private
       B15     => (Row => 1, Col => 7),
       B16     => (Row => 1, Col => 8),
       Rec     => (Row => 1, Col => 9),
-      Play    => (Row => 2, Col => 9),
-      FX      => (Row => 3, Col => 9),
-      Track_A  => (Row => 3, Col => 4),
-      Track_B  => (Row => 3, Col => 5),
-      Track_C  => (Row => 3, Col => 6),
-      Track_D  => (Row => 3, Col => 7),
-      Track_E  => (Row => 3, Col => 8));
+      Play    => (Row => 2, Col => 9));
 
    LED_State : array (Buttons) of UInt8 := (others => 0);
 

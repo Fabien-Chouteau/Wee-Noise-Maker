@@ -99,8 +99,8 @@ package body WNM.LED is
    procedure Turn_On (LED_Addr : LED_Address)
    is
    begin
-      Row_To_Point (LED_Addr.Row).Clear;
-      Col_To_Point (LED_Addr.Col).Set;
+      Row_To_Point (LED_Addr.Row).Set;
+      Col_To_Point (LED_Addr.Col).Clear;
    end Turn_On;
 
    --------------
@@ -110,8 +110,8 @@ package body WNM.LED is
    procedure Turn_Off (LED_Addr : LED_Address)
    is
    begin
-      Row_To_Point (LED_Addr.Row).Set;
-      Col_To_Point (LED_Addr.Col).Clear;
+      Row_To_Point (LED_Addr.Row).Clear;
+      Col_To_Point (LED_Addr.Col).Set;
    end Turn_Off;
 
    -----------------------
@@ -142,15 +142,14 @@ package body WNM.LED is
             if LED_State (Current_LED) > 0 then
                Turn_On (LED_To_Address (Current_LED));
                Configure (LED_Timer,
-                          Prescaler => 100,
+                          Prescaler => 50,
                           Period => (case LED_State (Current_LED) is
-                                        when 1      => 50,
-                                        when 2      => 600,
-                                        when others => 1700));
+                                        when 1      => 700,
+                                        when others => 3000));
             else
                Configure (LED_Timer,
-                          Prescaler => 100,
-                          Period => 700);
+                          Prescaler => 50,
+                          Period => 500);
             end if;
 
          end if;

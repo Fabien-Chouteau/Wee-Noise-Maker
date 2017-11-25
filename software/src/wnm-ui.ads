@@ -45,33 +45,57 @@ package WNM.UI is
 
 private
 
-   Key_To_Point : constant array (Buttons) of GPIO_Point :=
-     (B1        => PC1,
-      B2        => PA2,
-      B3        => PC4,
-      B4        => PE7,
-      B5        => PE11,
-      B6        => PE15,
-      B7        => PB13,
-      B8        => PD9,
-      B9        => PC3,
-      B10       => PA3,
-      B11       => PC5,
-      B12       => PE8,
-      B13       => PE12,
-      B14       => PB10,
-      B15       => PB12,
-      B16       => PD10,
-      Rec       => PA10,
-      Play      => PC6,
-      FX        => PD15,
-      Track_A    => PB1,
-      Track_B    => PE10,
-      Track_C    => PE14,
-      Track_D    => PB14,
-      Track_E    => PD8,
-      Encoder_L => PC14,
-      Encoder_R => PC15);
+   type Row_Index is range 1 .. 3;
+   type Col_Index is range 1 .. 11;
+
+   Row_To_Point : array (Row_Index) of GPIO_Point :=
+     (1 => PB12,
+      2 => PD14,
+      3 => PA2);
+
+   Col_To_Point : array (Col_Index) of GPIO_Point :=
+     (1  => PC4,
+      2  => PB0,
+      3  => PE7,
+      4  => PE9,
+      5  => PE11,
+      6  => PE13,
+      7  => PE15,
+      8  => PB11,
+      9  => PB14,
+      10 => PB15,
+      11 => PD10);
+
+   type Key_Address is record
+      Row : Row_Index;
+      Col : Col_Index;
+   end record;
+
+   Key_To_Address : constant array (Buttons) of Key_Address :=
+     (B1        => (Row => 1, Col => 2),
+      B2        => (Row => 1, Col => 3),
+      B3        => (Row => 1, Col => 4),
+      B4        => (Row => 1, Col => 5),
+      B5        => (Row => 1, Col => 6),
+      B6        => (Row => 1, Col => 7),
+      B7        => (Row => 1, Col => 8),
+      B8        => (Row => 1, Col => 9),
+      B9        => (Row => 2, Col => 2),
+      B10       => (Row => 2, Col => 3),
+      B11       => (Row => 2, Col => 4),
+      B12       => (Row => 2, Col => 5),
+      B13       => (Row => 2, Col => 6),
+      B14       => (Row => 2, Col => 7),
+      B15       => (Row => 2, Col => 8),
+      B16       => (Row => 2, Col => 9),
+      Rec       => (Row => 2, Col => 10),
+      Play      => (Row => 1, Col => 1),  -- Play is actually not connected to the matrix...
+      Menu      => (Row => 1, Col => 10),
+      Func      => (Row => 2, Col => 11),
+      Track_Button     => (Row => 1, Col => 1),
+      Pattern   => (Row => 2, Col => 1),
+      Encoder_L => (Row => 3, Col => 1),
+      Encoder_R => (Row => 3, Col => 3));
 
    Wakeup : GPIO_Point renames PA0;
 
@@ -82,9 +106,6 @@ private
    type Raw_Key_State is (Up, Down);
 
    Key_State : array (Buttons) of Raw_Key_State := (others => Up);
-   --  FIXME: This array stays here for external access to the button state.
-   --  In the future we shouldn't have to export this info, the array could
-   --  then be moved in UI_Task.
 
    function Has_Long_Press (Button : Buttons) return Boolean;
    --  Can this button trigger a On_Long_Press event?
