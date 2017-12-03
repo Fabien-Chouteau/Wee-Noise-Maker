@@ -137,7 +137,7 @@ package body WNM.Sequencer is
    procedure Play_Pause is
    begin
       Current_Seq_State := Transition (Current_Seq_State, Play_Event);
-      if Current_Seq_State in Play | Play_And_Rec then
+      if Current_Seq_State in Play | Play_And_Rec | Edit | Play_And_Edit then
          Current_Step := Sequencer_Steps'First;
          Microstep := 0;
       end if;
