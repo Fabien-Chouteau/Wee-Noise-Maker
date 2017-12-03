@@ -21,7 +21,6 @@
 
 package WNM.Sequence is
 
-
    type Instance is private;
    type Ref is access all Instance;
 
