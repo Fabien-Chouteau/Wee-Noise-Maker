@@ -19,19 +19,18 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL;                  use HAL;
+with HAL;                   use HAL;
 with HAL.Bitmap;
-with WNM.GUI.Bitmap_Fonts;
+with WNM.GUI.Bitmap_Fonts;  use WNM.GUI.Bitmap_Fonts;
 with WNM.GUI.Parameters;
 with WNM.Screen;
 with WNM.UI;
-with WNM.Sequencer;
-use WNM.Sequencer;
+with WNM.Sequencer;         use WNM.Sequencer;
+with WNM.Pattern_Sequencer; use WNM.Pattern_Sequencer;
 with WNM.Master_Volume;
 with WNM.GUI.Menu;
-with Quick_Synth;
-use Quick_Synth;
-with WNM.Sample_Library; use WNM.Sample_Library;
+with Quick_Synth;           use Quick_Synth;
+with WNM.Sample_Library;    use WNM.Sample_Library;
 
 package body WNM.GUI.Update is
 
@@ -69,54 +68,68 @@ package body WNM.GUI.Update is
                                           Max   => 200);
          when WNM.UI.Track_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
-            WNM.GUI.Parameters.Print_Percentage (Slot  => WNM.GUI.Parameters.Up,
-                                                 Name  => "Volume",
-                                                 Value => Quick_Synth.Volume (WNM.Sequencer.Track));
-            WNM.GUI.Parameters.Print_Pan (Slot  => WNM.GUI.Parameters.Down,
-                                          Name  => "PAN",
-                                          Value => Quick_Synth.Pan (WNM.Sequencer.Track));
+            B := 1;
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Select track");
+            B := 1;
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 9,
+                   Str         => "Current:" & To_Value (Track)'Img);
          when WNM.UI.Pattern_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => "Select pattern");
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Chain patterns");
+            B := 1;
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 9,
+                   Str         => "Current:" & To_Value (Current_Pattern)'Img);
          when WNM.UI.Pattern_Copy =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => "Copy pattern");
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Copy pattern");
          when WNM.UI.Note =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => Image (Track));
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Trk:" & To_Value (Track)'Img);
+            B := 54;
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Pat:" & To_Value (Current_Pattern)'Img);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 8,
-                                        Str         => Entry_Name (Sample_Of_Track (Track)));
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 9,
+                   Str         => Entry_Name (Sample_Of_Track (Track)));
          when WNM.UI.FX_Select =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => "Enable FX",
-                                        Invert_From => 0);
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => "Enable FX",
+                   Invert_From => 0);
          when WNM.UI.Trig_Edit =>
             WNM.Screen.Buffer.Set_Source (HAL.Bitmap.White);
             B := 1;
-            WNM.GUI.Bitmap_Fonts.Print (Buffer      => WNM.Screen.Buffer.all,
-                                        X_Offset    => B,
-                                        Y_Offset    => 0,
-                                        Str         => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
-                                        Invert_From => 0);
+            Print (Buffer      => WNM.Screen.Buffer.all,
+                   X_Offset    => B,
+                   Y_Offset    => 0,
+                   Str         => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
+                   Invert_From => 0);
          end case;
       end if;
       WNM.Screen.Update;
