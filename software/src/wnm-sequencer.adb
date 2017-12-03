@@ -325,18 +325,13 @@ package body WNM.Sequencer is
    ------------------
 
    procedure Execute_Step is
-      Now : constant Time := Clock;
    begin
-
-      if Now < Next_Start then
-         --  Nothing to do yet...
-         return;
-      end if;
 
       Next_Start := Next_Start +
         (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
 
-      case Microstep is
+      if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
+         case Microstep is
 
          --  Begining of a new step
          when 0 =>
@@ -352,8 +347,9 @@ package body WNM.Sequencer is
             if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
                Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
             end if;
-      end case;
-      Microstep := Microstep + 1;
+         end case;
+         Microstep := Microstep + 1;
+      end if;
    end Execute_Step;
 
    -----------
