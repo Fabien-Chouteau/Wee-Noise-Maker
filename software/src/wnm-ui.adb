@@ -32,6 +32,7 @@ with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
+with WNM.GUI.Menu.Track_Settings;
 with WNM.Buttons;
 with WNM.LED;
 
@@ -358,7 +359,9 @@ package body WNM.UI is
                   WNM.Sequencer.Trig_Prev (Editting_Step);
                end if;
             when others =>
-               null;
+               if L_Enco /= 0 or else R_Enco /= 0 then
+                  GUI.Menu.Track_Settings.Push_Window;
+               end if;
             end case;
          end if;
 
