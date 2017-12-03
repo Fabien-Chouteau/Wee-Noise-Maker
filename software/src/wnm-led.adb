@@ -19,7 +19,76 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Interrupts.Names;
+
+with STM32.Timers; use STM32.Timers;
+with STM32.GPIO;   use STM32.GPIO;
+with STM32.Device; use STM32.Device;
+with HAL;          use HAL;
+
 package body WNM.LED is
+
+   type Row_Index is range 1 .. 2;
+   type Col_Index is range 1 .. 9;
+
+   Row_To_Point : array (Row_Index) of GPIO_Point :=
+     (1 => PD13,
+      2 => PD12);
+
+   Col_To_Point : array (Col_Index) of GPIO_Point :=
+     (1 => PC5,
+      2 => PB1,
+      3 => PE8,
+      4 => PE10,
+      5 => PE12,
+      6 => PE14,
+      7 => PB10,
+      8 => PB13,
+      9 => PD11);
+
+   type LED_Address is record
+      Row : Row_Index;
+      Col : Col_Index;
+   end record;
+
+   LED_To_Address : constant array (LEDs) of LED_Address :=
+     (B1      => (Row => 2, Col => 1),
+      B2      => (Row => 2, Col => 2),
+      B3      => (Row => 2, Col => 3),
+      B4      => (Row => 2, Col => 4),
+      B5      => (Row => 2, Col => 5),
+      B6      => (Row => 2, Col => 6),
+      B7      => (Row => 2, Col => 7),
+      B8      => (Row => 2, Col => 8),
+      B9      => (Row => 1, Col => 1),
+      B10     => (Row => 1, Col => 2),
+      B11     => (Row => 1, Col => 3),
+      B12     => (Row => 1, Col => 4),
+      B13     => (Row => 1, Col => 5),
+      B14     => (Row => 1, Col => 6),
+      B15     => (Row => 1, Col => 7),
+      B16     => (Row => 1, Col => 8),
+      Rec     => (Row => 1, Col => 9),
+      Play    => (Row => 2, Col => 9));
+
+   LED_State : array (LEDs) of UInt8 := (others => 0);
+
+   LED_Timer : STM32.Timers.Timer renames Timer_7;
+
+   protected LED_Timer_Handler is
+      pragma Interrupt_Priority;
+
+   private
+
+      Current_LED : LEDs := LEDs'First;
+
+      procedure IRQ_Handler;
+      pragma Attach_Handler (IRQ_Handler, Ada.Interrupts.Names.TIM7_Interrupt);
+
+   end LED_Timer_Handler;
+
+   --  LED_Timer_Handler is only referenced by the interrupt handler
+   pragma Unreferenced (LED_Timer_Handler);
 
    procedure Turn_On (LED_Addr : LED_Address) with Inline_Always;
    procedure Turn_Off (LED_Addr : LED_Address) with Inline_Always;

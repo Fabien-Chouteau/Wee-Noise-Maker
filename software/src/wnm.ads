@@ -25,26 +25,24 @@ with MIDI;
 
 package WNM is
 
-   type Buttons is (B1, B2, B3, B4, B5, B6, B7, B8,
-                    B9, B10, B11, B12, B13, B14, B15, B16,
-                    Rec, Play, Menu, Func, Track_Button, Pattern,
-                    Encoder_L, Encoder_R);
+   type Button is (B1, B2, B3, B4, B5, B6, B7, B8,
+                   B9, B10, B11, B12, B13, B14, B15, B16,
+                   Rec, Play, Menu, Func, Track_Button, Pattern,
+                   Encoder_L, Encoder_R);
 
-   subtype Keyboard_Buttons is Buttons range B1 .. B16;
+   subtype Keyboard_Button is Button range B1 .. B16;
 
    type Keyboard_Value is range 1 .. 16;
 
-   subtype LEDs is Buttons range B1 .. Play;
+   subtype LEDs is Button range B1 .. Play;
 
-   function To_Value (B : Keyboard_Buttons) return Keyboard_Value;
-   function To_Button (V : Keyboard_Value) return Keyboard_Buttons;
+   function To_Value (B : Keyboard_Button) return Keyboard_Value;
+   function To_Button (V : Keyboard_Value) return Keyboard_Button;
 
-   subtype Tracks is Keyboard_Buttons;
-   subtype Patterns is Keyboard_Buttons;
+   subtype Tracks is Keyboard_Button;
+   subtype Patterns is Keyboard_Button;
 
    type Trigger is (None, Always, Percent_25, Percent_50, Percent_75);
-
-   function Image (Track : Tracks) return String;
 
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;

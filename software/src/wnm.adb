@@ -25,7 +25,7 @@ package body WNM is
    -- To_Value --
    --------------
 
-   function To_Value (B : Keyboard_Buttons) return Keyboard_Value is
+   function To_Value (B : Keyboard_Button) return Keyboard_Value is
    begin
       return Keyboard_Value (B'Enum_Rep - B1'Enum_Rep + 1);
    end To_Value;
@@ -34,7 +34,7 @@ package body WNM is
    -- To_Button --
    ---------------
 
-   function To_Button (V : Keyboard_Value) return Keyboard_Buttons
+   function To_Button (V : Keyboard_Value) return Keyboard_Button
    is (case V is
           when 1  => B1,
           when 2  => B2,
@@ -52,29 +52,6 @@ package body WNM is
           when 14 => B14,
           when 15 => B15,
           when 16 => B16);
-
-   -----------
-   -- Image --
-   -----------
-
-   function Image (Track : Tracks) return String
-   is ("Track " & (case Track is
-                      when B1  => "1",
-                      when B2  => "2",
-                      when B3  => "3",
-                      when B4  => "4",
-                      when B5  => "5",
-                      when B6  => "6",
-                      when B7  => "7",
-                      when B8  => "8",
-                      when B9  => "9",
-                      when B10 => "10",
-                      when B11 => "11",
-                      when B12 => "12",
-                      when B13 => "13",
-                      when B14 => "14",
-                      when B15 => "15",
-                      when B16 => "16"));
 
    --------------
    -- To_Track --

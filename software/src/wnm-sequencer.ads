@@ -43,9 +43,9 @@ package WNM.Sequencer is
 
    procedure Rec_Release;
 
-   procedure On_Press (Button : Keyboard_Buttons);
+   procedure On_Press (Button : Keyboard_Button);
 
-   procedure On_Release (Button : Keyboard_Buttons);
+   procedure On_Release (Button : Keyboard_Button);
 
    procedure Select_Track (Track : Tracks);
    --  Select the current track

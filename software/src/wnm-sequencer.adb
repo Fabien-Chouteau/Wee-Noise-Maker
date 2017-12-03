@@ -174,7 +174,7 @@ package body WNM.Sequencer is
    -- On_Press --
    --------------
 
-   procedure On_Press (Button : Keyboard_Buttons) is
+   procedure On_Press (Button : Keyboard_Button) is
    begin
       case Current_Seq_State is
          when Pause | Play =>
@@ -198,7 +198,7 @@ package body WNM.Sequencer is
    -- On_Release --
    ----------------
 
-   procedure On_Release (Button : Keyboard_Buttons) is
+   procedure On_Release (Button : Keyboard_Button) is
    begin
       null;
    end On_Release;

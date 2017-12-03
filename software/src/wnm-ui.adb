@@ -32,21 +32,20 @@ with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
+with WNM.Buttons;
 with WNM.LED;
 
 package body WNM.UI is
 
    UI_Task_Start   : Suspension_Object;
 
-   procedure Signal_Event (B : Buttons; Evt : Buttton_Event);
+   procedure Signal_Event (B : Button; Evt : Buttton_Event);
 
-   procedure Set_FX (B : Buttons);
-
-   procedure Scan_Buttons;
+   procedure Set_FX (B : Keyboard_Button);
 
    Default_Input_Mode : constant Input_Mode_Type := Note;
 
-   FX_Is_On : array (Buttons) of Boolean := (others => False);
+   FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
    Editting_Step : Sequencer_Steps := 1;
@@ -62,7 +61,7 @@ package body WNM.UI is
    -- Signal_Event --
    ------------------
 
-   procedure Signal_Event (B : Buttons; Evt : Buttton_Event) is
+   procedure Signal_Event (B : Button; Evt : Buttton_Event) is
    begin
       if GUI.Menu.In_Menu and then Evt = On_Press then
          if B = Encoder_L then
@@ -88,7 +87,7 @@ package body WNM.UI is
                         Sequencer.Play_Pause;
                      when Rec =>
                         Sequencer.Rec_Pressed;
-                     when Keyboard_Buttons =>
+                     when Keyboard_Button =>
                         Sequencer.On_Press (B);
                      when Track_Button =>
                         Current_Input_Mode := Track_Select;
@@ -115,7 +114,7 @@ package body WNM.UI is
                   end case;
                when On_Release =>
                   case B is
-                     when Keyboard_Buttons =>
+                     when Keyboard_Button =>
                         --  Release note or octave Up/Down
                         Sequencer.On_Release (B);
                      when Rec =>
@@ -138,7 +137,7 @@ package body WNM.UI is
             case Evt is
                when On_Press =>
                   case B is
-                     when B1 .. B16 =>
+                     when Keyboard_Button =>
                         Set_FX (B);
                      when others =>
                         null;
@@ -187,76 +186,19 @@ package body WNM.UI is
    -- Set_FX --
    ------------
 
-   procedure Set_FX (B : Buttons) is
+   procedure Set_FX (B : Keyboard_Button) is
    begin
       FX_Is_On (B) := not FX_Is_On (B);
    end Set_FX;
-
-   ------------------
-   -- Scan_Buttons --
-   ------------------
-
-   procedure Scan_Buttons is
-   begin
-
-      for Row in Row_Index loop
-         Row_To_Point (Row).Set;
-         for B in Buttons loop
-            if B /= Play and then Key_To_Address (B).Row = Row then
-               Key_State (B) :=
-                 (if Col_To_Point (Key_To_Address (B).Col).Set then Down else Up);
-            end if;
-         end loop;
-         Row_To_Point (Row).Clear;
-      end loop;
-
-      Key_State (Play) := (if Wakeup.Set then Down else Up);
-   end Scan_Buttons;
 
    -----------
    -- Start --
    -----------
 
    procedure Start is
-      Config : GPIO_Port_Configuration;
    begin
-
-      Config.Speed := Speed_2MHz;
-
-      -- Buttons --
-
-      Config.Mode        := Mode_In;
-      Config.Output_Type := Push_Pull;
-      Config.Resistors   := Pull_Down;
-
-      for Pt of Col_To_Point loop
-         Enable_Clock (Pt);
-         Pt.Configure_IO (Config);
-      end loop;
-
-      Config.Mode        := Mode_Out;
-      Config.Resistors   := Pull_Up;
-
-      for Pt of Row_To_Point loop
-         Enable_Clock (Pt);
-         Pt.Configure_IO (Config);
-         Pt.Clear;
-      end loop;
-
-      Enable_Clock (Wakeup);
-      Config.Mode        := Mode_In;
-      Config.Resistors   := Floating;
-      Wakeup.Configure_IO (Config);
-
       Set_True (UI_Task_Start);
    end Start;
-
-   ----------------
-   -- Is_Pressed --
-   ----------------
-
-   function Is_Pressed (B : Buttons) return Boolean is
-      (Key_State (B) = Down);
 
    ---------------------------
    -- Current_Editting_Trig --
@@ -269,14 +211,14 @@ package body WNM.UI is
    -- Has_Long_Press --
    --------------------
 
-   function Has_Long_Press (Button : Buttons) return Boolean is
+   function Has_Long_Press (B : Button) return Boolean is
 
       In_Edit : constant Boolean := Sequencer.State in Play_And_Edit | Edit;
 
       In_Pattern_Select : constant Boolean :=
         Current_Input_Mode in Pattern_Select | Pattern_Copy;
    begin
-      return (case Button is
+      return (case B is
               when B1        => In_Edit,
               when B2        => In_Edit,
               when B3        => In_Edit,
@@ -314,13 +256,16 @@ package body WNM.UI is
    end UI_Task;
 
    task body UI_Task is
+
+      use Buttons;
+
       Period     : Time_Span renames UI_Task_Period;
 
       Next_Start : Time;
       Now        : Time renames Next_Start;
-      Last_State    : array (Buttons) of Raw_Key_State := (others => Up);
-      Pressed_Since : array (Buttons) of Time := (others => Time_First);
-      Last_Event    : array (Buttons) of Buttton_Event := (others => On_Release);
+      Last_State    : array (Button) of Buttons.Raw_Button_State := (others => Up);
+      Pressed_Since : array (Button) of Time := (others => Time_First);
+      Last_Event    : array (Button) of Buttton_Event := (others => On_Release);
 
       L_Enco : Integer;
       R_Enco : Integer;
@@ -333,15 +278,15 @@ package body WNM.UI is
          Next_Start := Next_Start + Period;
          delay until Next_Start;
 
-         Scan_Buttons;
+         Buttons.Scan;
          --  Handle buttons
-         for B in Buttons loop
-            if Last_State (B) = Key_State (B) then
+         for B in Button loop
+            if Last_State (B) = State (B) then
                --  The button didn't change, let's check if we are waiting for
                --  a long press event.
                if Has_Long_Press (B)
                  and then
-                   Key_State (B) = Down
+                   State (B) = Down
                  and then
                    Last_Event (B) = Waiting_For_Long_Press
                  and then
@@ -351,7 +296,7 @@ package body WNM.UI is
                   Signal_Event (B, Last_Event (B));
                end if;
 
-            elsif Key_State (B) = Down then
+            elsif State (B) = Down then
                --  Button was justed pressed
 
                if Has_Long_Press (B) then
@@ -379,7 +324,7 @@ package body WNM.UI is
                Signal_Event (B, Last_Event (B));
             end if;
 
-            Last_State (B) := Key_State (B);
+            Last_State (B) := State (B);
          end loop;
 
          --------------
