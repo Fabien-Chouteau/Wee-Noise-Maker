@@ -347,11 +347,11 @@ package body WNM.UI is
          else
             case Current_Input_Mode is
             when Volume_BPM =>
-               WNM.Sequencer.Change_BPM (R_Enco * 5);
-               WNM.Master_Volume.Change (L_Enco * 5);
+               WNM.Sequencer.Change_BPM (R_Enco);
+               WNM.Master_Volume.Change (L_Enco);
             when Track_Select =>
-               Quick_Synth.Change_Pan (Sequencer.Track, R_Enco * 10);
-               Quick_Synth.Change_Volume (Sequencer.Track, L_Enco * 10);
+               Quick_Synth.Change_Pan (Sequencer.Track, R_Enco);
+               Quick_Synth.Change_Volume (Sequencer.Track, L_Enco);
             when Trig_Edit =>
                if L_Enco > 0 then
                   WNM.Sequencer.Trig_Next (Editting_Step);
