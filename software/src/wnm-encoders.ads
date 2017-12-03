@@ -19,35 +19,11 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with STM32.Device;
-private with STM32.GPIO;
-private with STM32.Timers;
-
 package WNM.Encoders
   with Elaborate_Body
 is
 
    function Left_Diff return Integer;
    function Right_Diff return Integer;
-
-private
-
-   use STM32.Device;
-   use STM32.GPIO;
-   use STM32.Timers;
-
-   Point_L_A : constant GPIO_Point := PA6;
-   Point_L_B : constant GPIO_Point := PA7;
-
-   Point_R_A : constant GPIO_Point := PA5;
-   Point_R_B : constant GPIO_Point := PA1;
-
-   Timer_L : Timer renames Timer_3;
-   Timer_R : Timer renames Timer_2;
-
-   AF_L : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM3_2;
-   AF_R : constant STM32.GPIO_Alternate_Function := GPIO_AF_TIM2_1;
-
-   Capture_Filter : constant Timer_Input_Capture_Filter := 6;
 
 end WNM.Encoders;
