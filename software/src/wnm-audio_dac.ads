@@ -24,4 +24,6 @@ package WNM.Audio_DAC is
    type DAC_Volume is range 0 .. 100;
    procedure Set_Volume (Volume : DAC_Volume);
 
+   procedure Power_Down;
+
 end WNM.Audio_DAC;

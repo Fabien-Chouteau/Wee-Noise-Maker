@@ -19,6 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Power_Control;
 with WNM.GUI.Menu.Drawing;           use WNM.GUI.Menu.Drawing;
 with WNM.GUI.Menu.Sample_Select;     use WNM.GUI.Menu.Sample_Select;
 with WNM.GUI.Menu.Text_Dialog;       use WNM.GUI.Menu.Text_Dialog;
@@ -35,7 +36,8 @@ package body WNM.GUI.Menu.Root is
           when Test_Text_Input => "Test text input",
           when Load            => "Load",
           when Save            => "Save",
-          when Settings        => "Settings");
+          when Settings        => "Settings",
+          when Shutdown        => "Shutdown");
 
    ----------------------
    -- Push_Root_Window --
@@ -80,6 +82,8 @@ package body WNM.GUI.Menu.Root is
                when Test_Text_Input =>
                   Text_Dialog.Set_Title ("Enter some text");
                   Text_Dialog.Push_Window;
+               when Shutdown =>
+                  WNM.Power_Control.Power_Down;
                when others =>
                   null;
             end case;

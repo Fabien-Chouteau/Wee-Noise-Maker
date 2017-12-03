@@ -105,6 +105,17 @@ package body WNM.Screen is
       Screen.Turn_On;
    end Wakeup;
 
+   ----------------
+   -- Power_Down --
+   ----------------
+
+   procedure Power_Down is
+   begin
+      Sleep;
+      Screen_Reset.Clear;
+   end Power_Down;
+
+
    ------------
    -- Update --
    ------------

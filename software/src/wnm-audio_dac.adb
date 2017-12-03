@@ -395,6 +395,26 @@ package body WNM.Audio_DAC is
       DAC_Dev.Set_Headphones_Volume (HP_Vol, HP_Vol);
    end Set_Volume;
 
+   ----------------
+   -- Power_Down --
+   ----------------
+
+   procedure Power_Down is
+   begin
+      DAC_Dev.Set_Analog_Power (VAG_PowerUp               => False,
+                                Reftop_PowerUp            => False,
+                                Headphone_PowerUp         => False,
+                                DAC_PowerUp               => False,
+                                Capless_Headphone_PowerUp => False,
+                                ADC_PowerUp               => False);
+
+      DAC_Dev.Set_Power_Control (ADC     => Off,
+                                 DAC     => Off,
+                                 DAP     => Off,
+                                 I2S_Out => Off,
+                                 I2S_In  => Off);
+   end Power_Down;
+
 begin
    Initialize;
 end WNM.Audio_DAC;

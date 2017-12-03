@@ -19,37 +19,23 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI.Menu.Root is
+with STM32.Power_Control;
+with WNM.Screen;
+with WNM.Audio_DAC;
 
-   procedure Push_Root_Window;
+package body WNM.Power_Control is
 
-private
+   ----------------
+   -- Power_Down --
+   ----------------
 
-   type Menu_Items is (Create_Sample,
-                       Change_Sample,
-                       Test_Text_Input,
-                       Load,
-                       Save,
-                       Settings,
-                       Shutdown);
+   procedure Power_Down is
+   begin
+      WNM.Screen.Power_Down;
+      WNM.Audio_DAC.Power_Down;
 
-   type Root_Menu is new Menu_Window with record
-      Item : Menu_Items;
-   end record;
+      STM32.Power_Control.Enable_Wakeup_Pin;
+      STM32.Power_Control.Enter_Standby_Mode;
+   end Power_Down;
 
-   overriding
-   procedure Draw (This   : in out Root_Menu;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Root_Menu;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Root_Menu);
-
-   overriding
-   procedure On_Focus (This       : in out Root_Menu;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Root;
+end WNM.Power_Control;

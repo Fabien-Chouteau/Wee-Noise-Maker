@@ -19,37 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI.Menu.Root is
-
-   procedure Push_Root_Window;
-
-private
-
-   type Menu_Items is (Create_Sample,
-                       Change_Sample,
-                       Test_Text_Input,
-                       Load,
-                       Save,
-                       Settings,
-                       Shutdown);
-
-   type Root_Menu is new Menu_Window with record
-      Item : Menu_Items;
-   end record;
-
-   overriding
-   procedure Draw (This   : in out Root_Menu;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
-
-   overriding
-   procedure On_Event (This  : in out Root_Menu;
-                       Event : Menu_Event);
-
-   overriding
-   procedure On_Pushed (This  : in out Root_Menu);
-
-   overriding
-   procedure On_Focus (This       : in out Root_Menu;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Root;
+package WNM.Power_Control is
+   procedure Power_Down;
+end WNM.Power_Control;

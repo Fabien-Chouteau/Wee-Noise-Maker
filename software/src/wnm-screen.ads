@@ -35,6 +35,8 @@ package WNM.Screen is
    procedure Sleep;
    procedure Wakeup;
 
+   procedure Power_Down;
+
 private
 
    type Screen_Mode is (Text, Parameter);
