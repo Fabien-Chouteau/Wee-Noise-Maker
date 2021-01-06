@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                  Copyright (C) 2016-2021 Fabien Chouteau                  --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -18,8 +18,6 @@
 --    along with We Noise Maker. If not, see <http://www.gnu.org/licenses/>. --
 --                                                                           --
 -------------------------------------------------------------------------------
-
-with HAL;
 
 package WNM.GUI.Update is
 

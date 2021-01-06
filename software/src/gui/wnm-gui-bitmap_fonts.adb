@@ -19,10 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Giza.Bitmaps.Indexed_1bit;
-with Giza.Colors;
-with HAL.Bitmap;                use HAL.Bitmap;
 with font_5x7;
+
+with WNM.Screen;
+use WNM;
 
 package body WNM.GUI.Bitmap_Fonts is
 
@@ -31,8 +31,7 @@ package body WNM.GUI.Bitmap_Fonts is
    -----------
 
    procedure Print
-     (Buffer      : in out HAL.Bitmap.Bitmap_Buffer'Class;
-      X_Offset    : in out Integer;
+     (X_Offset    : in out Integer;
       Y_Offset    : Integer;
       C           : Character;
       Invert_From : Integer := 96;
@@ -49,13 +48,15 @@ package body WNM.GUI.Bitmap_Fonts is
       -----------
 
       function Color (X, Y : Integer) return Boolean is
-         Giza_Color : Giza.Colors.Color;
-         use type Giza.Colors.RGB_Component;
+         type Bit_Array is array (Positive range <>) of Boolean
+           with Pack;
+
+         Data : Bit_Array (1 .. font_5x7.BMP.W * font_5x7.BMP.H)
+           with Address => font_5x7.BMP.Data'Address;
+
       begin
          if Index in 0 .. 93 and then X in 0 .. 4 and then Y in 0 .. 6 then
-            Giza_Color := Giza.Bitmaps.Indexed_1bit.Get_Pixel
-              (font_5x7.Data, (X + Bitmap_Offset, Y));
-            return Giza_Color.R /= 0;
+            return not Data (1 + X + Bitmap_Offset + Y * font_5x7.BMP.W);
          else
             return False;
          end if;
@@ -73,15 +74,14 @@ package body WNM.GUI.Bitmap_Fonts is
          for Y in 0 .. 6 loop
 
             if Y + Y_Offset in 0 .. 15 then
-               if X + X_Offset > Buffer.Width - 1 then
+               if X + X_Offset > Screen.Width - 1 then
                   exit Draw_Loop;
                elsif X + X_Offset >= 0
                  and then
-                   Y + Y_Offset in 0 .. Buffer.Height - 1
+                   Y + Y_Offset in 0 .. Screen.Height - 1
                then
-                  Buffer.Set_Pixel ((X + X_Offset, Y + Y_Offset),
-                                    (if Color (X, Y) xor Invert (X + X_Offset)
-                                     then White else Black));
+                  Screen.Set_Pixel ((X + X_Offset, Y + Y_Offset),
+                                    Color (X, Y) xor Invert (X + X_Offset));
                end if;
             end if;
          end loop;
@@ -95,8 +95,7 @@ package body WNM.GUI.Bitmap_Fonts is
    -----------
 
    procedure Print
-     (Buffer      : in out HAL.Bitmap.Bitmap_Buffer'Class;
-      X_Offset    : in out Integer;
+     (X_Offset    : in out Integer;
       Y_Offset    : Integer;
       Str         : String;
       Invert_From : Integer := 96;
@@ -108,18 +107,16 @@ package body WNM.GUI.Bitmap_Fonts is
       if Invert_From < X_Offset then
          Stop := Integer'Min (X_Offset, Invert_To);
 
-         Buffer.Set_Source (White);
-         Buffer.Fill_Rect ((Position => (Invert_From, Y_Offset),
+         Screen.Fill_Rect ((Position => (Invert_From, Y_Offset),
                             Width    => Stop - Invert_From,
                             Height   => 7));
       end if;
 
       for C of Str loop
-         if X_Offset > Buffer.Width then
+         if X_Offset > Screen.Width then
             return;
          end if;
-         Print (Buffer,
-                X_Offset,
+         Print (X_Offset,
                 Y_Offset,
                 C,
                 Invert_From,
@@ -129,8 +126,7 @@ package body WNM.GUI.Bitmap_Fonts is
       if Invert_From < 96 and then X_Offset < Invert_To then
          Start :=  Integer'Max (X_Offset, Invert_From);
 
-         Buffer.Set_Source (White);
-         Buffer.Fill_Rect ((Position => (Start, Y_Offset),
+         Screen.Fill_Rect ((Position => (Start, Y_Offset),
                             Width    => Invert_To - Start,
                             Height   => 7));
       end if;

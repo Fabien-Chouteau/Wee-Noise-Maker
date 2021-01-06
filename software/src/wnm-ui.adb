@@ -131,9 +131,9 @@ package body WNM.UI is
                WNM.Pattern_Sequencer.End_Sequence_Edit;
             end if;
 
-            if B in B1 .. B16 and Evt = On_Press then
-               Quick_Synth.Toggle_Mute (B);
-            end if;
+            --  if B in B1 .. B16 and Evt = On_Press then
+            --     Quick_Synth.Toggle_Mute (B);
+            --  end if;
          when FX_Select =>
             case Evt is
                when On_Press =>
@@ -332,8 +332,8 @@ package body WNM.UI is
          -- Encoders --
          --------------
 
-         L_Enco := WNM.Encoders.Left_Diff;
-         R_Enco := WNM.Encoders.Right_Diff;
+         L_Enco := WNM.Buttons.Left_Diff;
+         R_Enco := WNM.Buttons.Right_Diff;
 
          if GUI.Menu.In_Menu then
             if L_Enco /= 0 then
@@ -350,8 +350,9 @@ package body WNM.UI is
                WNM.Sequencer.Change_BPM (R_Enco);
                WNM.Master_Volume.Change (L_Enco);
             when Track_Select =>
-               Quick_Synth.Change_Pan (Sequencer.Track, R_Enco);
-               Quick_Synth.Change_Volume (Sequencer.Track, L_Enco);
+               null;
+               --  Quick_Synth.Change_Pan (Sequencer.Track, R_Enco);
+               --  Quick_Synth.Change_Volume (Sequencer.Track, L_Enco);
             when Trig_Edit =>
                if L_Enco > 0 then
                   WNM.Sequencer.Trig_Next (Editting_Step);

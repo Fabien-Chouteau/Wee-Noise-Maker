@@ -61,22 +61,19 @@ package body WNM.GUI.Menu.Text_Dialog is
    ----------
 
    overriding procedure Draw
-     (This   : in out Text_Dialog_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Text_Dialog_Window)
    is
       X        : Integer := 1;
       Select_X : constant Integer := X + (This.Index - This.Text'First) * 6;
    begin
       case This.Mode is
          when Text_Mode =>
-            Print (Buffer      => Screen.all,
-                   X_Offset    => X,
+            Print (X_Offset    => X,
                    Y_Offset    => 0,
                    Str         => Dialog_Title);
 
             X := 1;
-            Print (Buffer      => Screen.all,
-                   X_Offset    => X,
+            Print (X_Offset    => X,
                    Y_Offset    => 9,
                    Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1),
                    Invert_From => (Select_X - 1),
@@ -84,13 +81,11 @@ package body WNM.GUI.Menu.Text_Dialog is
 
          when Confirm_Mode =>
             X := 1;
-            Print (Buffer      => Screen.all,
-                   X_Offset    => X,
+            Print (X_Offset    => X,
                    Y_Offset    => 0,
                    Str         => "Confirm? : " & (if This.Confirm then "Yes" else "No"));
             X := 1;
-            Print (Buffer      => Screen.all,
-                   X_Offset    => X,
+            Print (X_Offset    => X,
                    Y_Offset    => 9,
                    Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1));
       end case;

@@ -23,7 +23,4 @@ package WNM.Encoders
   with Elaborate_Body
 is
 
-   function Left_Diff return Integer;
-   function Right_Diff return Integer;
-
-end WNM.Encoders;
+ end WNM.Encoders;

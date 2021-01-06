@@ -19,7 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with File_IO; use File_IO;
+--  with File_IO; use File_IO;
 
 package body WNM.Sample_Library is
 
@@ -213,36 +213,38 @@ package body WNM.Sample_Library is
    -----------------
 
    procedure Load_Folder (Folder : Sample_Folders) is
-
-      Path   : constant String := Folder_Full_Path (Folder);
-      DD     : Directory_Descriptor;
-      Status : Status_Code;
-      Unref  : Sample_Entry_Index with Unreferenced;
    begin
-      Status := Open (DD, Path);
-
-      if Status /= OK then
-         --  The folder is not here but we do not report any error
-         return;
-      end if;
-
-      loop
-         declare
-            DE : constant Directory_Entry := Read (DD);
-         begin
-
-            exit when
-                DE = Invalid_Dir_Entry
-              or else
-                Last_Entry = Sample_Entry_Index'Last;
-
-            if Ext_Is_Raw (DE.Name) then
-               Unref := Add_Sample (Folder, DE.Name (DE.Name'First .. DE.Name'Last - 4));
-            end if;
-         end;
-      end loop;
-
-      Close (DD);
+      null;
+   --
+   --     Path   : constant String := Folder_Full_Path (Folder);
+   --     DD     : Directory_Descriptor;
+   --     Status : Status_Code;
+   --     Unref  : Sample_Entry_Index with Unreferenced;
+   --  begin
+   --     Status := Open (DD, Path);
+   --
+   --     if Status /= OK then
+   --        --  The folder is not here but we do not report any error
+   --        return;
+   --     end if;
+   --
+   --     loop
+   --        declare
+   --           DE : constant Directory_Entry := Read (DD);
+   --        begin
+   --
+   --           exit when
+   --               DE = Invalid_Dir_Entry
+   --             or else
+   --               Last_Entry = Sample_Entry_Index'Last;
+   --
+   --           if Ext_Is_Raw (DE.Name) then
+   --              Unref := Add_Sample (Folder, DE.Name (DE.Name'First .. DE.Name'Last - 4));
+   --           end if;
+   --        end;
+   --     end loop;
+   --
+   --     Close (DD);
    end Load_Folder;
 
    ----------

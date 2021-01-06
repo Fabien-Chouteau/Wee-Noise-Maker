@@ -19,12 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;
-
 package WNM.GUI.Menu is
 
    function In_Menu return Boolean;
-   procedure Draw (Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw;
 
    type Menu_Event_Kind is (Left_Press,
                             Right_Press,
@@ -48,8 +46,7 @@ package WNM.GUI.Menu is
 
    type Any_Menu_Window is access all Menu_Window'Class;
 
-   procedure Draw (This   : in out Menu_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+   procedure Draw (This : in out Menu_Window)
    is abstract;
 
    procedure On_Event (This  : in out Menu_Window;

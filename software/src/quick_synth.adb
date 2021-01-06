@@ -19,17 +19,23 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Audio;                  use HAL.Audio;
-with HAL;                        use HAL;
+with Ada.Text_IO;
+
+with HAL.Audio;
 with WNM.Sample_Stream;          use WNM.Sample_Stream;
-with Managed_Buffers;            use Managed_Buffers;
 with WNM;                        use WNM;
-with WNM.Buffer_Allocation;      use WNM.Buffer_Allocation;
-with WNM.Sample_Library;         use WNM.Sample_Library;
-with Hex_Dump;
-with Semihosting;
+--  with WNM.Sample_Library;         use WNM.Sample_Library;
+with WNM.Audio;
+with WNM.File_System;            use WNM.File_System;
+
+--  with Hex_Dump;
+--  with Semihosting;
 
 package body Quick_Synth is
+
+   Recording_File   : aliased File_Descriptor;
+   Recording_Source : Rec_Source;
+   Recording_Size   : File_Signed_Size;
 
    Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
    Solo_Mode_Enabled : Boolean := False;
@@ -39,14 +45,13 @@ package body Quick_Synth is
      with Atomic_Components;
    Volume_For_Track : array (WNM.Tracks) of Integer := (others => 50)
      with Atomic_Components;
-   Sample_For_Track : array (WNM.Tracks) of Sample_Entry_Index :=
-     (others => Invalid_Sample_Entry)
-     with Atomic_Components;
+   --  Sample_For_Track : array (WNM.Tracks) of Sample_Entry_Index :=
+   --    (others => Invalid_Sample_Entry)
+   --    with Atomic_Components;
 
-   procedure Copy (Src : not null Any_Managed_Buffer;
-                   Dst : out Mono_Buffer);
-   procedure Copy_Stereo_To_Mono (Src : Stereo_Buffer;
-                                  Dst : not null Any_Managed_Buffer);
+   procedure Copy_Stereo_To_Mono (L, R : Mono_Buffer;
+                                  Dst : out Mono_Buffer);
+
    function Is_It_On (Track : Stream_Track) return Boolean;
    procedure Audio_Hex_Dump (Info : String;
                              Buffer : HAL.Audio.Audio_Buffer);
@@ -59,57 +64,36 @@ package body Quick_Synth is
    procedure Audio_Hex_Dump (Info : String;
                              Buffer : HAL.Audio.Audio_Buffer)
    is
-      Data : HAL.UInt8_Array (1 .. Buffer'Length / 2)
-        with Address => Buffer'Address;
+      --  Data : HAL.UInt8_Array (1 .. Buffer'Length / 2)
+      --    with Address => Buffer'Address;
    begin
-      Semihosting.Log_Line (Info);
-      Hex_Dump.Hex_Dump (Data,
-                         Put_Line  => Semihosting.Log_Line'Access,
-                         Base_Addr => 0);
+      --  Semihosting.Log_Line (Info);
+      --  Hex_Dump.Hex_Dump (Data,
+      --                     Put_Line  => Semihosting.Log_Line'Access,
+      --                     Base_Addr => 0);
+      null;
    end Audio_Hex_Dump;
-
-   ----------
-   -- Copy --
-   ----------
-
-   procedure Copy (Src : not null Any_Managed_Buffer;
-                   Dst : out Mono_Buffer)
-   is
-      Data : Mono_Buffer with Address => Src.Buffer_Address;
-   begin
-
-      if Src.Buffer_Length /= Mono_Buffer_Size_In_Bytes then
-         raise Program_Error with "WTF!?!";
-      end if;
-
-      Dst := Data;
-   end Copy;
 
    -------------------------
    -- Copy_Stereo_To_Mono --
    -------------------------
 
-   procedure Copy_Stereo_To_Mono (Src : Stereo_Buffer;
-                                  Dst : not null Any_Managed_Buffer)
+   procedure Copy_Stereo_To_Mono (L, R : Mono_Buffer;
+                                  Dst : out Mono_Buffer)
    is
-      Data : Mono_Buffer with Address => Dst.Buffer_Address;
       Tmp  : Integer_32;
    begin
 
-      if Dst.Buffer_Length /= Mono_Buffer_Size_In_Bytes then
-         raise Program_Error with "WTF!?!";
-      end if;
-
-      for Index in Data'Range loop
-         Tmp := Integer_32 (Src (Index).L) + Integer_32 (Src (Index).R);
+      for Index in Dst'Range loop
+         Tmp := Integer_32 (L (Index)) + Integer_32 (R (Index));
          Tmp := Tmp / 2;
 
          if Tmp > Integer_32 (Mono_Sample'Last) then
-            Data (Index) := Mono_Sample'Last;
+            Dst (Index) := Mono_Sample'Last;
          elsif Tmp < Integer_32 (Integer_16'First) then
-            Data (Index) := Mono_Sample'First;
+            Dst (Index) := Mono_Sample'First;
          else
-            Data (Index) := Mono_Sample (Tmp);
+            Dst (Index) := Mono_Sample (Tmp);
          end if;
       end loop;
    end Copy_Stereo_To_Mono;
@@ -132,50 +116,49 @@ package body Quick_Synth is
    -----------
 
    procedure Event (Msg : MIDI.Message) is
-      Track : constant WNM.Tracks := WNM.To_Track (Msg.Channel);
+      --  Track : constant WNM.Tracks := WNM.To_Track (Msg.Channel);
    begin
-
-      case Msg.Kind is
-         when MIDI.Note_On =>
-            if Track = B1 then
-               Start (Filepath    => (case Msg.Cmd.Key is
-                                         when MIDI.C4  => "/sdcard/drums/Clap.raw",
-                                         when MIDI.Cs4 => "/sdcard/drums/Clave.raw",
-                                         when MIDI.D4  => "/sdcard/drums/Cymbal-high.raw",
-                                         when MIDI.Ds4 => "/sdcard/drums/Hat_closed.raw",
-                                         when MIDI.E4  => "/sdcard/drums/Hat_long.raw",
-                                         when MIDI.F4  => "/sdcard/drums/Hi_Tom.raw",
-                                         when MIDI.Fs4 => "/sdcard/drums/Kick_long.raw",
-                                         when MIDI.G4  => "/sdcard/drums/Kick_short.raw",
-                                         when MIDI.Gs4 => "/sdcard/drums/Lo_Tom.raw",
-                                         when MIDI.A4  => "/sdcard/drums/Md_Tom.raw",
-                                         when MIDI.As4 => "/sdcard/drums/Rim_Shot.raw",
-                                         when MIDI.B4  => "/sdcard/drums/Snare_lo1.raw",
-                                         when MIDI.C5  => "/sdcard/drums/Snare_lo2.raw",
-                                         when MIDI.Cs5 => "/sdcard/drums/Snare_lo3.raw",
-                                         when MIDI.D5  => "/sdcard/drums/Cowbell.raw",
-                                         when MIDI.Ds5 => "/sdcard/drums/Maracas.raw",
-                                         when MIDI.E5  => "/sdcard/drums/Hi_Conga.raw",
-                                         when MIDI.F5  => "/sdcard/drums/Md_Conga.raw",
-                                         when MIDI.Fs5 => "/sdcard/quotes/wake.raw",
-                                         when MIDI.G5  => "/sdcard/quotes/darkside.raw",
-                                         when MIDI.Gs5 => "/sdcard/quotes/failure2_x.raw",
-                                         when MIDI.A5  => "/sdcard/quotes/failure3.raw",
-                                         when MIDI.As5 => "/sdcard/quotes/halbye.raw",
-                                         when MIDI.B5  => "/sdcard/quotes/learn.raw",
-                                         when MIDI.C6  => "/sdcard/quotes/trap.raw",
-                                         when others   => "/sdcard/test.raw"),
-                      Start_Point => 0,
-                      End_Point   => Natural'Last,
-                      Track       => To_Stream_Track (Track),
-                      Looping     => False,
-                      Poly        => True);
-            end if;
-         when  MIDI.Note_Off =>
-            null;
-         when others =>
-            null;
-      end case;
+      null;
+      --  case Msg.Kind is
+      --     when MIDI.Note_On =>
+      --        if Track = B1 then
+      --           Start (Filepath    => (case Msg.Cmd.Key is
+      --                                     when MIDI.C4  => "/sdcard/drums/Clap.raw",
+      --                                     when MIDI.Cs4 => "/sdcard/drums/Clave.raw",
+      --                                     when MIDI.D4  => "/sdcard/drums/Cymbal-high.raw",
+      --                                     when MIDI.Ds4 => "/sdcard/drums/Hat_closed.raw",
+      --                                     when MIDI.E4  => "/sdcard/drums/Hat_long.raw",
+      --                                     when MIDI.F4  => "/sdcard/drums/Hi_Tom.raw",
+      --                                     when MIDI.Fs4 => "/sdcard/drums/Kick_long.raw",
+      --                                     when MIDI.G4  => "/sdcard/drums/Kick_short.raw",
+      --                                     when MIDI.Gs4 => "/sdcard/drums/Lo_Tom.raw",
+      --                                     when MIDI.A4  => "/sdcard/drums/Md_Tom.raw",
+      --                                     when MIDI.As4 => "/sdcard/drums/Rim_Shot.raw",
+      --                                     when MIDI.B4  => "/sdcard/drums/Snare_lo1.raw",
+      --                                     when MIDI.C5  => "/sdcard/drums/Snare_lo2.raw",
+      --                                     when MIDI.Cs5 => "/sdcard/drums/Snare_lo3.raw",
+      --                                     when MIDI.D5  => "/sdcard/drums/Cowbell.raw",
+      --                                     when MIDI.Ds5 => "/sdcard/drums/Maracas.raw",
+      --                                     when MIDI.E5  => "/sdcard/drums/Hi_Conga.raw",
+      --                                     when MIDI.F5  => "/sdcard/drums/Md_Conga.raw",
+      --                                     when MIDI.Fs5 => "/sdcard/quotes/wake.raw",
+      --                                     when MIDI.G5  => "/sdcard/quotes/darkside.raw",
+      --                                     when MIDI.Gs5 => "/sdcard/quotes/failure2_x.raw",
+      --                                     when MIDI.A5  => "/sdcard/quotes/failure3.raw",
+      --                                     when MIDI.As5 => "/sdcard/quotes/halbye.raw",
+      --                                     when MIDI.B5  => "/sdcard/quotes/learn.raw",
+      --                                     when MIDI.C6  => "/sdcard/quotes/trap.raw",
+      --                                     when others   => "/sdcard/test.raw"),
+      --                  Start_Point => 0,
+      --                  End_Point   => Natural'Last,
+      --                  Track       => To_Stream_Track (Track),
+      --                  Looping     => False);
+      --        end if;
+      --     when  MIDI.Note_Off =>
+      --        null;
+      --     when others =>
+      --        null;
+      --  end case;
    end Event;
 
    ----------
@@ -184,14 +167,11 @@ package body Quick_Synth is
 
    procedure Trig (Track : WNM.Tracks) is
    begin
-      if Sample_For_Track (Track) /= Invalid_Sample_Entry then
-         Start (Filepath    => Entry_Path (Sample_For_Track (Track)),
-                Start_Point => 0,
-                End_Point   => Natural'Last,
-                Track       => To_Stream_Track (Track),
-                Looping     => False,
-                Poly        => True);
-      end if;
+      Ada.Text_IO.Put_Line ("Trig: " & Track'Img);
+      Start (Track       => To_Stream_Track (Track),
+             Start_Point => 0,
+             End_Point   => Natural'Last,
+             Looping     => False);
    end Trig;
 
    ------------------
@@ -200,37 +180,36 @@ package body Quick_Synth is
 
    procedure Load_Samples is
    begin
-      for Track in Tracks loop
-         Assign_Sample (Track,
-                        Entry_From_Path ((case Track is
-                             when B1 => "/sdcard/samples/drums/clap/Clap.raw",
-                             when B6 => "/sdcard/samples/drums/hat/Hat_closed.raw",
-                             when B2 => "/sdcard/samples/drums/kick/Kick_short.raw",
-                             when B3 => "/sdcard/samples/drums/misc/Rim_Shot.raw",
-                             when B4 => "/sdcard/samples/drums/snare/Snare_lo1.raw",
-                             when B5 => "/sdcard/samples/drums/snare/Snare_lo2.raw",
-                             when B7 => "/sdcard/samples/misc/Cowbell.raw",
-                             when B8 => "/sdcard/samples/drums/tom/Md_Tom.raw",
-                             when B9  => "/sdcard/samples/vocals/the_way_news_goes.raw",
-                             when B10 => "/sdcard/samples/vocals/show_me_what_you_got.raw",
-                             when B11 => "/sdcard/samples/vocals/pickle_rick.raw",
-                             when B12 => "/sdcard/samples/vocals/wake.raw",
-                             when B13 => "/sdcard/samples/vocals/darkside.raw",
-                             when B14 => "/sdcard/samples/vocals/failure2_x.raw",
-                             when B15 => "/sdcard/samples/vocals/halbye.raw",
-                             when B16 => "/sdcard/samples/user/AAA.raw")));
-      end loop;
+      Assign_Sample (ST_1, "/samples/kick");
+      Assign_Sample (ST_2, "/samples/kick");
+      Assign_Sample (ST_3, "/samples/snare");
+      Assign_Sample (ST_4, "/samples/clap");
+      Assign_Sample (ST_5, "/samples/rim");
+      Assign_Sample (ST_6, "/samples/hho");
+      Assign_Sample (ST_7, "/samples/hhc");
+      Assign_Sample (ST_8, "/samples/crash");
+      Assign_Sample (ST_9, "/samples/ride");
+      Assign_Sample (ST_10, "/samples/ride");
+      Assign_Sample (ST_11, "/samples/ride");
+      Assign_Sample (ST_12, "/samples/ride");
+      Assign_Sample (ST_13, "/samples/ride");
+      Assign_Sample (ST_14, "/samples/ride");
+      Assign_Sample (ST_15, "/samples/ride");
+      Assign_Sample (ST_16, "/samples/ride");
    end Load_Samples;
 
    -------------------
    -- Assign_Sample --
    -------------------
 
-   procedure Assign_Sample (Track  : WNM.Tracks;
-                            Sample : WNM.Sample_Library.Sample_Entry_Index)
+   procedure Assign_Sample (Track       : WNM.Tracks;
+                            Sample_Path : String)
    is
    begin
-      Sample_For_Track (Track) := Sample;
+      --  Sample_For_Track (Track) := Sample;
+
+      Sample_Stream.Assign_Sample (Sample_Stream.To_Stream_Track (Track),
+                                  Sample_Path);
    end Assign_Sample;
 
    ---------------------
@@ -240,130 +219,11 @@ package body Quick_Synth is
    function Sample_Of_Track (Track : WNM.Tracks)
                              return WNM.Sample_Library.Sample_Entry_Index
    is
+      pragma Unreferenced (Track);
    begin
-      return Sample_For_Track (Track);
+      return 1;
+      -- return Sample_For_Track (Track);
    end Sample_Of_Track;
-
-   ----------
-   -- Fill --
-   ----------
-
-   procedure Fill (Stereo_Input  :     Stereo_Buffer;
-                   Stereo_Output : out Stereo_Buffer)
-   is
-
-      procedure Mix (Mono_Samples : Mono_Buffer;
-                     ST           : Stream_Track);
-
-      ---------
-      -- Mix --
-      ---------
-
-      procedure Mix (Mono_Samples : Mono_Buffer;
-                     ST           : Stream_Track)
-      is
-         Val         : Integer_32;
-
-         Sample, Left, Right : Float;
-
-         Volume       : Float;
-         Pan          : Float;
-      begin
-         if ST = Always_On then
-            Volume := 1.0;
-            Pan    := 0.0;
-         else
-            Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
-
-            --  FIXME: Hack to fix the panning problem
-            Pan    := Float (Pan_For_Track (To_Track (ST)) + 100) / 200.0;
-            --  Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
-         end if;
-
---           Audio_Hex_Dump ("Stereo_Output before mix:", Stereo_Output);
-
-         for Index in Mono_Samples'Range loop
-
-            Sample := Float (Mono_Samples (Index));
-            Sample := Sample * Volume;
-
-            Right := Sample * (1.0 - Pan);
-            Left  := Sample * (1.0 + Pan);
-
-            Val := Integer_32 (Stereo_Output (Index).L) + Integer_32 (Left);
-            if Val > Integer_32 (Mono_Sample'Last) then
-               Stereo_Output (Index).L := Mono_Sample'Last;
-            elsif Val < Integer_32 (Integer_16'First) then
-               Stereo_Output (Index).L := Mono_Sample'First;
-            else
-               Stereo_Output (Index).L := Mono_Sample (Val);
-            end if;
-
-            Val := Integer_32 (Stereo_Output (Index).R) + Integer_32 (Right);
-            if Val > Integer_32 (Mono_Sample'Last) then
-               Stereo_Output (Index).R := Mono_Sample'Last;
-            elsif Val < Integer_32 (Integer_16'First) then
-               Stereo_Output (Index).R := Mono_Sample'First;
-            else
-               Stereo_Output (Index).R := Mono_Sample (Val);
-            end if;
-         end loop;
---           Audio_Hex_Dump ("Stereo_Output after mix:", Stereo_Output);
-      end Mix;
-
-      Mono_Tmp : Mono_Buffer;
-      Buf      : Any_Managed_Buffer;
-      On_Track : Stream_Track;
-   begin
-
-      -- Audio in --
-      Stereo_Output := Stereo_Input;
-
-      -- Samples streams --
-
-      for ID in Valid_Stream_ID loop
-         Next_Buffer (ID, Buf, On_Track);
-         if Buf /= null then
-            if Is_It_On (On_Track) then
-               Copy (Buf, Mono_Tmp);
-               Mix (Mono_Tmp, On_Track);
-            end if;
-            Release_Buffer (Buf);
-         end if;
-      end loop;
-
-      -- Recording --
-      case WNM.Sample_Stream.Now_Recording is
-         when WNM.Sample_Stream.None =>
-            null;
-         when WNM.Sample_Stream.Input =>
-            declare
-               Buffer : constant Any_Managed_Buffer :=
-                 Allocate (Kind => RAM,
-                           Size => Mono_Buffer_Size_In_Bytes);
-            begin
-               if Buffer = null then
-                  raise Program_Error with "Cannot allocate buffer...";
-               end if;
-
-               Copy_Stereo_To_Mono (Stereo_Input, Buffer);
-               WNM.Sample_Stream.Push_Record_Buffer (Buffer);
-            end;
-         when WNM.Sample_Stream.Master_Output =>
-            declare
-               Buffer : constant Any_Managed_Buffer :=
-                 Allocate (Kind => RAM,
-                           Size => Mono_Buffer_Size_In_Bytes);
-            begin
-               if Buffer = null then
-                  raise Program_Error with "Cannot allocate buffer...";
-               end if;
-
-               Copy_Stereo_To_Mono (Stereo_Output, Buffer);
-               WNM.Sample_Stream.Push_Record_Buffer (Buffer);
-            end;
-      end case;
-   end Fill;
 
    ----------
    -- Mute --
@@ -476,5 +336,178 @@ package body Quick_Synth is
 
    function Volume (Track : WNM.Tracks) return Natural
    is (Natural (Volume_For_Track (Track)));
+
+   ------------
+   -- Update --
+   ------------
+
+   procedure Update is
+
+      procedure Process (Out_L, Out_R : out Mono_Buffer;
+                         In_L,  In_R  :     Mono_Buffer);
+
+      -------------
+      -- Process --
+      -------------
+
+      procedure Process (Out_L, Out_R : out Mono_Buffer;
+                         In_L,  In_R  :     Mono_Buffer)
+      is
+         Len : File_System.File_Signed_Size;
+
+         procedure Mix (Mono_Samples : Mono_Buffer;
+                        ST           : Stream_Track);
+
+         ---------
+         -- Mix --
+         ---------
+
+         procedure Mix (Mono_Samples : Mono_Buffer;
+                        ST           : Stream_Track)
+         is
+            Val         : Integer_32;
+
+            Sample, Left, Right : Float;
+
+            Volume       : Float;
+            Pan          : Float;
+         begin
+            if ST = Always_On then
+               Volume := 1.0;
+               Pan    := 0.0;
+            else
+               Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
+
+               --  FIXME: Hack to fix the panning problem
+               Pan    := Float (Pan_For_Track (To_Track (ST)) + 100) / 200.0;
+               --  Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
+            end if;
+
+            --           Audio_Hex_Dump ("Stereo_Output before mix:", Stereo_Output);
+
+            for Index in Mono_Samples'Range loop
+
+               Sample := Float (Mono_Samples (Index));
+               Sample := Sample * Volume;
+
+               Right := Sample * (1.0 - Pan);
+               Left  := Sample * (1.0 + Pan);
+
+               Val := Integer_32 (Out_L (Index)) + Integer_32 (Left);
+               if Val > Integer_32 (Mono_Sample'Last) then
+                  Out_L (Index) := Mono_Sample'Last;
+               elsif Val < Integer_32 (Integer_16'First) then
+                  Out_L (Index) := Mono_Sample'First;
+               else
+                  Out_L (Index) := Mono_Sample (Val);
+               end if;
+
+               Val := Integer_32 (Out_R (Index)) + Integer_32 (Right);
+               if Val > Integer_32 (Mono_Sample'Last) then
+                  Out_R (Index) := Mono_Sample'Last;
+               elsif Val < Integer_32 (Integer_16'First) then
+                  Out_R (Index) := Mono_Sample'First;
+               else
+                  Out_R (Index) := Mono_Sample (Val);
+               end if;
+            end loop;
+         end Mix;
+
+      begin
+         --  Out_R := In_R;
+         --  Out_L := In_L;
+
+         Out_R := (others => 0);
+         Out_L := (others => 0);
+
+         declare
+            Sample_Buf : Mono_Buffer;
+            Success : Boolean;
+         begin
+            for Track in Stream_Track loop
+               Next_Buffer (Track, Sample_Buf, Success);
+               if Success then
+                  Mix (Sample_Buf, Track);
+               end if;
+            end loop;
+         end;
+
+         -- Recording --
+         if Recording_Source /= None then
+            declare
+               Sample_Buf : Mono_Buffer;
+            begin
+               case Recording_Source is
+               when None =>
+                  null;
+               when Input =>
+                  Copy_Stereo_To_Mono (In_L, In_R, Sample_Buf);
+               when Master_Output =>
+                  Copy_Stereo_To_Mono (Out_L, Out_R, Sample_Buf);
+               end case;
+
+               Len := Write (Recording_File, Sample_Buf'Address, Sample_Buf'Length * 2);
+               Recording_Size := Recording_Size + Len;
+               Ada.Text_IO.Put_Line ("Writing to sample rec: " & Len'Img);
+            end;
+         end if;
+
+      end Process;
+
+      procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
+
+   begin
+      Generate_Audio;
+   end Update;
+
+   -------------------
+   -- Now_Recording --
+   -------------------
+
+   function Now_Recording return Rec_Source
+   is (Recording_Source);
+
+   ---------------------
+   -- Start_Recording --
+   ---------------------
+
+   procedure Start_Recording (Filename : String;
+                              Source   : Rec_Source;
+                              Max_Size : Positive)
+   is
+      pragma Unreferenced (Max_Size);
+   begin
+      if Recording_Source /= None then
+         return;
+      end if;
+
+      Recording_Source := Source;
+      Create_File (Recording_File, Filename);
+      Recording_Size := 0;
+
+      Ada.Text_IO.Put_Line ("Start recording " & Source'Img & " to '" &
+                              Filename & "'");
+   end Start_Recording;
+
+   --------------------
+   -- Stop_Recording --
+   --------------------
+
+   procedure Stop_Recording is
+   begin
+      Ada.Text_IO.Put_Line ("Stop recording");
+
+      Ada.Text_IO.Put_Line ("File size is " & Size (Recording_File)'Img);
+
+      Close (Recording_File);
+      Recording_Source := None;
+   end Stop_Recording;
+
+   -----------------
+   -- Record_Size --
+   -----------------
+
+   function Record_Size return Natural
+   is (Natural (Recording_Size));
 
 end Quick_Synth;

@@ -28,8 +28,7 @@ private
    type Recording_Window is new Menu_Window with null record;
 
    overriding
-   procedure Draw (This   : in out Recording_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This   : in out Recording_Window);
 
    overriding
    procedure On_Event (This  : in out Recording_Window;

@@ -1,6 +1,5 @@
 
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
-with WNM.Screen;
 
 package body WNM.GUI.Parameters is
 
@@ -29,8 +28,7 @@ package body WNM.GUI.Parameters is
    begin
       Limit := Integer ((Float (Value - Min) / Float (Max - Min)) * 96.0);
 
-      Print (Buffer      => WNM.Screen.Buffer.all,
-             X_Offset    => B,
+      Print (X_Offset    => B,
              Y_Offset    => Y_Offset (Slot),
              Str         => String'(Name & ":" & Value'Img),
              Invert_From => 0,
@@ -81,8 +79,7 @@ package body WNM.GUI.Parameters is
          To   := Mid;
       end if;
 
-      Print (Buffer      => WNM.Screen.Buffer.all,
-             X_Offset    => B,
+      Print (X_Offset    => B,
              Y_Offset    => Y_Offset (Slot),
              Str         => String'(Name),
              Invert_From => From,

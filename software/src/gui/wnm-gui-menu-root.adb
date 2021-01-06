@@ -53,12 +53,10 @@ package body WNM.GUI.Menu.Root is
    ----------
 
    overriding procedure Draw
-     (This   : in out Root_Menu;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This   : in out Root_Menu)
    is
    begin
-      Draw_Menu_Box (Screen,
-                     Menu_Item_Text (This.Item),
+      Draw_Menu_Box (Menu_Item_Text (This.Item),
                      Top => This.Item /= Menu_Items'First,
                      Bottom => This.Item /= Menu_Items'Last);
    end Draw;

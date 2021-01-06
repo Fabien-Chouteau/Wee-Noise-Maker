@@ -27,7 +27,8 @@ package WNM is
 
    type Button is (B1, B2, B3, B4, B5, B6, B7, B8,
                    B9, B10, B11, B12, B13, B14, B15, B16,
-                   Rec, Play, Menu, Func, Track_Button, Pattern,
+                   Rec, Play,
+                   Menu, Func, Track_Button, Pattern,
                    Encoder_L, Encoder_R);
 
    subtype Keyboard_Button is Button range B1 .. B16;
@@ -81,5 +82,5 @@ package WNM is
    Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Buffer * 4;
 
 
-   Sample_Rec_Filepath : constant String := "/sdcard/sample_rec.raw";
+   Sample_Rec_Filepath : constant String := "/sample_rec.raw";
 end WNM;

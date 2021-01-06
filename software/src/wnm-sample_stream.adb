@@ -19,28 +19,16 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Buffer_FIFO;              use WNM.Buffer_FIFO;
-with File_IO;                      use File_IO;
-with WNM.Buffer_Allocation;        use WNM.Buffer_Allocation;
-with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
-with Ada.Unchecked_Deallocation;
-with WNM.File_Utils;               use WNM.File_Utils;
+with Interfaces; use Interfaces;
+
+with WNM.File_System; use WNM.File_System;
+with Littlefs;
+
+with Ada.Text_IO;
 
 package body WNM.Sample_Stream is
 
-   procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
-
-   task Sample_Stream_Task
-     with Priority     => Sample_Task_Priority,
-          Storage_Size => Sample_Taks_Stack_Size;
-
-   Start_Task      : Suspension_Object;
-   Log_Record_Size : Natural := 0;
-
-   procedure Close_Stream (ID             : Valid_Stream_ID;
-                           Keep_Allocated : Boolean);
-   procedure Process_Request;
-   procedure Process_Record_Request (FD  : in out File_Descriptor);
+   procedure Close_Stream (ST : Stream_Track);
 
    ---------------------
    -- To_Stream_Track --
@@ -89,323 +77,104 @@ package body WNM.Sample_Stream is
           when others => B16);
 
    ------------------
-   -- Streams_Prot --
+   -- Close_Stream --
    ------------------
 
-   protected body Streams_Prot is
-
-      -----------------
-      -- Next_Buffer --
-      -----------------
-
-      procedure Next_Buffer (ID     : Valid_Stream_ID;
-                             Buffer : out Any_Managed_Buffer;
-                             Track  : out Stream_Track)
-      is
-      begin
-         Pop (FIFOs (ID), Buffer);
-         Track := On_Track (ID);
-         if not Is_Free (ID) then
-            Something_To_Do := True;
-         end if;
-      end Next_Buffer;
-
-      ----------
-      -- Push --
-      ----------
-
-      procedure Push (ID     : Valid_Stream_ID;
-                      Buffer : Any_Managed_Buffer)
-      is
-      begin
-         Push (FIFOs (ID), Buffer);
-      end Push;
-
-      -----------
-      -- Flush --
-      -----------
-
-      procedure Flush (ID      : Valid_Stream_ID;
-                       Free_It : Boolean)
-      is
-         Buf : Any_Managed_Buffer;
-      begin
-
-         loop
-            Pop (FIFOs (ID), Buf);
-            exit when Buf = null;
-            Release_Buffer (Buf);
-         end loop;
-
-         if Free_It then
-            Is_Free (ID) := True;
-         end if;
-      end Flush;
-
-      ----------------------
-      -- Need_More_Buffer --
-      ----------------------
-
-      procedure Need_More_Buffer (ID   : Valid_Stream_ID;
-                                  Need : out Boolean)
-      is
-      begin
-         Need := not Is_Free (ID) and then not Full (FIFOs (ID));
-      end Need_More_Buffer;
-
-
-      ---------------------------------
-      -- Suspend_While_Nothing_To_Do --
-      ---------------------------------
-
-      entry Suspend_While_Nothing_To_Do when Something_To_Do is
-      begin
-         Something_To_Do := False;
-      end Suspend_While_Nothing_To_Do;
-
-      -------------------------------------
-      -- Check_If_Theres_Something_To_Do --
-      -------------------------------------
-
-      procedure Check_If_Theres_Something_To_Do is
-         Cnt : Natural := 0;
-      begin
-
-         --  Count how many FIFO still need more buffers
-         for ID in Valid_Stream_ID loop
-
-            if not Is_Free (ID) and then not Full (FIFOs (ID)) then
-               Cnt := Cnt + 1;
-            end if;
-         end loop;
-
-         Something_To_Do :=
-             Cnt /= 0
-           or else
-             not Request_FIFO.Empty (Requests)
-           or else
-             (Rec_Src /= None and then not Empty (Rec_FIFO));
-
-      end Check_If_Theres_Something_To_Do;
-
-      --------------
-      -- Allocate --
-      --------------
-
-      procedure Allocate (ID    : out Stream_ID;
-                          Track : Stream_Track;
-                          Reuse : Boolean) is
-         Ret : Stream_ID;
-      begin
-         ID := Valid_Stream_ID'First;
-
-         if Reuse then
-
-            Ret := Invalid_Stream;
-
-            loop
-               if Is_Free (ID) then
-                  Ret := ID;
-               elsif On_Track (ID) = Track then
-                  --  Reuse the stream allocated for this channel
-                  Ret := ID;
-                  exit;
-               end if;
-
-               if ID = Valid_Stream_ID'Last then
-                  exit;
-               end if;
-               ID := ID + 1;
-            end loop;
-
-            if Ret = Invalid_Stream then
-               return;
-            else
-               ID := Ret;
-            end if;
-         else
-            loop
-               exit when Is_Free (ID);
-
-               if ID = Valid_Stream_ID'Last then
-                  ID := Invalid_Stream;
-                  return;
-               else
-                  ID := ID + 1;
-               end if;
-            end loop;
-         end if;
-
-         Is_Free (ID)    := False;
-         On_Track (ID)   := Track;
-         Something_To_Do := True;
-      end Allocate;
-
-      ------------------
-      -- Push_Request --
-      ------------------
-
-      procedure Push_Request (Req : Sample_Request) is
-         Tmp : String_Access;
-      begin
-         if not Request_FIFO.Full (Requests) then
-            Request_FIFO.Push (Requests, Req);
-            Something_To_Do := True;
-         else
-
-            Tmp := Req.Filepath;
-            --  Discard this request...
-            Free (Tmp);
-         end if;
-      end Push_Request;
-
-      -----------------
-      -- Pop_Request --
-      -----------------
-
-      procedure Pop_Request (Req : out Sample_Request) is
-      begin
-         Request_FIFO.Pop (Requests, Req);
-      end Pop_Request;
-
-      ---------------------
-      -- Set_Rec_Request --
-      ---------------------
-
-      procedure Set_Rec_Request (Rec : Record_Request) is
-         Tmp : String_Access;
-      begin
-         if not Rec_Request.Active then
-            Rec_Request        := Rec;
-            Rec_Src            := Rec_Request.Src;
-            Rec_Request.Active := True;
-            Something_To_Do    := True;
-         else
-            --  Discard the request
-            Tmp := Rec.Filepath;
-            Free (Tmp);
-         end if;
-      end Set_Rec_Request;
-
-      ---------------------
-      -- Get_Rec_Request --
-      ---------------------
-
-      procedure Get_Rec_Request (Rec : out Record_Request) is
-      begin
-         Rec                := Rec_Request;
-         Rec_Request.Active := False;
-      end Get_Rec_Request;
-
-      -------------------
-      -- Now_Recording --
-      -------------------
-
-      function Now_Recording return Rec_Source is
-      begin
-         return Rec_Src;
-      end Now_Recording;
-
-      ---------------------
-      -- Start_Recording --
-      ---------------------
-
-      procedure Start_Recording (Src : Rec_Source) is
-      begin
-         Rec_Src := Src;
-      end Start_Recording;
-
-      --------------------
-      -- Stop_Recording --
-      --------------------
-
-      procedure Stop_Recording is
-         Buffer : Any_Managed_Buffer;
-      begin
-
-         --  Clear the FIFO
-         loop
-            Pop (Rec_FIFO, Buffer);
-            exit when Buffer = null;
-            WNM.Buffer_Allocation.Release_Buffer (Buffer);
-         end loop;
-
-         Rec_Src := None;
-         Something_To_Do := True;
-      end Stop_Recording;
-
-      ------------------------
-      -- Push_Record_Buffer --
-      ------------------------
-
-      procedure Push_Record_Buffer (Buffer : not null Any_Managed_Buffer) is
-      begin
-         if Rec_Src /= None and then not Full (Rec_FIFO) then
-            Push (Rec_FIFO, Buffer);
-            Something_To_Do := True;
-         else
-            WNM.Buffer_Allocation.Release_Buffer (Buffer);
-         end if;
-      end Push_Record_Buffer;
-
-      -----------------------
-      -- Get_Record_Buffer --
-      -----------------------
-
-      procedure Get_Record_Buffer (Buffer : out Any_Managed_Buffer) is
-      begin
-         Pop (Rec_FIFO, Buffer);
-      end Get_Record_Buffer;
-
-   end Streams_Prot;
-
-   ------------------------------
-   -- Start_Sample_Stream_Task --
-   ------------------------------
-
-   procedure Start_Sample_Stream_Task is
+   procedure Close_Stream (ST : Stream_Track) is
    begin
-      Set_True (Start_Task);
-   end Start_Sample_Stream_Task;
+      if Streams (St).State /= Unused then
+
+         Close (Streams (St).FD);
+
+         Streams (St).State := Unused;
+      end if;
+   end Close_Stream;
+
+   -------------------
+   -- Assign_Sample --
+   -------------------
+
+   procedure Assign_Sample (Track    : Stream_Track;
+                            Filepath : String)
+   is
+   begin
+      Close_Stream (Track);
+
+      Open_Read (Streams (Track).FD, Filepath);
+
+      Ada.Text_IO.Put_Line ("Open: " & Filepath);
+      Ada.Text_IO.Put_Line ("Size: " & Size (Streams (Track).FD)'Img);
+
+      Streams (Track).State := Assigned;
+   end Assign_Sample;
 
    -----------
    -- Start --
    -----------
 
-   procedure Start (Filepath    : String;
+   procedure Start (Track       : Stream_Track;
                     Start_Point : Natural;
                     End_Point   : Natural;
-                    Track       : Stream_Track;
-                    Looping     : Boolean;
-                    Poly        : Boolean)
+                    Looping     : Boolean)
    is
-      Req : Sample_Request := (Kind   => Sample_Play,
-                               others => <>);
    begin
-      Req.Start_Point := File_Size (Start_Point);
-      Req.End_Point   := File_Size (End_Point);
-      Req.Track       := Track;
-      Req.Looping     := Looping;
-      Req.Poly        := Poly;
-      Req.Filepath    := new String'(Filepath);
-      Streams_Prot.Push_Request (Req);
+      if Streams (Track).State = Unused then
+         Ada.Text_IO.Put_Line ("Track is unused: " & Track'Img);
+         return;
+      end if;
+
+      Ada.Text_IO.Put_Line ("Start track: " & Track'Img);
+
+      Streams (Track).State := Running;
+
+      Streams (Track).Looping := Looping;
+      Streams (Track).Start_Point := Start_Point;
+      Streams (Track).Cursor := Start_Point;
+      Streams (Track).End_Point := End_Point;
+
+      Seek (Streams (Track).FD, Offset (Start_Point), Littlefs.LFS_SEEK_SET);
    end Start;
 
    -----------------
    -- Next_Buffer --
    -----------------
 
-   procedure Next_Buffer (ID     : Stream_ID;
-                          Buffer : out Any_Managed_Buffer;
-                          Track  : out Stream_Track)
+   procedure Next_Buffer (Track   :     Stream_Track;
+                          Buffer  : out Quick_Synth.Mono_Buffer;
+                          Success : out Boolean)
    is
+      Len : File_Signed_Size;
    begin
-      if ID = Invalid_Stream then
-         Buffer := null;
+      if Streams (Track).State /= Running then
+         Success := False;
+         return;
+      end if;
+
+      Ada.Text_IO.Put_Line ("Track running: " & Track'Img);
+      Ada.Text_IO.Put_Line ("Size: " & Size (Streams (Track).FD)'Img);
+
+      Len := Read (Streams (Track).FD, Buffer'Address, Buffer'Length * 2);
+
+      Streams (Track).Cursor := Streams (Track).Cursor + Natural (Len);
+
+      Ada.Text_IO.Put_Line ("Next_Buffer Len: " & Len'Img);
+
+      if Len /= Buffer'Length * 2 then
+         Success := False;
       else
-         Streams_Prot.Next_Buffer (ID, Buffer, Track);
+         Success := True;
+      end if;
+
+      Ada.Text_IO.Put_Line ("Next_Buffer Success: " & Success'Img);
+
+      if not Success
+        or else
+          Streams (Track).Cursor > Streams (Track).End_Point
+      then
+         Streams (Track).State := Assigned;
       end if;
    end Next_Buffer;
+
 
    ---------------
    -- Copy_File --
@@ -414,276 +183,6 @@ package body WNM.Sample_Stream is
    procedure Copy_File (Srcpath  : String;
                         From, To : Natural;
                         Dstpath  : String)
-   is
-      Req : Sample_Request := (Kind   => Copy_File,
-                               others => <>);
-   begin
-      Req.Srcpath := new String'(Srcpath);
-      Req.Dstpath := new String'(Dstpath);
-      Req.From    := From;
-      Req.To      := To;
-      Streams_Prot.Push_Request (Req);
-   end Copy_File;
-
-   -------------------
-   -- Now_Recording --
-   -------------------
-
-   function Now_Recording return Rec_Source is
-   begin
-      return Streams_Prot.Now_Recording;
-   end Now_Recording;
-
-   ---------------------
-   -- Start_Recording --
-   ---------------------
-
-   procedure Start_Recording (Filename : String;
-                              Source   : Rec_Source;
-                              Max_Size : Positive)
-   is
-      Req : Record_Request;
-   begin
-      Req.Active := True;
-      Req.Src := Source;
-      Req.Max_Size := File_IO.File_Size (Max_Size);
-      Req.Filepath := new String'(Filename);
-      Streams_Prot.Set_Rec_Request (Req);
-   end Start_Recording;
-
-   --------------------
-   -- Stop_Recording --
-   --------------------
-
-   procedure Stop_Recording is
-   begin
-      Streams_Prot.Stop_Recording;
-   end Stop_Recording;
-
-   -----------------
-   -- Record_Size --
-   -----------------
-
-   function Record_Size return Natural is
-   begin
-      return Log_Record_Size;
-   end Record_Size;
-
-   ------------------------
-   -- Push_Record_Buffer --
-   ------------------------
-
-   procedure Push_Record_Buffer (Buffer : not null Any_Managed_Buffer) is
-   begin
-      Streams_Prot.Push_Record_Buffer (Buffer);
-   end Push_Record_Buffer;
-
-   ------------------
-   -- Close_Stream --
-   ------------------
-
-   procedure Close_Stream (ID             : Valid_Stream_ID;
-                           Keep_Allocated : Boolean) is
-   begin
-      Streams_Prot.Flush (ID, Free_It => not Keep_Allocated);
-      Close (Streams (ID).FD);
-      Streams (ID).State := Unused;
-   end Close_Stream;
-
-   ---------------------
-   -- Process_Request --
-   ---------------------
-
-   procedure Process_Request is
-      Req    : Sample_Request;
-      ID     : Stream_ID;
-      Status : Status_Code;
-      Amount : File_Size;
-   begin
-
-      Streams_Prot.Pop_Request (Req);
-
-      if Req = No_Request then
-         return;
-      end if;
-
-      case Req.Kind is
-         when Copy_File =>
-            if Req.Srcpath = null or else Req.Dstpath = null then
-               raise Program_Error with "Copy_File null path";
-            end if;
-
-            Status := File_IO.Unlink (Req.Dstpath.all);
-            Status := Copy_File_Slice (Req.Srcpath.all,
-                                       Req.From,
-                                       Req.To,
-                                       Req.Dstpath.all);
-            if Status /= OK then
-               raise Program_Error with "Cannot copy file '" & Req.Srcpath.all &
-                 "' to '" & Req.Dstpath.all & "': " & Status'Img;
-            end if;
-         when Sample_Play =>
-            if Req.Filepath /= null then
-               Streams_Prot.Allocate (ID, Req.Track, Reuse => not Req.Poly);
-               if ID /= Invalid_Stream then
-
-                  if Streams (ID).State /= Unused then
-                     Close_Stream (ID, Keep_Allocated => True);
-                  end if;
-
-                  Streams (ID).Start_Point := Req.Start_Point;
-                  Streams (ID).End_Point   := Req.End_Point;
-                  Streams (ID).Track       := Req.Track;
-                  Streams (ID).Looping     := Req.Looping;
-
-                  --  Open File
-                  Status := Open (Streams (ID).FD, Req.Filepath.all, Read_Only);
-
-                  if Status /= OK then
-                     raise Program_Error with "Cannot open '" & Req.Filepath.all &
-                       "': " & Status'Img;
-                  end if;
-
-                  Streams (ID).Size := Size (Streams (ID).FD);
-
-                  if Streams (ID).Start_Point >= Streams (ID).Size then
-                     Close_Stream (ID, Keep_Allocated => False);
-                  else
-                     Amount := Streams (ID).Start_Point;
-                     Status := Seek (Streams (ID).FD, From_Start, Amount);
-                     if Status /= OK then
-                        raise Program_Error with "Seek error";
-                     end if;
-
-                     Streams (ID).Offset := Amount;
-                     Streams (ID).State := In_Progress;
-                  end if;
-
-               end if;
-               Free (Req.Filepath);
-
-            end if;
-      end case;
-   end Process_Request;
-
-   ----------------------------
-   -- Process_Record_Request --
-   ----------------------------
-
-   procedure Process_Record_Request (FD  : in out File_Descriptor) is
-      Req    : Record_Request;
-      Status : Status_Code;
-   begin
-      Streams_Prot.Get_Rec_Request (Req);
-
-      if Req.Active and then Req.Filepath /= null then
-
-         Status := Open (FD, Req.Filepath.all, Write_Only);
-         if Status /= OK then
-            raise Program_Error with "Cannot open '" & Req.Filepath.all &
-              "': " & Status'Img;
-         end if;
-
-         Streams_Prot.Start_Recording (Req.Src);
-         Free (Req.Filepath);
-         Log_Record_Size := 0;
-      end if;
-   end Process_Record_Request;
-
-   ------------------------
-   -- Sample_Stream_Task --
-   ------------------------
-
-   task body Sample_Stream_Task is
-      Buffer : Any_Managed_Buffer;
-      Amount : File_Size;
-      Status : Status_Code;
-      Need   : Boolean;
-
-      Rec_FD : File_Descriptor;
-   begin
-      Suspend_Until_True (Start_Task);
-      loop
-         Streams_Prot.Check_If_Theres_Something_To_Do;
-         Streams_Prot.Suspend_While_Nothing_To_Do;
-
-         --  Process at most one sample request
-         Process_Request;
-
-         --  Play samples
-         for ID in Valid_Stream_ID loop
-            Streams_Prot.Need_More_Buffer (ID, Need);
-            if Need then
-               Buffer := Allocate (RAM, 512 * 2);
-               if Buffer = null then
-                  raise Program_Error with "Cannot allocate sample buffer...";
-               else
-                  Amount := Read (Streams (ID).FD,
-                                  Buffer.Buffer_Address,
-                                  File_Size (Buffer.Buffer_Length));
-
-                  Streams (ID).Offset := Streams (ID).Offset + Amount;
-
-                  if Amount /= File_Size (Buffer.Buffer_Length)
-                    or else
-                      Streams (ID).Offset > Streams (ID).End_Point
-                  then
-
-                     --  End of file or end of sample limit
-
-                     if Streams (ID).Looping then
-                        Streams (ID).Offset := Streams (ID).Start_Point;
-                        Amount := Streams (ID).Start_Point;
-                        Status := Seek (Streams (ID).FD, From_Start, Amount);
-                        if Status /= OK then
-                           raise Program_Error with "Seek error";
-                        end if;
-                     else
-                        Close_Stream (ID, Keep_Allocated => False);
-                     end if;
-                     Release_Buffer (Buffer);
-                  else
-
-                     Streams_Prot.Push (ID, Buffer);
-                  end if;
-               end if;
-            end if;
-         end loop;
-
-         --  Record
-         if Is_Open (Rec_FD) then
-
-            --  We are already recording
-
-            if Streams_Prot.Now_Recording = None then
-               --  Recording is now finised
-               Close (Rec_FD);
-            else
-               declare
-                  Buffer : Any_Managed_Buffer;
-               begin
-                  Streams_Prot.Get_Record_Buffer (Buffer);
-                  if Buffer /= null then
-                     if Write (Rec_FD,
-                               Buffer.Buffer_Address,
-                               File_Size (Buffer.Buffer_Length))
-                       /= File_Size (Buffer.Buffer_Length)
-                     then
-                        raise Program_Error with "Record Write failure";
-                     end if;
-
-                     Log_Record_Size := Log_Record_Size +
-                       Natural (Buffer.Buffer_Length);
-
-                     Release_Buffer (Buffer);
-                  end if;
-               end;
-            end if;
-         else
-            --  We are not recording, let's see if we have a request...
-            Process_Record_Request (Rec_FD);
-         end if;
-      end loop;
-   end Sample_Stream_Task;
+   is null;
 
 end WNM.Sample_Stream;

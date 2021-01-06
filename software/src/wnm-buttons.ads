@@ -32,4 +32,7 @@ package WNM.Buttons is
    function Is_Pressed (B : Button) return Boolean
      with Inline_Always;
 
+   function Left_Diff return Integer;
+   function Right_Diff return Integer;
+
 end WNM.Buttons;

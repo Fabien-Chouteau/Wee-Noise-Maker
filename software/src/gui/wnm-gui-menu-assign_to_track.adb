@@ -50,20 +50,17 @@ package body WNM.GUI.Menu.Assign_To_Track is
    ----------
 
    overriding procedure Draw
-     (This   : in out Assign_To_Track_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This   : in out Assign_To_Track_Window)
    is
       X : Integer;
    begin
       X := 5;
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 0,
              Str         => "Assign to track:");
 
       X := 5;
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 9,
              Str         => This.Track'Img);
    end Draw;

@@ -20,7 +20,7 @@
 -------------------------------------------------------------------------------
 
 with Ada.Synchronous_Task_Control;
-with MIDI;
+--  with MIDI;
 with Quick_Synth;
 with WNM.Sequence;          use WNM.Sequence;
 with WNM.Pattern_Sequencer;
@@ -28,7 +28,7 @@ with HAL;                   use HAL;
 
 package body WNM.Sequencer is
 
-   use type MIDI.Octaves;
+   --  use type MIDI.Octaves;
 
    type Pattern is array (Tracks) of WNM.Sequence.Instance;
    Sequences : array (Patterns) of Pattern;

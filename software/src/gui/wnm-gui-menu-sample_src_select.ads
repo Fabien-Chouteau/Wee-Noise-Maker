@@ -19,7 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with WNM.Sample_Stream;
+private with Quick_Synth;
 
 package WNM.GUI.Menu.Sample_Src_Select is
 
@@ -27,17 +27,16 @@ package WNM.GUI.Menu.Sample_Src_Select is
 
 private
 
-   subtype Rec_Src is Sample_Stream.Rec_Source range
-     Sample_Stream.Input .. Sample_Stream.Master_Output;
+   subtype Rec_Src is Quick_Synth.Rec_Source range
+     Quick_Synth.Input .. Quick_Synth.Master_Output;
 
    type Src_Select_Menu is new Menu_Window with record
-      Src    : Rec_Src := Sample_Stream.Input;
+      Src    : Rec_Src := Quick_Synth.Input;
       Volume : Natural := 0;
    end record;
 
    overriding
-   procedure Draw (This   : in out Src_Select_Menu;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This : in out Src_Select_Menu);
 
    overriding
    procedure On_Event (This  : in out Src_Select_Menu;

@@ -19,13 +19,15 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Text_IO;
+
 with WNM.GUI.Menu.Sample_Src_Select;
 with WNM.GUI.Menu.Recording;
 with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
 with WNM.Sample_Stream;
-with Quick_Synth;
+--  with Quick_Synth;
 
 package body WNM.GUI.Menu.Create_Sample is
 
@@ -77,6 +79,7 @@ package body WNM.GUI.Menu.Create_Sample is
 
          when Rec_In_Progress =>
 
+            Ada.Text_IO.Put_Line ("Rec_In_Progress Exit_Value:" & Exit_Value'Img);
             if Exit_Value = Success then
                New_State := Trim;
             else
@@ -114,13 +117,13 @@ package body WNM.GUI.Menu.Create_Sample is
             end if;
 
          when Assign_To_Track =>
-            if Exit_Value = Success
-              and then
-                This.Sample_Entry /= Invalid_Sample_Entry
-            then
-               Quick_Synth.Assign_Sample (Menu.Assign_To_Track.Selected_Track,
-                                          This.Sample_Entry);
-            end if;
+            --  if Exit_Value = Success
+            --    and then
+            --      This.Sample_Entry /= Invalid_Sample_Entry
+            --  then
+            --     Quick_Synth.Assign_Sample (Menu.Assign_To_Track.Selected_Track,
+            --                                This.Sample_Entry);
+            --  end if;
             Pop (Exit_Value);
             return;
       end case;
@@ -134,6 +137,7 @@ package body WNM.GUI.Menu.Create_Sample is
          when Rec_In_Progress =>
             Recording.Push_Window;
          when Trim =>
+            Ada.Text_IO.Put_Line ("Sample_Trim.Push_Window");
             Sample_Trim.Push_Window;
          when Enter_Name =>
             Text_Dialog.Set_Title ("Sample name?");

@@ -1,0 +1,15 @@
+name = "wee_noise_maker_sim"
+description = "Shiny new project"
+version = "0.0.0"
+
+authors = ["Fabien Chouteau"]
+maintainers = ["Fabien Chouteau <chouteau@adacore.com>"]
+maintainers-logins = ["Fabien-Chouteau"]
+
+executables = ["wee_noise_maker_sim"]
+
+[[depends-on]]
+sdlada = "*"
+hal = "*"
+littlefs = "*"
+bbqueue = "*"

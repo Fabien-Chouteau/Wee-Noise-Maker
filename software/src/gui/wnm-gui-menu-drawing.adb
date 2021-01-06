@@ -19,8 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
+with WNM.Screen;
 
 package body WNM.GUI.Menu.Drawing is
 
@@ -29,16 +29,13 @@ package body WNM.GUI.Menu.Drawing is
    -------------------
 
    procedure Draw_Menu_Box
-     (Screen      : not null HAL.Bitmap.Any_Bitmap_Buffer;
-      Text        : String;
+     (Text        : String;
       Top, Bottom : Boolean)
    is
       X : Integer := 3;
    begin
-      Screen.Set_Source (Black);
-      Screen.Fill;
+      Screen.Clear;
 
-      Screen.Set_Source (White);
       if Top then
          Screen.Set_Pixel ((0, 0));
          Screen.Set_Pixel ((1, 1));
@@ -48,39 +45,29 @@ package body WNM.GUI.Menu.Drawing is
       end if;
 
       --  Top line
-      Screen.Draw_Line (Start     => (2, 2),
-                        Stop      => (93, 2),
-                        Thickness => 1,
-                        Fast      => True);
+      Screen.Draw_Line (Start => (2, 2),
+                        Stop  => (93, 2));
       --  Bottom line
-      Screen.Draw_Line (Start     => (2, 12),
-                        Stop      => (93, 12),
-                        Thickness => 1,
-                        Fast      => True);
+      Screen.Draw_Line (Start => (2, 12),
+                        Stop  => (93, 12));
 
       --  Side left
-      Screen.Draw_Line (Start     => (0, 4),
-                        Stop      => (0, 10),
-                        Thickness => 1,
-                        Fast      => True);
+      Screen.Draw_Line (Start => (0, 4),
+                        Stop  => (0, 10));
       --  Side right
-      Screen.Draw_Line (Start     => (95, 4),
-                        Stop      => (95, 10),
-                        Thickness => 1,
-                        Fast      => True);
+      Screen.Draw_Line (Start => (95, 4),
+                        Stop  => (95, 10));
 
       Screen.Set_Pixel ((1, 3));
       Screen.Set_Pixel ((1, 11));
       Screen.Set_Pixel ((94, 3));
       Screen.Set_Pixel ((94, 11));
 
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
-             Y_Offset    => 3,
+      Print (X_Offset    => X,
+             Y_Offset    => 4,
              Str         => Text);
 
       if Bottom then
-         Screen.Set_Source (White);
          Screen.Set_Pixel ((0, 15));
          Screen.Set_Pixel ((0, 14));
          Screen.Set_Pixel ((1, 13));

@@ -19,7 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;      use HAL.Bitmap;
 with WNM.Screen;      use WNM.Screen;
 with wnm_logo_text;
 with wnm_logo_wave_1;
@@ -35,25 +34,20 @@ package body WNM.GUI.Logo is
 
    procedure Draw_On_Screen (Anim_Step : HAL.UInt2) is
    begin
-      WNM.Screen.Buffer.Set_Source (Black);
-      WNM.Screen.Buffer.Fill;
+      WNM.Screen.Clear;
+      Copy_Bitmap (wnm_logo_text.Data, 6, 2);
 
-      Copy_Bitmap (wnm_logo_text.Data, 6, 1);
-
-      WNM.Screen.Buffer.Set_Source (White);
-      WNM.Screen.Buffer.Draw_Line (Start     => (6, 10),
-                                   Stop      => (32, 10),
-                                   Thickness => 1);
-      WNM.Screen.Buffer.Draw_Line (Start     => (63, 10),
-                                   Stop      => (89, 10),
-                                   Thickness => 1);
+      WNM.Screen.Draw_Line (Start     => (6, 11),
+                            Stop      => (32, 11));
+      WNM.Screen.Draw_Line (Start     => (63, 11),
+                            Stop      => (89, 11));
 
       Copy_Bitmap ((case Anim_Step is
                       when 0 => wnm_logo_wave_1.Data,
                       when 1 => wnm_logo_wave_2.Data,
                       when 2 => wnm_logo_wave_3.Data,
                       when 3 => wnm_logo_wave_4.Data),
-                   33, 8);
+                   33, 9);
    end Draw_On_Screen;
 
 end WNM.GUI.Logo;

@@ -23,16 +23,14 @@ with HAL.Bitmap;
 
 package WNM.GUI.Bitmap_Fonts is
 
-   procedure Print (Buffer      : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                    X_Offset    : in out Integer;
+   procedure Print (X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     C           : Character;
                     Invert_From : Integer := 96;
                     Invert_To   : Integer := 96)
    with Pre => Invert_From <= Invert_To;
 
-   procedure Print (Buffer      : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                    X_Offset    : in out Integer;
+   procedure Print (X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     Str         : String;
                     Invert_From : Integer := 96;

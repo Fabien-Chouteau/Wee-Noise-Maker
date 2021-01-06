@@ -37,10 +37,10 @@ package body WNM.GUI.Menu is
    -- Draw --
    ----------
 
-   procedure Draw (Screen : not null HAL.Bitmap.Any_Bitmap_Buffer) is
+   procedure Draw is
    begin
       if Stack_Cnt /= 0 then
-         Stack (Stack_Cnt).Draw (Screen);
+         Stack (Stack_Cnt).Draw;
       else
          raise Program_Error with "We are not in the menu...";
       end if;

@@ -39,8 +39,7 @@ private
    end record;
 
    overriding
-   procedure Draw (This   : in out Create_Sample_Menu;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+   procedure Draw (This   : in out Create_Sample_Menu)
    is null;
 
    overriding

@@ -42,12 +42,10 @@ package body WNM.GUI.Menu.Track_Settings is
    ----------
 
    overriding procedure Draw
-     (This   : in out Track_Settings_Menu;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Track_Settings_Menu)
    is
    begin
-      Draw_Menu_Box (Screen,
-                     (case This.Current_Setting is
+      Draw_Menu_Box ((case This.Current_Setting is
                          when Volume => "Trk Volume:" & Quick_Synth.Volume (Track)'Img & "%",
                          when Pan    => "Trk Pan:" & Quick_Synth.Pan (Track)'Img,
                          when others => This.Current_Setting'Img),

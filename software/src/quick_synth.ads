@@ -27,6 +27,7 @@ with Interfaces;         use Interfaces;
 package Quick_Synth is
 
    type Mono_Sample is new Integer_16 with Size => 16;
+
    type Stereo_Sample is record
       L, R : Mono_Sample;
    end record with Pack, Size => 32;
@@ -40,8 +41,6 @@ package Quick_Synth is
    procedure Trig (Track : WNM.Tracks);
 
    procedure Event (Msg : MIDI.Message);
-   procedure Fill (Stereo_Input  :     Stereo_Buffer;
-                   Stereo_Output : out Stereo_Buffer);
 
    procedure Mute (Track : WNM.Tracks);
    procedure Unmute (Track : WNM.Tracks);
@@ -61,8 +60,30 @@ package Quick_Synth is
    function Volume (Track : WNM.Tracks) return Natural;
 
    procedure Load_Samples;
-   procedure Assign_Sample (Track  : WNM.Tracks;
-                            Sample : WNM.Sample_Library.Sample_Entry_Index);
+   procedure Assign_Sample (Track       : WNM.Tracks;
+                            Sample_Path : String);
    function Sample_Of_Track (Track : WNM.Tracks)
                              return WNM.Sample_Library.Sample_Entry_Index;
+
+   procedure Update;
+
+   ---------------
+   -- Recording --
+   ---------------
+
+   type Rec_Source is (None, Input, Master_Output);
+
+   function Now_Recording return Rec_Source;
+
+   procedure Start_Recording (Filename : String;
+                              Source   : Rec_Source;
+                              Max_Size : Positive)
+     with Pre => Now_Recording = None and then Source /= None;
+
+   procedure Stop_Recording
+     with Post => Now_Recording = None;
+
+   function Record_Size return Natural;
+   --  with Pre => Now_Recording /= None;
+
 end Quick_Synth;

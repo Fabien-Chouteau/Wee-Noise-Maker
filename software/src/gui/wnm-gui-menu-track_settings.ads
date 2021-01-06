@@ -32,8 +32,7 @@ private
    end record;
 
    overriding
-   procedure Draw (This   : in out Track_Settings_Menu;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This : in out Track_Settings_Menu);
 
    overriding
    procedure On_Event (This  : in out Track_Settings_Menu;

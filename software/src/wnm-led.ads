@@ -19,11 +19,13 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with HAL; use HAL;
+
 package WNM.LED is
 
-   procedure Start;
    procedure Turn_On (B : LEDs) with Inline_Always;
    procedure Turn_Off (B : LEDs) with Inline_Always;
    procedure Turn_Off_All with Inline_Always;
+   function Brightness (B : LEDS) return UInt8;
 
 end WNM.LED;

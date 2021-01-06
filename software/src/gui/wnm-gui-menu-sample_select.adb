@@ -21,12 +21,12 @@
 
 with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
-with Quick_Synth;
-with WNM.Sequencer;
+--  with Quick_Synth;
+--  with WNM.Sequencer;
 
 package body WNM.GUI.Menu.Sample_Select is
 
-   Folder_Select : aliased Folder_Select_Window;
+   --  Folder_Select : aliased Folder_Select_Window;
    Sample_Select : aliased Sample_Select_Window;
 
    -------------------------------
@@ -35,7 +35,8 @@ package body WNM.GUI.Menu.Sample_Select is
 
    procedure Push_Folder_Select_Window is
    begin
-      Push (Folder_Select'Access);
+      --  Push (Folder_Select'Access);
+      Push (Sample_Select'Access);
    end Push_Folder_Select_Window;
 
    ----------
@@ -43,12 +44,10 @@ package body WNM.GUI.Menu.Sample_Select is
    ----------
 
    overriding procedure Draw
-     (This   : in out Folder_Select_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Folder_Select_Window)
    is
    begin
-      Draw_Menu_Box (Screen => Screen,
-                     Text   => Folder_Path (This.Current_Folder),
+      Draw_Menu_Box (Text   => Folder_Path (This.Current_Folder),
                      Top    => This.Current_Folder /= Sample_Folders'First,
                      Bottom => This.Current_Folder /= Sample_Folders'Last);
    end Draw;
@@ -111,8 +110,7 @@ package body WNM.GUI.Menu.Sample_Select is
    ----------
 
    overriding procedure Draw
-     (This   : in out Sample_Select_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Sample_Select_Window)
    is
    begin
 
@@ -123,15 +121,13 @@ package body WNM.GUI.Menu.Sample_Select is
         or else
           This.Rang.From > This.Rang.To
       then
-         Draw_Menu_Box (Screen => Screen,
-                        Text   => "No samples...",
+         Draw_Menu_Box (Text   => "No samples...",
                         Top    => False,
                         Bottom => False);
          return;
       end if;
 
-      Draw_Menu_Box (Screen => Screen,
-                     Text   => Entry_Name (This.Index),
+      Draw_Menu_Box (Text   => Entry_Name (This.Index),
                      Top    => This.Index /= This.Rang.From,
                      Bottom => This.Index /= This.Rang.To);
    end Draw;
@@ -163,8 +159,8 @@ package body WNM.GUI.Menu.Sample_Select is
                      This.Index := This.Index - 1;
                   end if;
                end if;
-               Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
-                                          This.Index);
+               --  Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
+               --                             This.Index);
             end if;
       end case;
    end On_Event;
@@ -179,10 +175,10 @@ package body WNM.GUI.Menu.Sample_Select is
    begin
       This.Rang := Sample_Library.Folder_Range (This.Folder);
       This.Index := This.Rang.From;
-      if This.Index /= Invalid_Sample_Entry then
-         Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
-                                    This.Index);
-      end if;
+      --  if This.Index /= Invalid_Sample_Entry then
+      --     Quick_Synth.Assign_Sample (WNM.Sequencer.Track,
+      --                                This.Index);
+      --  end if;
    end On_Pushed;
 
    --------------

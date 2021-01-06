@@ -19,15 +19,15 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL;                      use HAL;
 with WNM.Screen;               use WNM.Screen;
 with WNM.GUI.Bitmap_Fonts;     use WNM.GUI.Bitmap_Fonts;
-with WNM.Sample_Stream;
+with Quick_Synth;
 
 with tape_1;
 with tape_2;
 with tape_3;
 with tape_4;
+with HAL; use HAL;
 
 package body WNM.GUI.Menu.Recording is
 
@@ -48,14 +48,12 @@ package body WNM.GUI.Menu.Recording is
    ----------
 
    overriding procedure Draw
-     (This   : in out Recording_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This   : in out Recording_Window)
    is
       pragma Unreferenced (This);
       X : Integer := 35;
    begin
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 5,
              Str         => "Recording");
 
@@ -82,10 +80,10 @@ package body WNM.GUI.Menu.Recording is
    begin
       case Event.Kind is
          when Left_Press =>
-            WNM.Sample_Stream.Stop_Recording;
+            Quick_Synth.Stop_Recording;
             Menu.Pop (Exit_Value => Success);
          when Right_Press =>
-            WNM.Sample_Stream.Stop_Recording;
+            Quick_Synth.Stop_Recording;
             Menu.Pop (Exit_Value => Failure);
          when Encoder_Right =>
             null;

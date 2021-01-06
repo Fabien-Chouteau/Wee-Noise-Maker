@@ -32,8 +32,7 @@ private
    end record;
 
    overriding
-   procedure Draw (This   : in out Folder_Select_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This : in out Folder_Select_Window);
 
    overriding
    procedure On_Event (This  : in out Folder_Select_Window;
@@ -53,8 +52,7 @@ private
    end record;
 
    overriding
-   procedure Draw (This   : in out Sample_Select_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This : in out Sample_Select_Window);
 
    overriding
    procedure On_Event (This  : in out Sample_Select_Window;

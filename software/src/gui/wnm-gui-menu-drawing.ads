@@ -19,13 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;
-
 package WNM.GUI.Menu.Drawing is
 
    procedure Draw_Menu_Box
-     (Screen      : not null HAL.Bitmap.Any_Bitmap_Buffer;
-      Text        : String;
+     (Text        : String;
       Top, Bottom : Boolean);
 
 end WNM.GUI.Menu.Drawing;

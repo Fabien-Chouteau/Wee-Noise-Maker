@@ -21,6 +21,9 @@
 
 package WNM.Sample_Library is
 
+   subtype Sample_Name is String (1 .. 10);
+
+
    subtype Sample_Entry_Index is Natural range 0 .. 256;
    Invalid_Sample_Entry : constant Sample_Entry_Index := Sample_Entry_Index'First;
 

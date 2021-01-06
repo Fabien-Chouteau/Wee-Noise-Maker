@@ -21,6 +21,8 @@
 
 with WNM.GUI.Bitmap_Fonts;     use WNM.GUI.Bitmap_Fonts;
 with WNM.Sample_Stream;
+with WNM.Screen;
+with Quick_Synth;
 
 package body WNM.GUI.Menu.Sample_Trim is
 
@@ -55,12 +57,13 @@ package body WNM.GUI.Menu.Sample_Trim is
 
    procedure Preview_Sample (This : Trim_Window) is
    begin
-      WNM.Sample_Stream.Start (Filepath    => Sample_Rec_Filepath,
+      WNM.Sample_Stream.Assign_Sample (WNM.Sample_Stream.Always_On,
+                                       Sample_Rec_Filepath);
+
+      WNM.Sample_Stream.Start (Track       => WNM.Sample_Stream.Always_On,
                                Start_Point => This.Start,
                                End_Point   => This.Stop,
-                               Track       => WNM.Sample_Stream.ST_1,
-                               Looping     => False,
-                               Poly        => False);
+                               Looping     => False);
    end Preview_Sample;
 
    ----------
@@ -68,8 +71,7 @@ package body WNM.GUI.Menu.Sample_Trim is
    ----------
 
    overriding procedure Draw
-     (This   : in out Trim_Window;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Trim_Window)
    is
       X : Integer := 5;
       Start : constant Natural := This.Start / This.Increment;
@@ -80,27 +82,18 @@ package body WNM.GUI.Menu.Sample_Trim is
 --               Y_Offset    => 0,
 --               Str         => "Trim sample");
 
-      Screen.Set_Source (HAL.Bitmap.White);
       Screen.Draw_Line (Start     => (Start, 12),
-                        Stop      => (Stop, 12),
-                        Thickness => 1,
-                        Fast      => True);
+                        Stop      => (Stop, 12));
       Screen.Draw_Line (Start     => (Start, 9),
-                        Stop      => (Start, 15),
-                        Thickness => 1,
-                        Fast      => True);
+                        Stop      => (Start, 15));
       Screen.Draw_Line (Start     => (Stop, 9),
-                        Stop      => (Stop, 15),
-                        Thickness => 1,
-                        Fast      => True);
+                        Stop      => (Stop, 15));
       X := 5;
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 0,
              Str         => This.Start'Img);
       X := 5;
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 8,
              Str         => This.Stop'Img);
    end Draw;
@@ -155,11 +148,12 @@ package body WNM.GUI.Menu.Sample_Trim is
    overriding procedure On_Pushed (This : in out Trim_Window)
    is
    begin
+
       This.Start := 0;
-      This.Stop  := Sample_Stream.Record_Size;
+      This.Stop  := Quick_Synth.Record_Size;
       This.Size  := This.Stop;
 
-      This.Increment := This.Size / 95;
+      This.Increment := (This.Size / 95) + 1;
 
       if This.Increment = 0 then
          Pop (Exit_Value => Failure);

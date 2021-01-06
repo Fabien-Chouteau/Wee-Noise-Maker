@@ -45,8 +45,7 @@ private
    end record;
 
    overriding
-   procedure Draw (This   : in out Text_Dialog_Window;
-                   Screen : not null HAL.Bitmap.Any_Bitmap_Buffer);
+   procedure Draw (This   : in out Text_Dialog_Window);
 
    overriding
    procedure On_Event (This  : in out Text_Dialog_Window;

@@ -19,7 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sample_Stream;      use WNM.Sample_Stream;
+with Quick_Synth;            use Quick_Synth;
 with WNM.GUI.Bitmap_Fonts;   use WNM.GUI.Bitmap_Fonts;
 with Enum_Next;
 
@@ -44,19 +44,16 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    ----------
 
    overriding procedure Draw
-     (This   : in out Src_Select_Menu;
-      Screen : not null HAL.Bitmap.Any_Bitmap_Buffer)
+     (This : in out Src_Select_Menu)
    is
       X : Integer := 5;
    begin
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 0,
              Str         => "Source:");
 
       X := 5;
-      Print (Buffer      => Screen.all,
-             X_Offset    => X,
+      Print (X_Offset    => X,
              Y_Offset    => 9,
              Str         => This.Src'Img);
 
@@ -75,7 +72,7 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    begin
       case Event.Kind is
          when Left_Press =>
-            Sample_Stream.Start_Recording
+            Quick_Synth.Start_Recording
               (Filename => Sample_Rec_Filepath,
                Source   => This.Src,
                Max_Size => 332000 * 10 * 2);
