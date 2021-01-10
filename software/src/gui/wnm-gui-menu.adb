@@ -88,4 +88,15 @@ package body WNM.GUI.Menu is
       end if;
    end Pop;
 
+   ---------------
+   -- Exit_Menu --
+   ---------------
+
+   procedure Exit_Menu is
+   begin
+      while Stack_Cnt /= 0 loop
+         Pop (None);
+      end loop;
+   end Exit_Menu;
+
 end WNM.GUI.Menu;

@@ -26,7 +26,7 @@ package body WNM.File_System is
    procedure Create_File (FD : aliased in out File_Descriptor; Name : String) is
    begin
       if Littlefs.Open (FS, FD, Name, LFS_O_WRONLY + LFS_O_CREAT) /= 0 then
-         raise Program_Error with "Create file error...";
+         raise Program_Error with "Create ('" & Name & "') file error...";
       end if;
    end Create_File;
 
@@ -37,7 +37,7 @@ package body WNM.File_System is
    procedure Open_Read (FD : aliased in out File_Descriptor; Name : String) is
    begin
       if Littlefs.Open (FS, FD, Name, LFS_O_RDONLY) /= 0 then
-         raise Program_Error with "Open_Read file error...";
+         raise Program_Error with "Open_Read ('" & Name & "') file error...";
       end if;
    end Open_Read;
 
@@ -96,6 +96,31 @@ package body WNM.File_System is
    begin
       return WNM.Storage.Size  - Littlefs.Size (FS) * 2048;
    end Available;
+
+   --------------------------
+   -- For_Each_File_In_Dir --
+   --------------------------
+
+   procedure For_Each_File_In_Dir (Dirpath : String)is
+      Dir : aliased LFS_Dir;
+      Err : int;
+      Info : aliased Entry_Info;
+   begin
+      Err := Open (FS, Dir, Dirpath);
+
+      if Err = 0 then
+         while Read (FS, Dir, Info) > 0 loop
+            declare
+               Name : constant String := Littlefs.Name (Info);
+            begin
+               if Name /= "." and then Name /= ".." then
+                  Process (Name);
+               end if;
+            end;
+         end loop;
+         Err := Close (FS, Dir);
+      end if;
+   end For_Each_File_In_Dir;
 
 begin
    if Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all) /= 0 then

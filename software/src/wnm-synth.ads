@@ -19,24 +19,21 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Interfaces;
+
 with MIDI;
 with WNM;
 with WNM.Sample_Library;
-with Interfaces;         use Interfaces;
+with WNM.Time;
+with WNM.Audio;
 
-package Quick_Synth is
+package WNM.Synth is
 
-   type Mono_Sample is new Integer_16 with Size => 16;
+   type Sample_Time is new Interfaces.Unsigned_64;
 
-   type Stereo_Sample is record
-      L, R : Mono_Sample;
-   end record with Pack, Size => 32;
-
-   type Mono_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Mono_Sample
-     with Pack, Size => WNM.Mono_Buffer_Size_In_Bytes * 8;
-
-   type Stereo_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Stereo_Sample
-     with Pack, Size => WNM.Stereo_Buffer_Size_In_Bytes * 8;
+   function Sample_Clock return Sample_Time;
+   --  How many audio samples have been sent to the DAC so far.
+   --  This number can be used to count time between two events.
 
    procedure Trig (Track : WNM.Tracks);
 
@@ -65,13 +62,16 @@ package Quick_Synth is
    function Sample_Of_Track (Track : WNM.Tracks)
                              return WNM.Sample_Library.Sample_Entry_Index;
 
-   procedure Update;
+   function Update return WNM.Time.Time_Ms;
+
+   procedure Set_Passthrough (Kind : Audio.Input_Kind);
+   function Get_Passthrough return Audio.Input_Kind;
 
    ---------------
    -- Recording --
    ---------------
 
-   type Rec_Source is (None, Input, Master_Output);
+   type Rec_Source is (None, Line_In, FM, Master_Output);
 
    function Now_Recording return Rec_Source;
 
@@ -86,4 +86,4 @@ package Quick_Synth is
    function Record_Size return Natural;
    --  with Pre => Now_Recording /= None;
 
-end Quick_Synth;
+end WNM.Synth;

@@ -30,7 +30,6 @@ with WNM.Pattern_Sequencer; use WNM.Pattern_Sequencer;
 with WNM.Master_Volume;
 with WNM.GUI.Menu;
 with WNM.GUI.Logo;
-with WNM.Time;
 --  with WNM.Sample_Library;    use WNM.Sample_Library;
 
 --  with Quick_Synth;           use Quick_Synth;
@@ -39,16 +38,25 @@ package body WNM.GUI.Update is
 
    Anim_Step : HAL.UInt32 := 0;
 
+   Next_Start : Time.Time_Ms := Time.Time_Ms'First;
+
    ------------
    -- Update --
    ------------
 
-   procedure Update is
+   function Update return Time.Time_Ms is
       B : Integer;
 
       BPM : Natural;
       Volume : Natural;
+      Now : constant Time.Time_Ms := Time.Clock;
    begin
+      if Now < Next_Start then
+         return Next_Start;
+      end if;
+
+      Next_Start := Next_Start + GUI_Task_Period_Ms;
+
       WNM.Screen.Clear;
 
       --  Splash screen
@@ -56,7 +64,7 @@ package body WNM.GUI.Update is
          WNM.GUI.Logo.Draw_On_Screen (UInt2 (Anim_Step mod 4));
          WNM.Screen.Update;
          Anim_Step := Anim_Step + 1;
-         return;
+         return Next_Start;
       end if;
 
       if Menu.In_Menu then
@@ -117,18 +125,16 @@ package body WNM.GUI.Update is
                    Y_Offset    => 0,
                    Str         => "Enable FX",
                    Invert_From => 0);
-         when WNM.UI.Trig_Edit =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => 0,
-                   Str         => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
-                   Invert_From => 0);
+         when WNM.UI.Step_Edit =>
+            null; --  Step edit is a menu
          end case;
       end if;
 
       WNM.Screen.Update;
 
       Anim_Step := Anim_Step + 1;
+
+      return Next_Start;
    end Update;
 
 end WNM.GUI.Update;

@@ -29,7 +29,7 @@ with WNM.Master_Volume;
 with WNM.SDCard;
 with WNM.Sample_Stream;
 with WNM.Sample_Library;
-with Quick_Synth;
+with WNM.Synth;
 
 procedure Main is
 begin

@@ -24,29 +24,28 @@
 --  it to/from the current step. Active notes for this step are shown with the
 --  LEDs. Press the current chan to erase the squence.
 
-with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
 with WNM.Sequencer;                use WNM.Sequencer;
 with WNM.Encoders;                 use WNM.Encoders;
-with Quick_Synth;                  use Quick_Synth;
+with WNM.Synth;                  use WNM.Synth;
 with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
 with WNM.GUI.Menu.Track_Settings;
+with WNM.GUI.Menu.Step_Settings;
 with WNM.Buttons;
 with WNM.LED;
+with HAL; use HAL;
 
 package body WNM.UI is
 
-   UI_Task_Start   : Suspension_Object;
-
    procedure Signal_Event (B : Button; Evt : Buttton_Event);
 
-   procedure Set_FX (B : Keyboard_Button);
+   procedure Toggle_FX (B : Keyboard_Button);
 
    Default_Input_Mode : constant Input_Mode_Type := Note;
 
-   FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
+   FX_Is_On : array (Tracks) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
    Editting_Step : Sequencer_Steps := 1;
@@ -109,8 +108,12 @@ package body WNM.UI is
                         --  Switch to squence edition mode
                         Sequencer.Rec_Long;
                      when B1 .. B16 =>
-                        Current_Input_Mode := Trig_Edit;
+
+                        GUI.Menu.Step_Settings.Push_Window;
+                        Current_Input_Mode := Step_Edit;
                         Editting_Step := To_Value (B);
+
+
                      when others => null;
                   end case;
                when On_Release =>
@@ -131,15 +134,15 @@ package body WNM.UI is
                WNM.Pattern_Sequencer.End_Sequence_Edit;
             end if;
 
-            --  if B in B1 .. B16 and Evt = On_Press then
-            --     Quick_Synth.Toggle_Mute (B);
-            --  end if;
+            if B in B1 .. B16 and Evt = On_Press then
+               WNM.Synth.Toggle_Mute (B);
+            end if;
          when FX_Select =>
             case Evt is
                when On_Press =>
                   case B is
                      when Keyboard_Button =>
-                        Set_FX (B);
+                        Toggle_FX (B);
                      when others =>
                         null;
                   end case;
@@ -176,30 +179,25 @@ package body WNM.UI is
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
-         when Trig_Edit =>
-            if To_Value (B) = Editting_Step and then Evt = On_Release then
+         when Step_Edit =>
+            if B in B1 .. B16 and then Evt = On_Press then
+               Editting_Step := To_Value (B);
+            end if;
+
+            if not WNM.GUI.Menu.In_Menu then
                Current_Input_Mode := Default_Input_Mode;
             end if;
       end case;
    end Signal_Event;
 
-   ------------
-   -- Set_FX --
-   ------------
+   ---------------
+   -- Toggle_FX --
+   ---------------
 
-   procedure Set_FX (B : Keyboard_Button) is
+   procedure Toggle_FX (B : Tracks) is
    begin
       FX_Is_On (B) := not FX_Is_On (B);
-   end Set_FX;
-
-   -----------
-   -- Start --
-   -----------
-
-   procedure Start is
-   begin
-      Set_True (UI_Task_Start);
-   end Start;
+   end Toggle_FX;
 
    ---------------------------
    -- Current_Editting_Trig --
@@ -207,6 +205,13 @@ package body WNM.UI is
 
    function Current_Editting_Trig return Sequencer_Steps
    is (Editting_Step);
+
+   -----------
+   -- FX_On --
+   -----------
+
+   function FX_On (B : Tracks) return Boolean
+   is (FX_Is_On (B));
 
    --------------------
    -- Has_Long_Press --
@@ -246,106 +251,98 @@ package body WNM.UI is
               when Encoder_R => True);
    end Has_Long_Press;
 
-   -------------
-   -- UI_Task --
-   -------------
 
-   task UI_Task is
-      pragma Priority (UI_Task_Priority);
-      pragma Storage_Size (UI_Task_Stack_Size);
-      pragma Secondary_Stack_Size (UI_Task_Secondary_Stack_Size);
-   end UI_Task;
+   Last_State    : array (Button) of Buttons.Raw_Button_State := (others => WNM.Buttons.Up);
+   Pressed_Since : array (Button) of WNM.Time.Time_Ms := (others => 0);
+   Last_Event    : array (Button) of Buttton_Event := (others => On_Release);
+   Next_Start    : Time.Time_Ms := Time.Time_Ms'First;
 
-   task body UI_Task is
+   ------------
+   -- Update --
+   ------------
 
+   function Update return Time.Time_Ms is
       use Buttons;
-
-      Period     : Time_Span renames UI_Task_Period;
-
-      Next_Start : Time;
-      Now        : Time renames Next_Start;
-      Last_State    : array (Button) of Buttons.Raw_Button_State := (others => Up);
-      Pressed_Since : array (Button) of Time := (others => Time_First);
-      Last_Event    : array (Button) of Buttton_Event := (others => On_Release);
 
       L_Enco : Integer;
       R_Enco : Integer;
+
+      Now : constant Time.Time_Ms := Time.Clock;
    begin
-      Suspend_Until_True (UI_Task_Start);
+      if Now < Next_Start then
+         return Next_Start;
+      end if;
 
-      Next_Start := Clock;
-      loop
+      Next_Start := Next_Start + UI_Task_Period_Ms;
 
-         Next_Start := Next_Start + Period;
-         delay until Next_Start;
+      Buttons.Scan;
 
-         Buttons.Scan;
-         --  Handle buttons
-         for B in Button loop
-            if Last_State (B) = State (B) then
-               --  The button didn't change, let's check if we are waiting for
-               --  a long press event.
-               if Has_Long_Press (B)
-                 and then
-                   State (B) = Down
-                 and then
-                   Last_Event (B) = Waiting_For_Long_Press
-                 and then
-                   Pressed_Since (B) + Long_Press_Time_Span < Now
-               then
-                  Last_Event (B) := On_Long_Press;
-                  Signal_Event (B, Last_Event (B));
-               end if;
-
-            elsif State (B) = Down then
-               --  Button was justed pressed
-
-               if Has_Long_Press (B) then
-                  --  If this button has long press event we don't signal the
-                  --  On_Press right now, but we record the time at wich it was
-                  --  pressed.
-
-                  Last_Event (B) := Waiting_For_Long_Press;
-                  Pressed_Since (B) := Now;
-               else
-                  Last_Event (B) := On_Press;
-                  Signal_Event (B, Last_Event (B));
-               end if;
-            else
-               --  Button was just released
-
-               if Last_Event (B) = Waiting_For_Long_Press then
-                  --  The button was released before we reached the long press
-                  --  delay. It was not a long press after all so we first send
-                  --  The On_Press event and then the On_Realease.
-                  Signal_Event (B, On_Press);
-               end if;
-
-               Last_Event (B) := On_Release;
+      --  Handle buttons
+      for B in Button loop
+         if Last_State (B) = State (B) then
+            --  The button didn't change, let's check if we are waiting for
+            --  a long press event.
+            if Has_Long_Press (B)
+              and then
+                State (B) = Down
+              and then
+                Last_Event (B) = Waiting_For_Long_Press
+              and then
+                Pressed_Since (B) + Long_Press_Time_Span_Ms < Now
+            then
+               Last_Event (B) := On_Long_Press;
                Signal_Event (B, Last_Event (B));
             end if;
 
-            Last_State (B) := State (B);
-         end loop;
+         elsif State (B) = Down then
+            --  Button was justed pressed
 
-         --------------
-         -- Encoders --
-         --------------
+            if Has_Long_Press (B) then
+               --  If this button has long press event we don't signal the
+               --  On_Press right now, but we record the time at wich it was
+               --  pressed.
 
-         L_Enco := WNM.Buttons.Left_Diff;
-         R_Enco := WNM.Buttons.Right_Diff;
-
-         if GUI.Menu.In_Menu then
-            if L_Enco /= 0 then
-               GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Left,
-                                   Value => L_Enco));
-            end if;
-            if R_Enco /= 0 then
-               GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Right,
-                                   Value => R_Enco));
+               Last_Event (B) := Waiting_For_Long_Press;
+               Pressed_Since (B) := Now;
+            else
+               Last_Event (B) := On_Press;
+               Signal_Event (B, Last_Event (B));
             end if;
          else
-            case Current_Input_Mode is
+            --  Button was just released
+
+            if Last_Event (B) = Waiting_For_Long_Press then
+               --  The button was released before we reached the long press
+               --  delay. It was not a long press after all so we first send
+               --  The On_Press event and then the On_Realease.
+               Signal_Event (B, On_Press);
+            end if;
+
+            Last_Event (B) := On_Release;
+            Signal_Event (B, Last_Event (B));
+         end if;
+
+         Last_State (B) := State (B);
+      end loop;
+
+      --------------
+      -- Encoders --
+      --------------
+
+      L_Enco := WNM.Buttons.Left_Diff;
+      R_Enco := WNM.Buttons.Right_Diff;
+
+      if GUI.Menu.In_Menu then
+         if L_Enco /= 0 then
+            GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Left,
+                                Value => L_Enco));
+         end if;
+         if R_Enco /= 0 then
+            GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Right,
+                                Value => R_Enco));
+         end if;
+      else
+         case Current_Input_Mode is
             when Volume_BPM =>
                WNM.Sequencer.Change_BPM (R_Enco);
                WNM.Master_Volume.Change (L_Enco);
@@ -353,105 +350,100 @@ package body WNM.UI is
                null;
                --  Quick_Synth.Change_Pan (Sequencer.Track, R_Enco);
                --  Quick_Synth.Change_Volume (Sequencer.Track, L_Enco);
-            when Trig_Edit =>
-               if L_Enco > 0 then
-                  WNM.Sequencer.Trig_Next (Editting_Step);
-               elsif L_Enco < 0 then
-                  WNM.Sequencer.Trig_Prev (Editting_Step);
-               end if;
             when others =>
                if L_Enco /= 0 or else R_Enco /= 0 then
                   GUI.Menu.Track_Settings.Push_Window;
                end if;
-            end case;
-         end if;
+         end case;
+      end if;
 
-         --------------
-         -- Set LEDs --
-         --------------
+      --------------
+      -- Set LEDs --
+      --------------
 
-         LED.Turn_Off_All;
+      LED.Turn_Off_All;
 
-         -- Play LED --
-         if Sequencer.State not in Pause | Edit then
+      -- Play LED --
+      if Sequencer.State not in Pause | Edit then
+         LED.Turn_On (Play);
+         if Sequencer.Step in 1 | 5 | 9 | 13 then
             LED.Turn_On (Play);
-            if Sequencer.Step in 1 | 5 | 9 | 13 then
-               LED.Turn_On (Play);
-            end if;
          end if;
+      end if;
 
-         -- Rec LED --
-         if Sequencer.State = Edit
-           or else
-            Sequencer.State in Play_And_Rec | Play_And_Edit
-         then
-            LED.Turn_On (Rec);
-         end if;
+      -- Rec LED --
+      if Sequencer.State = Edit
+        or else
+          Sequencer.State in Play_And_Rec | Play_And_Edit
+      then
+         LED.Turn_On (Rec);
+      end if;
 
-         --  B1 .. B16 LEDs --
-         case Current_Input_Mode is
+      --  B1 .. B16 LEDs --
+      case Current_Input_Mode is
 
-            -- FX selection mode --
-            when FX_Select =>
-               --  The FX LED will be on if there's at least one FX enabled
+         -- FX selection mode --
+         when FX_Select =>
+            --  The FX LED will be on if there's at least one FX enabled
 
-               for B in B1 .. B16 loop
-                  if FX_Is_On (B) then
-                     LED.Turn_On (B);
-                  end if;
-               end loop;
+            for B in B1 .. B16 loop
+               if FX_Is_On (B) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
 
             -- Track assign mode --
-            when Track_Select =>
-               for B in B1 .. B16 loop
-                  if Sequencer.Track = B then
-                     LED.Turn_On (B);
-                  end if;
-               end loop;
+         when Track_Select =>
+            for B in B1 .. B16 loop
+               if Sequencer.Track = B then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
 
             --  Pattern select --
-            when Pattern_Select | Pattern_Copy =>
-               for B in B1 .. B16 loop
-                  if Pattern_Sequencer.Current_Pattern = B then
-                     LED.Turn_On (B);
-                  end if;
-                  if Pattern_Sequencer.Is_In_Pattern_Sequence (B) then
-                     LED.Turn_On (B);
-                  end if;
-               end loop;
+         when Pattern_Select | Pattern_Copy =>
+            for B in B1 .. B16 loop
+               if Pattern_Sequencer.Current_Pattern = B then
+                  LED.Turn_On (B);
+               end if;
+               if Pattern_Sequencer.Is_In_Pattern_Sequence (B) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
 
-            --  Volume and BPM mode --
-            when Volume_BPM =>
-               for B in B1 .. B16 loop
-                  if not Quick_Synth.Muted (B) then
-                     LED.Turn_On (B);
-                  end if;
-               end loop;
+         --  Volume and BPM mode --
+         when Volume_BPM =>
+            for B in B1 .. B16 loop
+               if not WNM.Synth.Muted (B) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
 
             --  Any other mode --
-            when others =>
-               case Sequencer.State is
-                  when Edit | Play_And_Edit =>
-                        for B in B1 .. B16 loop
-                           if Sequencer.Set (To_Value (B)) then
-                              LED.Turn_On (B);
-                           end if;
-                        end loop;
-                  when Play | Play_And_Rec =>
-                     for B in B1 .. B16 loop
-                        if Sequencer.Set (B, Sequencer.Step) then
-                           LED.Turn_On (B);
-                        end if;
-                     end loop;
-                  when others =>
-                     null;
-               end case;
-         end case;
+         when others =>
+            case Sequencer.State is
+               when Edit | Play_And_Edit =>
+                  for B in B1 .. B16 loop
+                     if Sequencer.Set (To_Value (B)) then
+                        LED.Turn_On (B);
+                     end if;
+                  end loop;
+               when Play | Play_And_Rec =>
+                  for B in B1 .. B16 loop
+                     if Sequencer.Set (B, Sequencer.Step) then
+                        LED.Turn_On (B);
+                     end if;
+                  end loop;
+               when others =>
+                  null;
+            end case;
+      end case;
 
-         if Sequencer.State in Play_And_Edit | Play_And_Rec | Play then
-            LED.Turn_On (To_Button (Sequencer.Step));
-         end if;
-      end loop;
-   end UI_Task;
+      if Sequencer.State in Play_And_Edit | Play_And_Rec | Play then
+         LED.Turn_On (To_Button (Sequencer.Step));
+      end if;
+
+      return Next_Start;
+   end Update;
 
 end WNM.UI;

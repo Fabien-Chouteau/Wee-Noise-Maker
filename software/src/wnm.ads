@@ -19,9 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Real_Time; use Ada.Real_Time;
-with System;
 with MIDI;
+with Enum_Next;
 
 package WNM is
 
@@ -43,7 +42,11 @@ package WNM is
    subtype Tracks is Keyboard_Button;
    subtype Patterns is Keyboard_Button;
 
-   type Trigger is (None, Always, Percent_25, Percent_50, Percent_75);
+   type Trigger is (None, Always, Fill, Percent_25, Percent_50, Percent_75);
+   type Repeat is mod 9;
+   type Repeat_Rate is (Rate_1_1, Rate_1_2, Rate_1_3, Rate_1_4, Rate_1_5,
+                        Rate_1_6, Rate_1_8, Rate_1_10, Rate_1_12, Rate_1_16,
+                        Rate_1_20, Rate_1_24, Rate_1_32);
 
    function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
      with Inline_Always;
@@ -55,32 +58,31 @@ package WNM is
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 6;
 
-   DAC_Task_Priority       : constant System.Priority := System.Default_Priority + 10;
-   Synth_Task_Priority     : constant System.Priority := DAC_Task_Priority - 1;
-   Sample_Task_Priority    : constant System.Priority := Synth_Task_Priority - 1;
-   Sequencer_Task_Priority : constant System.Priority := Sample_Task_Priority - 1;
-   UI_Task_Priority        : constant System.Priority := Sequencer_Task_Priority - 1;
-   LED_Task_Priority       : constant System.Priority := UI_Task_Priority - 1;
+   UI_Task_Period_Ms : constant := 50;
+   GUI_Task_Period_Ms : constant := 50;
 
-   UI_Task_Period               : constant Time_Span := Milliseconds (50);
-   UI_Task_Stack_Size           : constant := 10 * 1024;
-   UI_Task_Secondary_Stack_Size : constant := 5 * 1024;
+   Long_Press_Time_Span_Ms : constant := 300;
+   --  How much time (in miliseconds) users have to press a button to get the
+   --  alternative function.
 
-   Sequencer_Task_Stack_Size           : constant := 10 * 1024;
-   Sequencer_Task_Secondary_Stack_Size : constant := 5 * 1024;
-
-   Sample_Taks_Stack_Size       : constant := 10 * 1024;
-
-   LED_Task_Period   : constant Time_Span := Microseconds (1000);
-
-   Long_Press_Time_Span : constant Time_Span := Milliseconds (300);
-   --  How much time users have to press a button to get the alternative
-   --  function.
-
+   Sample_Frequency            : constant := 44_100;
    Samples_Per_Buffer          : constant := 512;
    Mono_Buffer_Size_In_Bytes   : constant := Samples_Per_Buffer * 2;
    Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Buffer * 4;
 
+   Audio_Queue_Size : constant := 3;
 
    Sample_Rec_Filepath : constant String := "/sample_rec.raw";
+
+
+   --  Enums utils --
+   pragma Warnings (Off, "use clause for package");
+   package Trigger_Next is new Enum_Next (Trigger);
+   use Trigger_Next;
+   package Repeat_Next is new Enum_Next (Repeat);
+   use Repeat_Next;
+   package Repeat_Rate_Next is new Enum_Next (Repeat_Rate);
+   use Repeat_Rate_Next;
+   pragma Warnings (On, "use clause for package");
+
 end WNM;

@@ -22,7 +22,7 @@
 with WNM.GUI.Bitmap_Fonts;     use WNM.GUI.Bitmap_Fonts;
 with WNM.Sample_Stream;
 with WNM.Screen;
-with Quick_Synth;
+with WNM.Synth;
 
 package body WNM.GUI.Menu.Sample_Trim is
 
@@ -150,7 +150,7 @@ package body WNM.GUI.Menu.Sample_Trim is
    begin
 
       This.Start := 0;
-      This.Stop  := Quick_Synth.Record_Size;
+      This.Stop  := Synth.Record_Size;
       This.Size  := This.Stop;
 
       This.Increment := (This.Size / 95) + 1;

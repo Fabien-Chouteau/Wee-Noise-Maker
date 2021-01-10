@@ -19,7 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Quick_Synth;            use Quick_Synth;
+with WNM.Synth;            use WNM.Synth;
+with WNM.Audio;
 with WNM.GUI.Bitmap_Fonts;   use WNM.GUI.Bitmap_Fonts;
 with Enum_Next;
 
@@ -29,6 +30,18 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    use Rec_Src_Enum_Next;
 
    Src_Select_Window_Singleton : aliased Src_Select_Menu;
+
+   procedure Set_Passthrough (Src : Rec_Src) is
+   begin
+      case Src is
+         when Line_In =>
+            WNM.Synth.Set_Passthrough (Audio.Line_In);
+         when FM =>
+            WNM.Synth.Set_Passthrough (Audio.FM);
+         when Master_Output =>
+            WNM.Synth.Set_Passthrough (Audio.None);
+      end case;
+   end Set_Passthrough;
 
    -----------------
    -- Push_Window --
@@ -72,7 +85,7 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    begin
       case Event.Kind is
          when Left_Press =>
-            Quick_Synth.Start_Recording
+            Synth.Start_Recording
               (Filename => Sample_Rec_Filepath,
                Source   => This.Src,
                Max_Size => 332000 * 10 * 2);
@@ -91,8 +104,10 @@ package body WNM.GUI.Menu.Sample_Src_Select is
          when Encoder_Left =>
             if Event.Value > 0 then
                This.Src := Next (This.Src);
+               Set_Passthrough (This.Src);
             elsif Event.Value < 0 then
                This.Src := Prev (This.Src);
+               Set_Passthrough (This.Src);
             end if;
       end case;
    end On_Event;
@@ -104,9 +119,8 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    overriding procedure On_Pushed
      (This  : in out Src_Select_Menu)
    is
-      pragma Unreferenced (This);
    begin
-      null;
+      Set_Passthrough (This.Src);
    end On_Pushed;
 
    --------------

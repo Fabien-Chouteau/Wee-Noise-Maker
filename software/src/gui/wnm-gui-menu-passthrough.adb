@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2020 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,14 +19,17 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;           use HAL.Bitmap;
-with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
 with WNM.Synth;
-with WNM.Sequencer;        use WNM.Sequencer;
+with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
+with HAL.Bitmap;           use HAL.Bitmap;
+with Enum_Next;
 
-package body WNM.GUI.Menu.Track_Settings is
+package body WNM.GUI.Menu.Passthrough is
 
-   Track_Settings_Singleton : aliased Track_Settings_Menu;
+   package Src_Enum_Next is new Enum_Next (Audio.Input_Kind);
+   use Src_Enum_Next;
+
+   Win  : aliased Passthrough_Window;
 
    -----------------
    -- Push_Window --
@@ -34,79 +37,67 @@ package body WNM.GUI.Menu.Track_Settings is
 
    procedure Push_Window is
    begin
-      Push (Track_Settings_Singleton'Access);
+      Push (Win'Access);
    end Push_Window;
 
    ----------
    -- Draw --
    ----------
 
-   overriding procedure Draw
-     (This : in out Track_Settings_Menu)
+   overriding
+   procedure Draw (This : in out Passthrough_Window)
    is
+      X : Integer := 5;
    begin
-      Draw_Menu_Box ((case This.Current_Setting is
-                         when Volume => "Trk Volume:" & WNM.Synth.Volume (Track)'Img & "%",
-                         when Pan    => "Trk Pan:" & WNM.Synth.Pan (Track)'Img),
-                     Top => This.Current_Setting /= Settings'First,
-                     Bottom => This.Current_Setting /= Settings'Last);
+      Print (X_Offset    => X,
+             Y_Offset    => 0,
+             Str         => "Source:");
+
+      X := 5;
+      Print (X_Offset    => X,
+             Y_Offset    => 9,
+             Str         => This.Src'Img);
    end Draw;
 
    --------------
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
-     (This  : in out Track_Settings_Menu;
+   overriding
+   procedure On_Event
+     (This  : in out Passthrough_Window;
       Event : Menu_Event)
    is
    begin
       case Event.Kind is
          when Left_Press =>
-            null;
+            Menu.Exit_Menu;
          when Right_Press =>
-            Menu.Pop (Exit_Value => None);
+            Synth.Set_Passthrough (This.Before);
+            Menu.Pop (Exit_Value => Failure);
          when Encoder_Right =>
-            case This.Current_Setting is
-               when Volume =>
-                  WNM.Synth.Change_Volume (Track, Event.Value);
-               when Pan =>
-                  Synth.Change_Pan (Track, Event.Value);
-            end case;
+            null;
          when Encoder_Left =>
             if Event.Value > 0 then
-               if This.Current_Setting /= Settings'Last then
-                  This.Current_Setting := Settings'Succ (This.Current_Setting);
-               end if;
+               This.Src := Next (This.Src);
+               Synth.Set_Passthrough (This.Src);
             elsif Event.Value < 0 then
-               if This.Current_Setting /= Settings'First then
-                  This.Current_Setting := Settings'Pred (This.Current_Setting);
-               end if;
+               This.Src := Prev (This.Src);
+               Synth.Set_Passthrough (This.Src);
             end if;
       end case;
    end On_Event;
 
-      ---------------
+   ---------------
    -- On_Pushed --
    ---------------
 
    overriding procedure On_Pushed
-     (This  : in out Track_Settings_Menu)
+     (This  : in out Passthrough_Window)
    is
    begin
-      null;
+      This.Src := Synth.Get_Passthrough;
+      This.Before := This.Src;
    end On_Pushed;
 
-   --------------
-   -- On_Focus --
-   --------------
-
-   overriding procedure On_Focus
-     (This       : in out Track_Settings_Menu;
-      Exit_Value : Window_Exit_Value)
-   is
-   begin
-      null;
-   end On_Focus;
-
-end WNM.GUI.Menu.Track_Settings;
+end WNM.GUI.Menu.Passthrough;

@@ -19,6 +19,9 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Time;
+with WNM.Synth;
+
 package WNM.Sequencer is
 
    type Sequencer_State is (Pause,
@@ -62,17 +65,25 @@ package WNM.Sequencer is
    procedure Set_BPM (BPM : Beat_Per_Minute);
    procedure Change_BPM (BPM_Delta : Integer);
    function BPM return Beat_Per_Minute;
+   function Samples_Per_Beat return Synth.Sample_Time;
 
    procedure Execute_Step;
 
-   procedure Start;
-   --  Start the sequencer task
+   function Update return Time.Time_Ms;
 
    function Set (Step : Sequencer_Steps) return Boolean;
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean;
 
-   function Trig (Step : Sequencer_Steps) return Trigger;
+   function Trig (Step : Sequencer_Steps) return WNM.Trigger;
    procedure Trig_Next (Step : Sequencer_Steps);
    procedure Trig_Prev (Step : Sequencer_Steps);
+
+   function Repeat (Step : Sequencer_Steps) return WNM.Repeat;
+   procedure Repeat_Next (Step : Sequencer_Steps);
+   procedure Repeat_Prev (Step : Sequencer_Steps);
+
+   function Repeat_Rate (Step : Sequencer_Steps) return WNM.Repeat_Rate;
+   procedure Repeat_Rate_Next (Step : Sequencer_Steps);
+   procedure Repeat_Rate_Prev (Step : Sequencer_Steps);
 
 end WNM.Sequencer;

@@ -1,4 +1,5 @@
 with Littlefs;
+with System;
 
 package WNM.File_System is
 
@@ -32,5 +33,9 @@ package WNM.File_System is
                    Whence : Seek_Whence);
 
    function Available return File_Signed_Size;
+
+   generic
+      with procedure Process (Filename : String);
+   procedure For_Each_File_In_Dir (Dirpath : String);
 
 end WNM.File_System;

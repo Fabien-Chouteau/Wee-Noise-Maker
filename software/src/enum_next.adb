@@ -47,4 +47,22 @@ package body Enum_Next is
       end if;
    end Prev;
 
+   ----------
+   -- Next --
+   ----------
+
+   procedure Next (Elt : in out T) is
+   begin
+      Elt := Next (Elt);
+   end Next;
+
+   ----------
+   -- Prev --
+   ----------
+
+   procedure Prev (Elt : in out T) is
+   begin
+      Elt := Prev (Elt);
+   end Prev;
+
 end Enum_Next;

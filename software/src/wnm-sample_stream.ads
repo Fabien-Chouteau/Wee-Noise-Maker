@@ -21,7 +21,7 @@
 
 with WNM.File_System;
 
-with Quick_Synth;
+with WNM.Audio;
 
 package WNM.Sample_Stream is
    pragma Elaborate_Body;
@@ -43,7 +43,7 @@ package WNM.Sample_Stream is
                     Looping     : Boolean);
 
    procedure Next_Buffer (Track   :     Stream_Track;
-                          Buffer  : out Quick_Synth.Mono_Buffer;
+                          Buffer  : out Audio.Mono_Buffer;
                           Success : out Boolean);
 
    procedure Copy_File (Srcpath  : String;

@@ -1,5 +1,4 @@
 with GNAT.OS_Lib;
-with Interfaces; use Interfaces;
 with Interfaces.C; use Interfaces.C;
 
 with BBqueue;
@@ -15,16 +14,17 @@ package body WNM.Audio is
                                  Len      : Interfaces.C.int);
    pragma Export (C, SDL_Audio_Callback, "sdl_audio_callback");
 
-   function Init_SDL_Audio (Sample_Rate : Interfaces.C.int)
+   function Init_SDL_Audio (Sample_Rate : Interfaces.C.int;
+                            Sample_Cnt  : Interfaces.C.int)
                             return Interfaces.C.int;
    pragma Import (C, Init_SDL_Audio, "init_sdl_audio");
 
-   Buffer_Count : constant BBqueue.Buffer_Offset := 3;
+   Buffer_Count : constant BBqueue.Buffer_Offset := Audio_Queue_Size;
 
-   Out_L : array (1 .. Buffer_Count) of Quick_Synth.Mono_Buffer;
-   Out_R : array (1 .. Buffer_Count) of Quick_Synth.Mono_Buffer;
-   In_L : array (1 .. Buffer_Count) of Quick_Synth.Mono_Buffer;
-   In_R : array (1 .. Buffer_Count) of Quick_Synth.Mono_Buffer;
+   Out_L : array (1 .. Buffer_Count) of Mono_Buffer;
+   Out_R : array (1 .. Buffer_Count) of Mono_Buffer;
+   In_L : array (1 .. Buffer_Count) of Mono_Buffer;
+   In_R : array (1 .. Buffer_Count) of Mono_Buffer;
 
    Out_Queue : BBqueue.Offsets_Only (Buffer_Count);
    In_Queue : BBqueue.Offsets_Only (Buffer_Count);
@@ -43,14 +43,14 @@ package body WNM.Audio is
       use BBqueue;
 
       pragma Unreferenced (Userdata);
-      Output : Quick_Synth.Stereo_Buffer with Address => Stream;
+      Output : Stereo_Buffer with Address => Stream;
 
       Out_Read : Read_Grant;
       In_Write : Write_Grant;
 
    begin
       if Len /= WNM.Samples_Per_Buffer * 2 * 2 then
-         raise Program_Error;
+         raise Program_Error with "Unexpected SDL buffer len:" & Len'Img;
       end if;
 
       -- Output --
@@ -86,10 +86,10 @@ package body WNM.Audio is
          In_Index : constant Buffer_Offset :=
            In_L'First + Slice (In_Write).From;
 
-         Radio : Quick_Synth.Stereo_Buffer;
+         Radio : Stereo_Buffer;
       begin
 
-         Radio := Quick_Synth.Stereo_Buffer'Input (Radio_Input_Stream);
+         Radio := Stereo_Buffer'Input (Radio_Input_Stream);
 
          for X in Output'Range loop
             In_L (In_Index) (X) := Radio (X).L;
@@ -175,7 +175,7 @@ begin
       GNAT.OS_Lib.Setenv ("SDL_AUDIODRIVER", "directsound");
    end if;
 
-   if Init_SDL_Audio (44_100) /= 0 then
+   if Init_SDL_Audio (Sample_Frequency, Samples_Per_Buffer) /= 0 then
       raise Program_Error with "SDL Audio init failed";
    end if;
 

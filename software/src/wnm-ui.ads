@@ -19,9 +19,11 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Time;
+
 package WNM.UI is
 
-   procedure Start;
+   function Update return Time.Time_Ms;
 
    type Input_Mode_Type is (Note,
                             Volume_BPM,
@@ -29,12 +31,13 @@ package WNM.UI is
                             Track_Select,
                             Pattern_Select,
                             Pattern_Copy,
-                            Trig_Edit);
+                            Step_Edit);
 
    function Input_Mode return Input_Mode_Type;
 
-   function Current_Editting_Trig return Sequencer_Steps
-     with Pre => Input_Mode = Trig_Edit;
+   function Current_Editting_Trig return Sequencer_Steps;
+
+   function FX_On (B : Tracks) return Boolean;
 
 private
 

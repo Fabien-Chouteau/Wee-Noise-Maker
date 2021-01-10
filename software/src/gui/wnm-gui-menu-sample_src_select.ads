@@ -19,7 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with Quick_Synth;
+private with WNM.Synth;
 
 package WNM.GUI.Menu.Sample_Src_Select is
 
@@ -27,11 +27,11 @@ package WNM.GUI.Menu.Sample_Src_Select is
 
 private
 
-   subtype Rec_Src is Quick_Synth.Rec_Source range
-     Quick_Synth.Input .. Quick_Synth.Master_Output;
+   subtype Rec_Src is WNM.Synth.Rec_Source range
+     WNM.Synth.Line_In .. WNM.Synth.Master_Output;
 
    type Src_Select_Menu is new Menu_Window with record
-      Src    : Rec_Src := Quick_Synth.Input;
+      Src    : Rec_Src := Synth.Line_In;
       Volume : Natural := 0;
    end record;
 

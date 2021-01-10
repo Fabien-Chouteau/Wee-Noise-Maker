@@ -24,4 +24,6 @@ generic
 package Enum_Next is
    function Next (Elt : T) return T with Inline_Always;
    function Prev (Elt : T) return T with Inline_Always;
+   procedure Next (Elt : in out T) with Inline_Always;
+   procedure Prev (Elt : in out T) with Inline_Always;
 end Enum_Next;

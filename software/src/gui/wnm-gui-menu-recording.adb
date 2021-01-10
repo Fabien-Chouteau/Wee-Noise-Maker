@@ -21,7 +21,7 @@
 
 with WNM.Screen;               use WNM.Screen;
 with WNM.GUI.Bitmap_Fonts;     use WNM.GUI.Bitmap_Fonts;
-with Quick_Synth;
+with WNM.Synth;
 
 with tape_1;
 with tape_2;
@@ -80,10 +80,10 @@ package body WNM.GUI.Menu.Recording is
    begin
       case Event.Kind is
          when Left_Press =>
-            Quick_Synth.Stop_Recording;
+            WNM.Synth.Stop_Recording;
             Menu.Pop (Exit_Value => Success);
          when Right_Press =>
-            Quick_Synth.Stop_Recording;
+            Synth.Stop_Recording;
             Menu.Pop (Exit_Value => Failure);
          when Encoder_Right =>
             null;

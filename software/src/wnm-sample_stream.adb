@@ -19,12 +19,13 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Text_IO;
+
 with Interfaces; use Interfaces;
+with System.Storage_Elements; use System.Storage_Elements;
 
 with WNM.File_System; use WNM.File_System;
 with Littlefs;
-
-with Ada.Text_IO;
 
 package body WNM.Sample_Stream is
 
@@ -102,9 +103,6 @@ package body WNM.Sample_Stream is
 
       Open_Read (Streams (Track).FD, Filepath);
 
-      Ada.Text_IO.Put_Line ("Open: " & Filepath);
-      Ada.Text_IO.Put_Line ("Size: " & Size (Streams (Track).FD)'Img);
-
       Streams (Track).State := Assigned;
    end Assign_Sample;
 
@@ -119,11 +117,8 @@ package body WNM.Sample_Stream is
    is
    begin
       if Streams (Track).State = Unused then
-         Ada.Text_IO.Put_Line ("Track is unused: " & Track'Img);
          return;
       end if;
-
-      Ada.Text_IO.Put_Line ("Start track: " & Track'Img);
 
       Streams (Track).State := Running;
 
@@ -140,7 +135,7 @@ package body WNM.Sample_Stream is
    -----------------
 
    procedure Next_Buffer (Track   :     Stream_Track;
-                          Buffer  : out Quick_Synth.Mono_Buffer;
+                          Buffer  : out Audio.Mono_Buffer;
                           Success : out Boolean)
    is
       Len : File_Signed_Size;
@@ -150,22 +145,15 @@ package body WNM.Sample_Stream is
          return;
       end if;
 
-      Ada.Text_IO.Put_Line ("Track running: " & Track'Img);
-      Ada.Text_IO.Put_Line ("Size: " & Size (Streams (Track).FD)'Img);
-
       Len := Read (Streams (Track).FD, Buffer'Address, Buffer'Length * 2);
 
       Streams (Track).Cursor := Streams (Track).Cursor + Natural (Len);
-
-      Ada.Text_IO.Put_Line ("Next_Buffer Len: " & Len'Img);
 
       if Len /= Buffer'Length * 2 then
          Success := False;
       else
          Success := True;
       end if;
-
-      Ada.Text_IO.Put_Line ("Next_Buffer Success: " & Success'Img);
 
       if not Success
         or else
@@ -183,6 +171,34 @@ package body WNM.Sample_Stream is
    procedure Copy_File (Srcpath  : String;
                         From, To : Natural;
                         Dstpath  : String)
-   is null;
+   is
+      Src_FD, Dst_FD : aliased File_Descriptor;
+      Buf : Storage_Array (1 .. 512);
+
+      Len, Count : File_Signed_Size;
+   begin
+      Open_Read (Src_FD, Srcpath);
+      Create_File (Dst_FD, Dstpath);
+
+      Seek (Src_FD, Offset (From), Littlefs.LFS_SEEK_SET);
+
+      Count := File_Signed_Size (From);
+
+      loop
+         Len := Read (Src_FD, Buf'Address, Buf'Length);
+
+         exit when Len < 0;
+
+         Len := Write (Dst_FD, Buf'Address, File_Size (Len));
+
+         Count := Count + Len;
+         exit when Len /= Buf'Length or else Count >= File_Signed_Size (To);
+      end loop;
+
+      Ada.Text_IO.Put_Line (Count'Img & " copied from '" &
+                              Srcpath & "' to '" & Dstpath & "'");
+      Close (Src_FD);
+      Close (Dst_FD);
+   end Copy_File;
 
 end WNM.Sample_Stream;

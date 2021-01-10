@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2020 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,14 +19,15 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+
 with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
-with WNM.Synth;
 with WNM.Sequencer;        use WNM.Sequencer;
+with WNM.UI;
 
-package body WNM.GUI.Menu.Track_Settings is
+package body WNM.GUI.Menu.Step_Settings is
 
-   Track_Settings_Singleton : aliased Track_Settings_Menu;
+   Step_Settings_Singleton : aliased Step_Settings_Menu;
 
    -----------------
    -- Push_Window --
@@ -34,7 +35,7 @@ package body WNM.GUI.Menu.Track_Settings is
 
    procedure Push_Window is
    begin
-      Push (Track_Settings_Singleton'Access);
+      Push (Step_Settings_Singleton'Access);
    end Push_Window;
 
    ----------
@@ -42,12 +43,13 @@ package body WNM.GUI.Menu.Track_Settings is
    ----------
 
    overriding procedure Draw
-     (This : in out Track_Settings_Menu)
+     (This : in out Step_Settings_Menu)
    is
    begin
       Draw_Menu_Box ((case This.Current_Setting is
-                         when Volume => "Trk Volume:" & WNM.Synth.Volume (Track)'Img & "%",
-                         when Pan    => "Trk Pan:" & WNM.Synth.Pan (Track)'Img),
+                        when Condition   => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
+                        when Repeat      => Sequencer.Repeat (UI.Current_Editting_Trig)'Img,
+                        when Repeat_Rate => Sequencer.Repeat_Rate (UI.Current_Editting_Trig)'Img),
                      Top => This.Current_Setting /= Settings'First,
                      Bottom => This.Current_Setting /= Settings'Last);
    end Draw;
@@ -57,7 +59,7 @@ package body WNM.GUI.Menu.Track_Settings is
    --------------
 
    overriding procedure On_Event
-     (This  : in out Track_Settings_Menu;
+     (This  : in out Step_Settings_Menu;
       Event : Menu_Event)
    is
    begin
@@ -65,13 +67,27 @@ package body WNM.GUI.Menu.Track_Settings is
          when Left_Press =>
             null;
          when Right_Press =>
-            Menu.Pop (Exit_Value => None);
+            Menu.Exit_Menu;
          when Encoder_Right =>
             case This.Current_Setting is
-               when Volume =>
-                  WNM.Synth.Change_Volume (Track, Event.Value);
-               when Pan =>
-                  Synth.Change_Pan (Track, Event.Value);
+               when Condition =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Trig_Next (UI.Current_Editting_Trig);
+                  else
+                     WNM.Sequencer.Trig_Prev (UI.Current_Editting_Trig);
+                  end if;
+               when Repeat =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Repeat_Next (UI.Current_Editting_Trig);
+                  else
+                     WNM.Sequencer.Repeat_Prev (UI.Current_Editting_Trig);
+                  end if;
+               when Repeat_Rate =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Repeat_Rate_Next (UI.Current_Editting_Trig);
+                  else
+                     WNM.Sequencer.Repeat_Rate_Prev (UI.Current_Editting_Trig);
+                  end if;
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
@@ -91,7 +107,7 @@ package body WNM.GUI.Menu.Track_Settings is
    ---------------
 
    overriding procedure On_Pushed
-     (This  : in out Track_Settings_Menu)
+     (This  : in out Step_Settings_Menu)
    is
    begin
       null;
@@ -102,11 +118,11 @@ package body WNM.GUI.Menu.Track_Settings is
    --------------
 
    overriding procedure On_Focus
-     (This       : in out Track_Settings_Menu;
+     (This       : in out Step_Settings_Menu;
       Exit_Value : Window_Exit_Value)
    is
    begin
       null;
    end On_Focus;
 
-end WNM.GUI.Menu.Track_Settings;
+end WNM.GUI.Menu.Step_Settings;

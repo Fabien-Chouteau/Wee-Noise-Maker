@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2020 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -22,9 +22,9 @@
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
 with HAL.Bitmap;           use HAL.Bitmap;
 
-package body WNM.GUI.Menu.Text_Dialog is
+package body WNM.GUI.Menu.Yes_No_Dialog is
 
-   Text_Dialog  : aliased Text_Dialog_Window;
+   Yes_No_Dialog  : aliased Yes_No_Dialog_Window;
    Dialog_Title : String (1 .. Title_Max_Len) := (others => ' ');
 
    -----------------
@@ -33,7 +33,7 @@ package body WNM.GUI.Menu.Text_Dialog is
 
    procedure Push_Window is
    begin
-      Push (Text_Dialog'Access);
+      Push (Yes_No_Dialog'Access);
    end Push_Window;
 
    ---------------
@@ -48,34 +48,23 @@ package body WNM.GUI.Menu.Text_Dialog is
       end if;
    end Set_Title;
 
-
-   -----------
-   -- Value --
-   -----------
-
-   function Value return String
-   is (Text_Dialog.Text (Text_Dialog.Text'First .. Text_Dialog.Text'First + Text_Dialog.Len - 1));
-
    ----------
    -- Draw --
    ----------
 
-   overriding procedure Draw
-     (This : in out Text_Dialog_Window)
+   overriding
+   procedure Draw (This : in out Yes_No_Dialog_Window)
    is
-      X        : Integer := 1;
-      Select_X : constant Integer := X + (This.Index - This.Text'First) * 6;
+      X : Natural := 1;
    begin
-      Print (X_Offset    => X,
-             Y_Offset    => 0,
-             Str         => Dialog_Title);
+      Print (X_Offset => X,
+             Y_Offset => 0,
+             Str      => Dialog_Title);
 
       X := 1;
-      Print (X_Offset    => X,
-             Y_Offset    => 9,
-             Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1),
-             Invert_From => (Select_X - 1),
-             Invert_To   => (Select_X + 5));
+      Print (X_Offset => X,
+             Y_Offset => 9,
+             Str      => "-> " & (if This.Yes then "Yes" else "No"));
    end Draw;
 
    --------------
@@ -83,49 +72,23 @@ package body WNM.GUI.Menu.Text_Dialog is
    --------------
 
    overriding procedure On_Event
-     (This  : in out Text_Dialog_Window;
+     (This  : in out Yes_No_Dialog_Window;
       Event : Menu_Event)
    is
    begin
       case Event.Kind is
          when Left_Press =>
-            Menu.Pop (Exit_Value => Success);
-         when Right_Press =>
-
-            if This.Len > 1 then
-               if This.Index = This.Text'First + This.Len - 1 then
-                  This.Index := This.Index - 1;
-               end if;
-               This.Len := This.Len - 1;
+            if This.Yes then
+               Menu.Pop (Exit_Value => Success);
             else
-
-               --  Trying to delete the last char means exit
                Menu.Pop (Exit_Value => Failure);
             end if;
-
-         when Encoder_Right =>
-
-            --  Move cursor and increase length if necessary
-
-            if Event.Value > 0 then
-               if This.Index < This.Text'First + This.Len - 1 then
-                  This.Index := This.Index + 1;
-               elsif This.Index /= This.Text'Last then
-                  This.Index := This.Index + 1;
-                  This.Len   := This.Len + 1;
-                  This.Text (This.Index) := 'A';
-               end if;
-            elsif Event.Value < 0 then
-               if This.Index > This.Text'First then
-                  This.Index := This.Index - 1;
-               end if;
-            end if;
+         when Right_Press =>
+            Menu.Pop (Exit_Value => Failure);
          when Encoder_Left =>
-            if Event.Value > 0 then
-               This.Text (This.Index) := Character'Succ (This.Text (This.Index));
-            elsif Event.Value < 0 then
-               This.Text (This.Index) := Character'Pred (This.Text (This.Index));
-            end if;
+            This.Yes := not This.Yes;
+         when others =>
+            null;
       end case;
    end On_Event;
 
@@ -134,12 +97,10 @@ package body WNM.GUI.Menu.Text_Dialog is
    ---------------
 
    overriding procedure On_Pushed
-     (This  : in out Text_Dialog_Window)
+     (This  : in out Yes_No_Dialog_Window)
    is
    begin
-      This.Len   := 1;
-      This.Index := This.Text'First;
-      This.Text (This.Text'First) := 'A';
+      This.Yes := False;
    end On_Pushed;
 
-end WNM.GUI.Menu.Text_Dialog;
+end WNM.GUI.Menu.Yes_No_Dialog;

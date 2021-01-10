@@ -19,15 +19,14 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-
 with WNM.GUI.Menu.Sample_Src_Select;
 with WNM.GUI.Menu.Recording;
 with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
+with WNM.GUI.Menu.Yes_No_Dialog;
 with WNM.Sample_Stream;
---  with Quick_Synth;
+with WNM.Synth;
 
 package body WNM.GUI.Menu.Create_Sample is
 
@@ -46,12 +45,14 @@ package body WNM.GUI.Menu.Create_Sample is
    -- On_Pushed --
    ---------------
 
-   overriding procedure On_Pushed
+   overriding
+   procedure On_Pushed
      (This  : in out Create_Sample_Menu)
    is
    begin
       This.State := Select_Source;
       This.Sample_Entry := Invalid_Sample_Entry;
+      This.Input_Before := WNM.Synth.Get_Passthrough;
       Sample_Src_Select.Push_Window;
    end On_Pushed;
 
@@ -59,7 +60,8 @@ package body WNM.GUI.Menu.Create_Sample is
    -- On_Focus --
    --------------
 
-   overriding procedure On_Focus
+   overriding
+   procedure On_Focus
      (This       : in out Create_Sample_Menu;
       Exit_Value : Window_Exit_Value)
    is
@@ -73,14 +75,14 @@ package body WNM.GUI.Menu.Create_Sample is
             if Exit_Value = Success then
                New_State := Rec_In_Progress;
             else
+               WNM.Synth.Set_Passthrough (This.Input_Before);
                Menu.Pop (Exit_Value);
                return;
             end if;
 
          when Rec_In_Progress =>
-
-            Ada.Text_IO.Put_Line ("Rec_In_Progress Exit_Value:" & Exit_Value'Img);
             if Exit_Value = Success then
+               WNM.Synth.Set_Passthrough (This.Input_Before);
                New_State := Trim;
             else
                New_State := Select_Source;
@@ -98,18 +100,35 @@ package body WNM.GUI.Menu.Create_Sample is
 
             if Exit_Value = Success then
                declare
+                  Name : constant String := Text_Dialog.Value;
+               begin
+                  if Sample_Library.User_Sample_Exists (Name) then
+                     Yes_No_Dialog.Set_Title ("Replace sample?");
+                  else
+                     Yes_No_Dialog.Set_Title ("Create sample?");
+                  end if;
+                  New_State := Confirm;
+               end;
+            else
+               New_State := Trim;
+            end if;
+
+         when Confirm =>
+
+            if Exit_Value = Success then
+               declare
                   New_Sample_Path : constant String :=
-                    Folder_Full_Path (User) & Text_Dialog.Value & ".raw";
+                    Root_Samples_Path & Text_Dialog.Value;
                   Unref : Boolean with Unreferenced;
                begin
-                  --  Copy sample file to a user directory with it's new name
+                  --  Copy sample with it's new name
                   WNM.Sample_Stream.Copy_File (Sample_Rec_Filepath,
                                                Menu.Sample_Trim.Start,
                                                Menu.Sample_Trim.Stop,
                                                New_Sample_Path);
 
                   --  Add it to the library
-                  This.Sample_Entry := Add_User_Sample (New_Sample_Path);
+                  This.Sample_Entry := Add_Sample (Text_Dialog.Value);
                   New_State := Assign_To_Track;
                end;
             else
@@ -117,14 +136,15 @@ package body WNM.GUI.Menu.Create_Sample is
             end if;
 
          when Assign_To_Track =>
-            --  if Exit_Value = Success
-            --    and then
-            --      This.Sample_Entry /= Invalid_Sample_Entry
-            --  then
-            --     Quick_Synth.Assign_Sample (Menu.Assign_To_Track.Selected_Track,
-            --                                This.Sample_Entry);
-            --  end if;
-            Pop (Exit_Value);
+            if Exit_Value = Success
+              and then
+                This.Sample_Entry /= Invalid_Sample_Entry
+            then
+               WNM.Synth.Assign_Sample
+                 (Menu.Assign_To_Track.Selected_Track,
+                  Sample_Library.Entry_Path (This.Sample_Entry));
+            end if;
+            Menu.Exit_Menu;
             return;
       end case;
 
@@ -137,8 +157,9 @@ package body WNM.GUI.Menu.Create_Sample is
          when Rec_In_Progress =>
             Recording.Push_Window;
          when Trim =>
-            Ada.Text_IO.Put_Line ("Sample_Trim.Push_Window");
             Sample_Trim.Push_Window;
+         when Confirm =>
+            Yes_No_Dialog.Push_Window;
          when Enter_Name =>
             Text_Dialog.Set_Title ("Sample name?");
             Text_Dialog.Push_Window;

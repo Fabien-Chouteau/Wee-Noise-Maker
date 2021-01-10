@@ -19,8 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Time;
+
 package WNM.GUI.Update is
 
-   procedure Update;
+   function Update return WNM.Time.Time_Ms;
 
 end WNM.GUI.Update;

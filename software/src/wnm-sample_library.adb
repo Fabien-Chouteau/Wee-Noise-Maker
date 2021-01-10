@@ -19,57 +19,40 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
---  with File_IO; use File_IO;
+with WNM.File_System;
 
 package body WNM.Sample_Library is
-
-   procedure Load_Folder (Folder : Sample_Folders);
-   function Starts_With (Str, Prefix : String) return Boolean;
-   function Sub_String (Str : String; Remove_Len : Natural) return String;
-
-   function Ext_Is_Raw (Filename : String) return Boolean
-   is (Filename'Length > 4
-       and then
-       Filename (Filename'Last - 3 .. Filename'Last) = ".raw");
 
    function Valid_Entry (Index : Sample_Entry_Index) return Boolean
      is (Index /= Invalid_Sample_Entry and then Index <= Last_Entry);
 
-   function Add_Sample (Folder : Sample_Folders; Name : String)
-                        return Sample_Entry_Index;
+   -----------------------
+   -- First_Valid_Entry --
+   -----------------------
 
-   -----------------
-   -- Starts_With --
-   -----------------
+   function First_Valid_Entry return Sample_Entry_Index
+   is (if Last_Entry = Invalid_Sample_Entry
+       then Invalid_Sample_Entry
+       else Valid_Sample_Entry_Index'First);
 
-   function Starts_With (Str, Prefix : String) return Boolean is
-   begin
-      return Str'Length > Prefix'Length
-        and then
-          Str (Str'First .. Str'First + Prefix'Length - 1) = Prefix;
-   end Starts_With;
+   ----------------------
+   -- Last_Valid_Entry --
+   ----------------------
 
-   ----------------
-   -- Sub_String --
-   ----------------
-
-   function Sub_String (Str : String; Remove_Len : Natural) return String
-   is (Str (Str'First + Remove_Len .. Str'Last));
+   function Last_Valid_Entry return Sample_Entry_Index
+   is (Last_Entry);
 
    ----------------
    -- Add_Sample --
    ----------------
 
-   function Add_Sample (Folder : Sample_Folders; Name : String)
-                        return Sample_Entry_Index
+   function Add_Sample (Name : String) return Sample_Entry_Index
    is
    begin
       --  Is there enough room to store the name?
       if Name_Buffer'Length - Name_Buffer_Cnt >= Name'Length then
 
          Last_Entry := Last_Entry + 1;
-
-         Entries (Last_Entry).Folder    := Folder;
          Entries (Last_Entry).Name_From := Name_Buffer_Cnt + 1;
          Entries (Last_Entry).Name_To   := Name_Buffer_Cnt + Name'Length;
          Name_Buffer_Cnt := Entries (Last_Entry).Name_To;
@@ -78,38 +61,10 @@ package body WNM.Sample_Library is
          Name_Buffer (Entries (Last_Entry).Name_From .. Entries (Last_Entry).Name_To)
            := Name;
 
-         --  Update the folder range
-         if Folder_Ranges (Folder).From = Invalid_Sample_Entry then
-            Folder_Ranges (Folder).From := Last_Entry;
-
-         elsif Folder_Ranges (Folder).To /= Last_Entry - 1 then
-            raise Program_Error with "Cannot add an entry to this folder anymore...";
-         end if;
-
-         Folder_Ranges (Folder).To := Last_Entry;
-
          return Last_Entry;
       end if;
       return Invalid_Sample_Entry;
    end Add_Sample;
-
-   ------------------
-   -- Folder_Range --
-   ------------------
-
-   function Folder_Range
-     (Folder : Sample_Folders)
-      return Sample_Folder_Range
-   is (Folder_Ranges (Folder));
-
-   ----------------------
-   -- Folder_Full_Path --
-   ----------------------
-
-   function Folder_Full_Path (Folder : Sample_Folders) return String is
-   begin
-      return Root_Samples_Path & Folder_Path (Folder);
-   end Folder_Full_Path;
 
    ----------------
    -- Entry_Name --
@@ -131,46 +86,11 @@ package body WNM.Sample_Library is
    function Entry_Path (Index : Sample_Entry_Index) return String is
    begin
       if Valid_Entry (Index) then
-         return Folder_Full_Path (Entries (Index).Folder) &
-           Entry_Name (Index) & ".raw";
+         return Root_Samples_Path & Entry_Name (Index);
       else
          return "";
       end if;
    end Entry_Path;
-
-   ---------------------
-   -- Entry_From_Path --
-   ---------------------
-
-   function Entry_From_Path (Path : String) return Sample_Entry_Index is
-   begin
-      if not Starts_With (Path, Root_Samples_Path) then
-         return Invalid_Sample_Entry;
-      end if;
-
-      declare
-         Sub : constant String := Sub_String (Path, Root_Samples_Path'Length);
-      begin
-         --  Try to find the folder
-         for Folder in Sample_Folders loop
-            if Starts_With (Sub, Folder_Path (Folder)) then
-               declare
-                  Sample : constant String :=
-                    Sub_String (Sub, Folder_Path (Folder)'Length);
-               begin
-                  for Index in Folder_Range (Folder).From .. Folder_Range (Folder).To loop
-                     if Entry_Name (Index) & ".raw" = Sample then
-                        return Index;
-                     end if;
-                  end loop;
-               end;
-               return Invalid_Sample_Entry;
-            end if;
-         end loop;
-      end;
-
-      return Invalid_Sample_Entry;
-   end Entry_From_Path;
 
    ------------------------
    -- User_Sample_Exists --
@@ -179,7 +99,7 @@ package body WNM.Sample_Library is
    function User_Sample_Exists (Name : String) return Boolean is
    begin
 
-      for Index in Folder_Range (User).From .. Folder_Range (User).To loop
+      for Index in Valid_Sample_Entry_Index'First .. Last_Entry loop
          if Entry_Name (Index) = Name then
             return True;
          end if;
@@ -188,74 +108,22 @@ package body WNM.Sample_Library is
       return False;
    end User_Sample_Exists;
 
-   ---------------------
-   -- Add_User_Sample --
-   ---------------------
-
-   function Add_User_Sample (Path : String) return Sample_Entry_Index is
-   begin
-      if Starts_With (Path, Folder_Full_Path (User))
-        and then
-          Ext_Is_Raw (Path)
-      then
-         declare
-            Name : constant String :=
-              Path (Path'First + Folder_Full_Path (User)'Length .. Path'Last - 4);
-         begin
-            return Add_Sample (User, Name);
-         end;
-      end if;
-      return Invalid_Sample_Entry;
-   end Add_User_Sample;
-
-   -----------------
-   -- Load_Folder --
-   -----------------
-
-   procedure Load_Folder (Folder : Sample_Folders) is
-   begin
-      null;
-   --
-   --     Path   : constant String := Folder_Full_Path (Folder);
-   --     DD     : Directory_Descriptor;
-   --     Status : Status_Code;
-   --     Unref  : Sample_Entry_Index with Unreferenced;
-   --  begin
-   --     Status := Open (DD, Path);
-   --
-   --     if Status /= OK then
-   --        --  The folder is not here but we do not report any error
-   --        return;
-   --     end if;
-   --
-   --     loop
-   --        declare
-   --           DE : constant Directory_Entry := Read (DD);
-   --        begin
-   --
-   --           exit when
-   --               DE = Invalid_Dir_Entry
-   --             or else
-   --               Last_Entry = Sample_Entry_Index'Last;
-   --
-   --           if Ext_Is_Raw (DE.Name) then
-   --              Unref := Add_Sample (Folder, DE.Name (DE.Name'First .. DE.Name'Last - 4));
-   --           end if;
-   --        end;
-   --     end loop;
-   --
-   --     Close (DD);
-   end Load_Folder;
-
    ----------
    -- Load --
    ----------
 
    procedure Load is
+      procedure Add_To_Library (Filename : String) is
+         Unused : Sample_Entry_Index;
+      begin
+         Unused := Add_Sample (Filename);
+      end Add_To_Library;
+
+      procedure For_Each_File
+      is new WNM.File_System.For_Each_File_In_Dir (Add_To_Library);
+
    begin
-      for Folder in Sample_Folders loop
-         Load_Folder (Folder);
-      end loop;
+      For_Each_File (Root_Samples_Path);
    end Load;
 
 end WNM.Sample_Library;

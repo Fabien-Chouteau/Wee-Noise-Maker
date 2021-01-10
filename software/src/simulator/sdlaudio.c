@@ -2,7 +2,7 @@
 
 extern void sdl_audio_callback(void *userdata, Uint8 *stream, int len);
 
-int init_sdl_audio(int sample_rate)
+int init_sdl_audio(int sample_rate, int sample_cnt)
 {
   static SDL_AudioSpec want, have;
 
@@ -18,7 +18,7 @@ int init_sdl_audio(int sample_rate)
   want.format = AUDIO_S16;
   want.freq = sample_rate;
   want.channels = 2;
-  want.samples = 1024;
+  want.samples = sample_cnt * want.channels;
 
   if (SDL_OpenAudio(&want, &have) < 0 ){
     fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());

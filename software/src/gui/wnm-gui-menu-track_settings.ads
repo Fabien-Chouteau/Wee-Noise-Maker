@@ -25,7 +25,7 @@ package WNM.GUI.Menu.Track_Settings is
 
 private
 
-   type Settings is (Volume, Pan, Effect, Effect_Val);
+   type Settings is (Volume, Pan);
 
    type Track_Settings_Menu is new Menu_Window with record
       Current_Setting : Settings := Settings'First;

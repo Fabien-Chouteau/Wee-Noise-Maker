@@ -47,25 +47,25 @@ package body WNM.Screen is
    Button_Y_Margin : constant := 20;
    LED_Size : constant := 10;
 
-   Screen_Pixel_Size : constant := 6;
+   Screen_Pixel_Size : constant := 4;
 
    Button_Col : constant array (Button) of Natural :=
-     (Menu | Track_Button | Encoder_L => 0,
-      B1   | B9 | Encoder_R           => 1,
-      B2   | B10                      => 2,
-      B3   | B11                      => 3,
-      B4   | B12                      => 4,
-      B5   | B13                      => 5,
-      B6   | B14                      => 6,
-      B7   | B15                      => 7,
-      B8   | B16                      => 8,
-      Play | Rec                      => 9,
-      others                          => 10);
+     (Pattern | Track_Button | Encoder_L => 0,
+      B1   | B9 | Encoder_R              => 1,
+      B2   | B10 | Menu                  => 2,
+      B3   | B11                         => 3,
+      B4   | B12                         => 4,
+      B5   | B13                         => 5,
+      B6   | B14                         => 6,
+      B7   | B15                         => 7,
+      B8   | B16                         => 8,
+      Play | Rec                         => 9,
+      others                             => 10);
 
    Button_Row : constant array (Button) of Natural :=
-     (Encoder_L | Encoder_R          => 0,
+     (Encoder_L | Encoder_R | Menu   => 0,
       B1 .. B8 | Play | Track_Button => 1,
-      B9 .. B16 | Rec | Menu         => 2,
+      B9 .. B16 | Rec | Pattern      => 2,
       others                         => 3);
 
    Screen_Pixels : array (0 .. 95, 0 .. 15) of Boolean :=
@@ -177,10 +177,14 @@ package body WNM.Screen is
                begin
                   if Screen_Pixels (X, Y) then
                      Renderer.Fill (Rect);
-                  else
-                     Renderer.Draw
-                       (Rectangles.Point'(Rect.X + Screen_Pixel_Size / 2,
-                        Rect.Y + Screen_Pixel_Size / 2));
+
+                  --  Uncomment to see small dot instead of empty pixels (useful
+                  --  for debugging).
+                  --
+                  --  else
+                  --     Renderer.Draw
+                  --       (Rectangles.Point'(Rect.X + Screen_Pixel_Size / 2,
+                  --        Rect.Y + Screen_Pixel_Size / 2));
                   end if;
                end;
             end loop;

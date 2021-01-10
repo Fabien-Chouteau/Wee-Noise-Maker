@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------------
 
 with WNM.Sample_Library; use WNM.Sample_Library;
+with WNM.Audio;
 
 package WNM.GUI.Menu.Create_Sample is
 
@@ -31,11 +32,14 @@ private
                                 Rec_In_Progress,
                                 Trim,
                                 Enter_Name,
+                                Confirm,
                                 Assign_To_Track);
 
    type Create_Sample_Menu is new Menu_Window with record
       State        : Create_Sample_State;
       Sample_Entry : Sample_Entry_Index := Invalid_Sample_Entry;
+
+      Input_Before : Audio.Input_Kind;
    end record;
 
    overriding

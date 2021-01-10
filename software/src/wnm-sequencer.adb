@@ -19,18 +19,24 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Synchronous_Task_Control;
 --  with MIDI;
-with Quick_Synth;
-with WNM.Sequence;          use WNM.Sequence;
+with WNM.Short_Term_Sequencer;
 with WNM.Pattern_Sequencer;
+with WNM.UI;
 with HAL;                   use HAL;
 
 package body WNM.Sequencer is
 
    --  use type MIDI.Octaves;
 
-   type Pattern is array (Tracks) of WNM.Sequence.Instance;
+   type Step_Rec is record
+      Trig        : Trigger;
+      Repeat      : WNM.Repeat;
+      Repeat_Rate : WNM.Repeat_Rate;
+   end record;
+
+   type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
+   type Pattern is array (Tracks) of Sequence;
    Sequences : array (Patterns) of Pattern;
 
    Sequencer_BPM : Beat_Per_Minute := 90;
@@ -41,13 +47,7 @@ package body WNM.Sequencer is
    Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
 
-   Task_Start     : Ada.Synchronous_Task_Control.Suspension_Object;
-   Next_Start     : Time := Time_Last;
-
-   task Sequencer_Task
-     with Priority             => Sequencer_Task_Priority,
-          Storage_Size         => Sequencer_Task_Stack_Size,
-          Secondary_Stack_Size => Sequencer_Task_Secondary_Stack_Size;
+   Next_Start : Synth.Sample_Time := Synth.Sample_Time'First;
 
    type Microstep_Cnt is mod 2;
    Microstep : Microstep_Cnt := 1;
@@ -178,19 +178,27 @@ package body WNM.Sequencer is
    begin
       case Current_Seq_State is
          when Pause | Play =>
-            Quick_Synth.Trig (Button);
+            WNM.Synth.Trig (Button);
             Current_Track := Button;
          when Play_And_Rec =>
-            Set (Sequences (Pattern_Sequencer.Current_Pattern)(Button),
-                 Current_Step);
+            Sequences (Pattern_Sequencer.Current_Pattern)(Button)(Step).Trig := Always;
             Current_Track := Button;
-
             if Microstep /= 1 then
-               Quick_Synth.Trig (Button);
+               WNM.Synth.Trig (Button);
             end if;
          when Play_And_Edit | Edit =>
-            Toggle (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
-                    To_Value (Button));
+
+            declare
+               S : Step_Rec renames Sequences (Pattern_Sequencer.Current_Pattern)
+                                              (Current_Track)
+                 (To_Value (Button));
+            begin
+               if S.Trig /= None then
+                  S.Trig := None;
+               else
+                  S.Trig := Always;
+               end if;
+            end;
       end case;
    end On_Press;
 
@@ -273,6 +281,18 @@ package body WNM.Sequencer is
    function BPM return Beat_Per_Minute
    is (Sequencer_BPM);
 
+   ----------------------
+   -- Samples_Per_Beat --
+   ----------------------
+
+   function Samples_Per_Beat return Synth.Sample_Time is
+      use Synth;
+
+      Samples_Per_Minute : constant Sample_Time := 60 * Sample_Frequency;
+   begin
+      return Samples_Per_Minute / Sample_Time (Sequencer_BPM);
+   end Samples_Per_Beat;
+
    ------------
    -- Random --
    ------------
@@ -296,27 +316,57 @@ package body WNM.Sequencer is
    -- Process_Step --
    ------------------
 
-   procedure Process_Step (Pattern : Patterns; Step : Sequencer_Steps) is
+   procedure Process_Step (Pattern : Patterns;
+                           Step : Sequencer_Steps)
+   is
+      use Synth;
+
+      Condition : Boolean := False;
+      Now : constant Sample_Time := Sample_Clock;
    begin
       for Track in Tracks loop
-         case Trig (Sequences (Pattern)(Track), Step) is
+         case Sequences (Pattern)(Track)(Step).Trig is
             when None =>
-               null;
+               Condition := False;
             when Always =>
-               Quick_Synth.Trig (Track);
+               Condition := True;
+            when Fill =>
+               Condition := WNM.UI.FX_On (B1);
             when Percent_25 =>
-               if Random <= 25 then
-                  Quick_Synth.Trig (Track);
-               end if;
+               condition := Random <= 25;
             when Percent_50 =>
-               if Random <= 50 then
-                  Quick_Synth.Trig (Track);
-               end if;
+               condition := Random <= 50;
             when Percent_75 =>
-               if Random <= 75 then
-                  Quick_Synth.Trig (Track);
-               end if;
+               condition := Random <= 75;
          end case;
+
+         if Condition then
+            WNM.Synth.Trig (Track);
+
+            declare
+               Repeat_Span : constant Sample_Time :=
+                 Samples_Per_Beat /  (case Sequences (Pattern) (Track) (Step).Repeat_Rate is
+                                         when Rate_1_1  => 1,
+                                         when Rate_1_2  => 2,
+                                         when Rate_1_3  => 3,
+                                         when Rate_1_4  => 4,
+                                         when Rate_1_5  => 5,
+                                         when Rate_1_6  => 6,
+                                         when Rate_1_8  => 8,
+                                         when Rate_1_10 => 10,
+                                         when Rate_1_12 => 12,
+                                         when Rate_1_16 => 16,
+                                         when Rate_1_20 => 20,
+                                         when Rate_1_24 => 24,
+                                         when Rate_1_32 => 32);
+               Repeat_Time : Sample_Time := Now + Repeat_Span;
+            begin
+               for Rep in 1 .. Sequences (Pattern) (Track) (Step).Repeat loop
+                  WNM.Short_Term_Sequencer.Push (Track, Repeat_Time);
+                  Repeat_Time := Repeat_Time + Repeat_Span;
+               end loop;
+            end;
+         end if;
       end loop;
    end Process_Step;
 
@@ -325,63 +375,60 @@ package body WNM.Sequencer is
    ------------------
 
    procedure Execute_Step is
+      use Synth;
    begin
 
-      Next_Start := Next_Start +
-        (Milliseconds ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
+      --  Next_Start := Next_Start +
+      --    (Time.Time_Ms ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
+
+      Next_Start := Next_Start + Samples_Per_Beat / Steps_Per_Beat / 2;
 
       if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
          case Microstep is
 
-         --  Begining of a new step
-         when 0 =>
-            if Current_Step /= Sequencer_Steps'Last then
-               Current_Step := Current_Step + 1;
-            else
-               Current_Step := Sequencer_Steps'First;
-               Pattern_Sequencer.Signal_End_Of_Pattern;
-            end if;
+            --  Begining of a new step
+            when 0 =>
+               if Current_Step /= Sequencer_Steps'Last then
+                  Current_Step := Current_Step + 1;
+               else
+                  Current_Step := Sequencer_Steps'First;
+                  Pattern_Sequencer.Signal_End_Of_Pattern;
+               end if;
 
-         --  At the middle of the step we play the recorded notes
-         when 1 =>
-            if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
-               Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
-            end if;
+               --  At the middle of the step we play the recorded notes
+            when 1 =>
+               if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
+                  Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
+               end if;
          end case;
          Microstep := Microstep + 1;
       end if;
    end Execute_Step;
 
-   -----------
-   -- Start --
-   -----------
+   ------------
+   -- Update --
+   ------------
 
-   procedure Start is
+   function Update return Time.Time_Ms is
+      use Synth;
+
+      Now     : constant Sample_Time := Sample_Clock;
+      Success : Boolean;
+      Track   : Tracks;
    begin
-
-      for Pattern in Patterns loop
-         for Track in Tracks loop
-            Clear (Sequences (Pattern)(Track));
-         end loop;
-      end loop;
-      Next_Start := Clock + Milliseconds (100);
-
-      Ada.Synchronous_Task_Control.Set_True (Task_Start);
-   end Start;
-
-
-   --------------------
-   -- Sequencer_Task --
-   --------------------
-
-   task body Sequencer_Task is
-   begin
-      Ada.Synchronous_Task_Control.Suspend_Until_True (Task_Start);
-      loop
-         delay until Next_Start;
+      if now >= Next_Start then
          Execute_Step;
+      end if;
+
+      loop
+         WNM.Short_Term_Sequencer.Pop (Now, Track, Success);
+         exit when not Success;
+
+         WNM.Synth.Trig (Track);
       end loop;
-   end Sequencer_Task;
+
+      return Time.Time_Ms'First;
+   end Update;
 
    ---------
    -- Set --
@@ -389,8 +436,7 @@ package body WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
-                   Step) /= None;
+      return Sequences (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig /= None;
    end Set;
 
    ---------
@@ -399,7 +445,7 @@ package body WNM.Sequencer is
 
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Track), Step) /= None;
+      return Sequences (Pattern_Sequencer.Current_Pattern)(Track)(Step).Trig /= None;
    end Set;
 
    ----------
@@ -408,8 +454,7 @@ package body WNM.Sequencer is
 
    function Trig (Step : Sequencer_Steps) return Trigger is
    begin
-      return Trig (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track),
-                   Step);
+      return Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig;
    end Trig;
 
    ---------------
@@ -418,7 +463,7 @@ package body WNM.Sequencer is
 
    procedure Trig_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track), Step);
+      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig);
    end Trig_Next;
 
    ---------------
@@ -427,7 +472,71 @@ package body WNM.Sequencer is
 
    procedure Trig_Prev (Step : Sequencer_Steps) is
    begin
-      Previous (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track), Step);
+      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig);
    end Trig_Prev;
 
+   ------------
+   -- Repeat --
+   ------------
+
+   function Repeat (Step : Sequencer_Steps) return WNM.Repeat is
+   begin
+      return Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat;
+   end Repeat;
+
+   -----------------
+   -- Repeat_Next --
+   -----------------
+
+   procedure Repeat_Next (Step : Sequencer_Steps) is
+   begin
+      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat);
+   end Repeat_Next;
+
+   -----------------
+   -- Repeat_Prev --
+   -----------------
+
+   procedure Repeat_Prev (Step : Sequencer_Steps) is
+   begin
+      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat);
+   end Repeat_Prev;
+
+   -----------------
+   -- Repeat_Rate --
+   -----------------
+
+   function Repeat_Rate (Step : Sequencer_Steps) return WNM.Repeat_Rate is
+   begin
+      return Sequences (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat_Rate;
+   end Repeat_Rate;
+
+
+   ----------------------
+   -- Repeat_Rate_Next --
+   ----------------------
+
+   procedure Repeat_Rate_Next (Step : Sequencer_Steps) is
+   begin
+      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat_Rate);
+   end Repeat_Rate_Next;
+
+   ----------------------
+   -- Repeat_Rate_Prev --
+   ----------------------
+
+   procedure Repeat_Rate_Prev (Step : Sequencer_Steps) is
+   begin
+      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat_Rate);
+   end Repeat_Rate_Prev;
+
+
+begin
+   for Pattern in Patterns loop
+      for Track in Tracks loop
+         for Step in Sequencer_Steps loop
+            Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_1);
+         end loop;
+      end loop;
+   end loop;
 end WNM.Sequencer;

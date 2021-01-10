@@ -19,19 +19,18 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-
-with HAL.Audio;
+with HAL; use HAL;
+with Interfaces; use Interfaces;
 with WNM.Sample_Stream;          use WNM.Sample_Stream;
 with WNM;                        use WNM;
 --  with WNM.Sample_Library;         use WNM.Sample_Library;
-with WNM.Audio;
+with WNM.Audio;                  use WNM.Audio;
 with WNM.File_System;            use WNM.File_System;
 
 --  with Hex_Dump;
 --  with Semihosting;
 
-package body Quick_Synth is
+package body WNM.Synth is
 
    Recording_File   : aliased File_Descriptor;
    Recording_Source : Rec_Source;
@@ -49,30 +48,23 @@ package body Quick_Synth is
    --    (others => Invalid_Sample_Entry)
    --    with Atomic_Components;
 
+   Passthrough : Input_Kind := None;
+
+   Next_Start : WNM.Time.Time_Ms := WNM.Time.Time_Ms'First;
+   Glob_Sample_Clock : Sample_Time := 0 with Volatile;
+
    procedure Copy_Stereo_To_Mono (L, R : Mono_Buffer;
                                   Dst : out Mono_Buffer);
 
    function Is_It_On (Track : Stream_Track) return Boolean;
-   procedure Audio_Hex_Dump (Info : String;
-                             Buffer : HAL.Audio.Audio_Buffer);
-   pragma Unreferenced (Audio_Hex_Dump);
 
-   --------------------
-   -- Audio_Hex_Dump --
-   --------------------
+   ------------------
+   -- Sample_Clock --
+   ------------------
 
-   procedure Audio_Hex_Dump (Info : String;
-                             Buffer : HAL.Audio.Audio_Buffer)
-   is
-      --  Data : HAL.UInt8_Array (1 .. Buffer'Length / 2)
-      --    with Address => Buffer'Address;
-   begin
-      --  Semihosting.Log_Line (Info);
-      --  Hex_Dump.Hex_Dump (Data,
-      --                     Put_Line  => Semihosting.Log_Line'Access,
-      --                     Base_Addr => 0);
-      null;
-   end Audio_Hex_Dump;
+   function Sample_Clock return Sample_Time
+   is (Glob_Sample_Clock);
+
 
    -------------------------
    -- Copy_Stereo_To_Mono --
@@ -167,7 +159,6 @@ package body Quick_Synth is
 
    procedure Trig (Track : WNM.Tracks) is
    begin
-      Ada.Text_IO.Put_Line ("Trig: " & Track'Img);
       Start (Track       => To_Stream_Track (Track),
              Start_Point => 0,
              End_Point   => Natural'Last,
@@ -299,7 +290,7 @@ package body Quick_Synth is
                          Pan   : Integer)
    is
    begin
-      Pan_For_Track (Track) := Pan_For_Track (Track) + Pan;
+      Pan_For_Track (Track) := Pan_For_Track (Track) + Pan * 10;
       if Pan_For_Track (Track) > 100 then
          Pan_For_Track (Track) := 100;
       elsif Pan_For_Track (Track) < -100 then
@@ -341,7 +332,7 @@ package body Quick_Synth is
    -- Update --
    ------------
 
-   procedure Update is
+   function Update return WNM.Time.Time_Ms is
 
       procedure Process (Out_L, Out_R : out Mono_Buffer;
                          In_L,  In_R  :     Mono_Buffer);
@@ -377,13 +368,8 @@ package body Quick_Synth is
                Pan    := 0.0;
             else
                Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
-
-               --  FIXME: Hack to fix the panning problem
-               Pan    := Float (Pan_For_Track (To_Track (ST)) + 100) / 200.0;
-               --  Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
+               Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
             end if;
-
-            --           Audio_Hex_Dump ("Stereo_Output before mix:", Stereo_Output);
 
             for Index in Mono_Samples'Range loop
 
@@ -414,11 +400,13 @@ package body Quick_Synth is
          end Mix;
 
       begin
-         --  Out_R := In_R;
-         --  Out_L := In_L;
-
-         Out_R := (others => 0);
-         Out_L := (others => 0);
+         if Passthrough /= None then
+            Out_R := In_R;
+            Out_L := In_L;
+         else
+            Out_R := (others => 0);
+            Out_L := (others => 0);
+         end if;
 
          declare
             Sample_Buf : Mono_Buffer;
@@ -440,7 +428,7 @@ package body Quick_Synth is
                case Recording_Source is
                when None =>
                   null;
-               when Input =>
+               when Line_In | FM =>
                   Copy_Stereo_To_Mono (In_L, In_R, Sample_Buf);
                when Master_Output =>
                   Copy_Stereo_To_Mono (Out_L, Out_R, Sample_Buf);
@@ -448,17 +436,43 @@ package body Quick_Synth is
 
                Len := Write (Recording_File, Sample_Buf'Address, Sample_Buf'Length * 2);
                Recording_Size := Recording_Size + Len;
-               Ada.Text_IO.Put_Line ("Writing to sample rec: " & Len'Img);
             end;
          end if;
 
+         Glob_Sample_Clock := Glob_Sample_Clock + Samples_Per_Buffer;
       end Process;
 
       procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
 
+      Now : constant WNM.Time.Time_Ms := WNM.Time.Clock;
    begin
-      Generate_Audio;
+      if Now >= Next_Start then
+         Next_Start := Next_Start + 0;
+
+         Generate_Audio;
+      end if;
+
+      return Next_Start;
    end Update;
+
+   ---------------------
+   -- Set_Passthrough --
+   ---------------------
+
+   procedure Set_Passthrough (Kind : Input_Kind) is
+   begin
+      WNM.Audio.Select_Input (Kind);
+      Passthrough := Kind;
+   end Set_Passthrough;
+
+   ---------------------
+   -- Get_Passthrough --
+   ---------------------
+
+   function Get_Passthrough return Input_Kind is
+   begin
+      return Passthrough;
+   end Get_Passthrough;
 
    -------------------
    -- Now_Recording --
@@ -484,9 +498,6 @@ package body Quick_Synth is
       Recording_Source := Source;
       Create_File (Recording_File, Filename);
       Recording_Size := 0;
-
-      Ada.Text_IO.Put_Line ("Start recording " & Source'Img & " to '" &
-                              Filename & "'");
    end Start_Recording;
 
    --------------------
@@ -495,10 +506,6 @@ package body Quick_Synth is
 
    procedure Stop_Recording is
    begin
-      Ada.Text_IO.Put_Line ("Stop recording");
-
-      Ada.Text_IO.Put_Line ("File size is " & Size (Recording_File)'Img);
-
       Close (Recording_File);
       Recording_Source := None;
    end Stop_Recording;
@@ -510,4 +517,4 @@ package body Quick_Synth is
    function Record_Size return Natural
    is (Natural (Recording_Size));
 
-end Quick_Synth;
+end WNM.Synth;

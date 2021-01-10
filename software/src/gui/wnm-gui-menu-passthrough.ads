@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2020 Fabien Chouteau                  --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,46 +19,31 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.Sequence is
+with WNM.Audio;
 
-   type Instance is private;
-   type Ref is access all Instance;
+package WNM.GUI.Menu.Passthrough is
 
-   procedure Clear (This : in out Instance)
-     with Inline_Always;
+   procedure Push_Window;
 
-   procedure Set (This : in out Instance;
-                  Step : Sequencer_Steps;
-                  Trig : Trigger := Always)
-     with Inline_Always;
+ private
 
-   procedure Toggle (This : in out Instance;
-                     Step : Sequencer_Steps)
-     with Inline_Always;
-
-   procedure Next (This : in out Instance;
-                   Step : Sequencer_Steps)
-     with Inline_Always;
-
-   procedure Previous (This : in out Instance;
-                       Step : Sequencer_Steps)
-     with Inline_Always;
-
-   procedure Clear (This : in out Instance;
-                    Step : Sequencer_Steps)
-     with Inline_Always;
-
-   function Trig (This  : Instance;
-                 Step  : Sequencer_Steps)
-                 return Trigger
-     with Inline_Always;
-
-private
-
-   type Event_Array is array (Sequencer_Steps) of Trigger with Pack;
-
-   type Instance is record
-      Events : Event_Array;
+   type Passthrough_Window is new Menu_Window with record
+      Src, Before : Audio.Input_Kind;
    end record;
 
-end WNM.Sequence;
+   overriding
+   procedure Draw (This : in out Passthrough_Window);
+
+   overriding
+   procedure On_Event (This  : in out Passthrough_Window;
+                       Event : Menu_Event);
+
+   overriding
+   procedure On_Pushed (This : in out Passthrough_Window);
+
+   overriding
+   procedure On_Focus (This       : in out Passthrough_Window;
+                       Exit_Value : Window_Exit_Value)
+   is null;
+
+end WNM.GUI.Menu.Passthrough;

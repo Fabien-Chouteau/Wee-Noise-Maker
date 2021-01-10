@@ -19,7 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.GUI.Bitmap_Fonts;   use WNM.GUI.Bitmap_Fonts;
+with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
+with WNM.Sequencer;
 with Enum_Next;
 
 package body WNM.GUI.Menu.Assign_To_Track is
@@ -97,7 +98,7 @@ package body WNM.GUI.Menu.Assign_To_Track is
    overriding procedure On_Pushed (This  : in out Assign_To_Track_Window)
    is
    begin
-      This.Track := Tracks'First;
+      This.Track := Sequencer.Track;
    end On_Pushed;
 
 

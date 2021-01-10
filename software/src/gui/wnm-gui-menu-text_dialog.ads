@@ -32,16 +32,12 @@ package WNM.GUI.Menu.Text_Dialog is
 
 private
 
-   type Text_Dialog_Mode is (Text_Mode, Confirm_Mode);
-
    subtype Text_Range is Natural range 1 .. 15;
 
    type Text_Dialog_Window is new Menu_Window with record
       Text    : String (Text_Range);
       Len     : Natural;
       Index   : Natural;
-      Mode    : Text_Dialog_Mode;
-      Confirm : Boolean;
    end record;
 
    overriding

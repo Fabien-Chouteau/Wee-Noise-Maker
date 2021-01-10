@@ -106,7 +106,7 @@ package body WNM.Buttons is
                      Key_State (B16) := State;
 
                   when Scan_Code_A =>
-                     Key_State (Menu) := State;
+                     Key_State (Pattern) := State;
                   when Scan_Code_Q =>
                      Key_State (Track_Button) := State;
 
@@ -114,6 +114,10 @@ package body WNM.Buttons is
                      Key_State (Encoder_L) := State;
                   when Scan_Code_2 =>
                      Key_State (Encoder_R) := State;
+                  when Scan_Code_3 =>
+                     Key_State (Menu) := State;
+                  when Scan_Code_4 =>
+                     Key_State (Func) := State;
 
                   when Scan_Code_Up =>
                      if State = Down then

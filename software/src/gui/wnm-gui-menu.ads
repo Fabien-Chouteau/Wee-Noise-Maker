@@ -62,4 +62,7 @@ package WNM.GUI.Menu is
    procedure Push (Window : not null Any_Menu_Window);
    procedure Pop (Exit_Value : Window_Exit_Value);
 
+   procedure Exit_Menu;
+   --  Pop all the windows in stack with a None exit value
+
 end WNM.GUI.Menu;
