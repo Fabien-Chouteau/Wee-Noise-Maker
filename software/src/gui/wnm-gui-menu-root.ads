@@ -29,6 +29,7 @@ private
                        Change_Sample,
                        Set_Passthrough,
                        Test_Text_Input,
+                       FM_Tune,
                        Load,
                        Save,
                        Settings,

@@ -58,7 +58,8 @@ package body WNM.Sample_Library is
          Name_Buffer_Cnt := Entries (Last_Entry).Name_To;
 
          --  Insert name in the Name_Buffer
-         Name_Buffer (Entries (Last_Entry).Name_From .. Entries (Last_Entry).Name_To)
+         Name_Buffer
+           (Entries (Last_Entry).Name_From .. Entries (Last_Entry).Name_To)
            := Name;
 
          return Last_Entry;
@@ -73,7 +74,8 @@ package body WNM.Sample_Library is
    function Entry_Name (Index : Sample_Entry_Index) return String is
    begin
       if Valid_Entry (Index) then
-         return Name_Buffer (Entries (Index).Name_From .. Entries (Index).Name_To);
+         return Name_Buffer
+           (Entries (Index).Name_From .. Entries (Index).Name_To);
       else
          return "";
       end if;
@@ -113,6 +115,8 @@ package body WNM.Sample_Library is
    ----------
 
    procedure Load is
+      procedure Add_To_Library (Filename : String);
+
       procedure Add_To_Library (Filename : String) is
          Unused : Sample_Entry_Index;
       begin

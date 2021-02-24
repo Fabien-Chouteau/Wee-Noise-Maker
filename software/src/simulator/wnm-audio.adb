@@ -164,7 +164,6 @@ begin
                                Ada.Streams.Stream_IO.In_File,
                                "/home/chouteau/Downloads/radio_in.raw");
 
-
    Radio_Input_Stream := Ada.Streams.Stream_IO.Stream (Radio_Input_File);
 
    if Radio_Input_Stream = null then

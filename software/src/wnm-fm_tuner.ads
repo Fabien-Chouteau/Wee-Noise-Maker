@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2021 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,44 +19,21 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sample_Library; use WNM.Sample_Library;
-with WNM.Audio;
+with HAL;
 
-package WNM.GUI.Menu.Create_Sample is
+package WNM.FM_Tuner is
 
-   procedure Push_Window;
+   type State_Kind is (Tuned, Seeking_Up, Seeking_Down, Tunning);
 
-private
+   function State return State_Kind;
 
-   type Create_Sample_State is (Select_Source,
-                                FM_Tune,
-                                Rec_In_Progress,
-                                Trim,
-                                Enter_Name,
-                                Confirm,
-                                Assign_To_Track);
+   type Seek_Direction is (Up, Down);
 
-   type Create_Sample_Menu is new Menu_Window with record
-      State        : Create_Sample_State;
-      Sample_Entry : Sample_Entry_Index := Invalid_Sample_Entry;
+   procedure Seek (Dir : Seek_Direction);
 
-      Input_Before : Audio.Input_Kind;
-   end record;
+   procedure Tune (Freq : HAL.UInt10);
 
-   overriding
-   procedure Draw (This   : in out Create_Sample_Menu)
-   is null;
+   function Channel return HAL.UInt10;
+   function Strength return HAL.UInt8;
 
-   overriding
-   procedure On_Event (This  : in out Create_Sample_Menu;
-                       Event : Menu_Event)
-   is null;
-
-   overriding
-   procedure On_Pushed (This  : in out Create_Sample_Menu);
-
-   overriding
-   procedure On_Focus (This       : in out Create_Sample_Menu;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Create_Sample;
+end WNM.FM_Tuner;

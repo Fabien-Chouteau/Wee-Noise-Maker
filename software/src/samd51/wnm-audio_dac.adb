@@ -19,44 +19,23 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sample_Library; use WNM.Sample_Library;
-with WNM.Audio;
+package body WNM.Audio_DAC is
 
-package WNM.GUI.Menu.Create_Sample is
+   ----------------
+   -- Set_Volume --
+   ----------------
 
-   procedure Push_Window;
+   procedure Set_Volume (Volume : DAC_Volume) is
+   begin
+      null;
+   end Set_Volume;
 
-private
+   ----------------
+   -- Power_Down --
+   ----------------
 
-   type Create_Sample_State is (Select_Source,
-                                FM_Tune,
-                                Rec_In_Progress,
-                                Trim,
-                                Enter_Name,
-                                Confirm,
-                                Assign_To_Track);
-
-   type Create_Sample_Menu is new Menu_Window with record
-      State        : Create_Sample_State;
-      Sample_Entry : Sample_Entry_Index := Invalid_Sample_Entry;
-
-      Input_Before : Audio.Input_Kind;
-   end record;
-
-   overriding
-   procedure Draw (This   : in out Create_Sample_Menu)
-   is null;
-
-   overriding
-   procedure On_Event (This  : in out Create_Sample_Menu;
-                       Event : Menu_Event)
-   is null;
-
-   overriding
-   procedure On_Pushed (This  : in out Create_Sample_Menu);
-
-   overriding
-   procedure On_Focus (This       : in out Create_Sample_Menu;
-                       Exit_Value : Window_Exit_Value);
-
-end WNM.GUI.Menu.Create_Sample;
+   procedure Power_Down is
+   begin
+      null;
+   end Power_Down;
+end WNM.Audio_DAC;

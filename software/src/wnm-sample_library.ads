@@ -26,7 +26,8 @@ package WNM.Sample_Library is
    --  a directory walk in the sample select window package.
 
    subtype Sample_Entry_Index is Natural range 0 .. 256;
-   Invalid_Sample_Entry : constant Sample_Entry_Index := Sample_Entry_Index'First;
+   Invalid_Sample_Entry : constant Sample_Entry_Index :=
+     Sample_Entry_Index'First;
 
    Root_Samples_Path : constant String := "/samples/";
 

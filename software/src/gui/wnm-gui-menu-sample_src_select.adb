@@ -52,6 +52,13 @@ package body WNM.GUI.Menu.Sample_Src_Select is
       Push (Src_Select_Window_Singleton'Access);
    end Push_Window;
 
+   ---------
+   -- Src --
+   ---------
+
+   function Src return WNM.Synth.Rec_Source
+   is (Src_Select_Window_Singleton.Src);
+
    ----------
    -- Draw --
    ----------
@@ -85,10 +92,6 @@ package body WNM.GUI.Menu.Sample_Src_Select is
    begin
       case Event.Kind is
          when Left_Press =>
-            Synth.Start_Recording
-              (Filename => Sample_Rec_Filepath,
-               Source   => This.Src,
-               Max_Size => 332000 * 10 * 2);
             Menu.Pop (Exit_Value => Success);
          when Right_Press =>
             Menu.Pop (Exit_Value => Failure);

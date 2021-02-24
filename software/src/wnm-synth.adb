@@ -65,7 +65,6 @@ package body WNM.Synth is
    function Sample_Clock return Sample_Time
    is (Glob_Sample_Clock);
 
-
    -------------------------
    -- Copy_Stereo_To_Mono --
    -------------------------
@@ -171,22 +170,38 @@ package body WNM.Synth is
 
    procedure Load_Samples is
    begin
-      Assign_Sample (ST_1, "/samples/kick");
-      Assign_Sample (ST_2, "/samples/kick");
-      Assign_Sample (ST_3, "/samples/snare");
-      Assign_Sample (ST_4, "/samples/clap");
-      Assign_Sample (ST_5, "/samples/rim");
-      Assign_Sample (ST_6, "/samples/hho");
-      Assign_Sample (ST_7, "/samples/hhc");
-      Assign_Sample (ST_8, "/samples/crash");
-      Assign_Sample (ST_9, "/samples/ride");
-      Assign_Sample (ST_10, "/samples/ride");
-      Assign_Sample (ST_11, "/samples/ride");
-      Assign_Sample (ST_12, "/samples/ride");
-      Assign_Sample (ST_13, "/samples/ride");
-      Assign_Sample (ST_14, "/samples/ride");
-      Assign_Sample (ST_15, "/samples/ride");
-      Assign_Sample (ST_16, "/samples/ride");
+      --  Assign_Sample (ST_1, "/samples/kick");
+      --  Assign_Sample (ST_2, "/samples/kick");
+      --  Assign_Sample (ST_3, "/samples/snare");
+      --  Assign_Sample (ST_4, "/samples/clap");
+      --  Assign_Sample (ST_5, "/samples/rim");
+      --  Assign_Sample (ST_6, "/samples/hho");
+      --  Assign_Sample (ST_7, "/samples/hhc");
+      --  Assign_Sample (ST_8, "/samples/crash");
+      --  Assign_Sample (ST_9, "/samples/A4");
+      --  Assign_Sample (ST_10, "/samples/B4");
+      --  Assign_Sample (ST_11, "/samples/C5");
+      --  Assign_Sample (ST_12, "/samples/D5");
+      --  Assign_Sample (ST_13, "/samples/E5");
+      --  Assign_Sample (ST_14, "/samples/F5");
+      --  Assign_Sample (ST_15, "/samples/G5");
+      --  Assign_Sample (ST_16, "/samples/A5");
+      Assign_Sample (ST_1,  "/samples/A4");
+      Assign_Sample (ST_2,  "/samples/B4");
+      Assign_Sample (ST_3,  "/samples/C5");
+      Assign_Sample (ST_4,  "/samples/D5");
+      Assign_Sample (ST_5,  "/samples/E5");
+      Assign_Sample (ST_6,  "/samples/F5");
+      Assign_Sample (ST_7,  "/samples/G5");
+      Assign_Sample (ST_8,  "/samples/A5");
+      Assign_Sample (ST_9,  "/samples/A4");
+      Assign_Sample (ST_10, "/samples/B4");
+      Assign_Sample (ST_11, "/samples/C5");
+      Assign_Sample (ST_12, "/samples/D5");
+      Assign_Sample (ST_13, "/samples/E5");
+      Assign_Sample (ST_14, "/samples/F5");
+      Assign_Sample (ST_15, "/samples/G5");
+      Assign_Sample (ST_16, "/samples/A5");
    end Load_Samples;
 
    -------------------
@@ -414,7 +429,10 @@ package body WNM.Synth is
          begin
             for Track in Stream_Track loop
                Next_Buffer (Track, Sample_Buf, Success);
-               if Success then
+               if Success
+                 and then
+                  (Track = Always_On or else not Track_Muted (To_Track (Track)))
+               then
                   Mix (Sample_Buf, Track);
                end if;
             end loop;

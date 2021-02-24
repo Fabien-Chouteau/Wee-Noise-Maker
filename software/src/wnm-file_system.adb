@@ -83,7 +83,7 @@ package body WNM.File_System is
                    Whence : Seek_Whence)
    is
    begin
-      if Littlefs.Seek (FS, FD, Off, Whence) < 0 then
+      if Littlefs.Seek (FS, FD, Off, Whence'Enum_Rep) < 0 then
          raise Program_Error with "Seek error...";
       end if;
    end Seek;
@@ -122,15 +122,25 @@ package body WNM.File_System is
       end if;
    end For_Each_File_In_Dir;
 
+
+   Err : int;
+
+   Do_Reset : constant Boolean := True;
 begin
-   if Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all) /= 0 then
-      raise Program_Error with "Format error...";
+   if Do_Reset then
+      Err := Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all);
+      if Err /= 0 then
+         raise Program_Error with "Format error:" & Err'Img;
+      end if;
    end if;
 
-   if Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all) /= 0 then
-      raise Program_Error with "Mount error...";
+   Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
+   if Err /= 0 then
+      raise Program_Error with "Mount error:" & Err'Img;
    end if;
 
-   WNM.Factory_Reset.Reset (FS);
 
+   if Do_Reset then
+      WNM.Factory_Reset.Reset (FS);
+   end if;
 end WNM.File_System;

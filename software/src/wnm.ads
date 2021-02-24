@@ -60,6 +60,7 @@ package WNM is
 
    UI_Task_Period_Ms : constant := 50;
    GUI_Task_Period_Ms : constant := 50;
+   LED_Task_Period_Ms : constant := 50;
 
    Long_Press_Time_Span_Ms : constant := 300;
    --  How much time (in miliseconds) users have to press a button to get the
@@ -73,7 +74,6 @@ package WNM is
    Audio_Queue_Size : constant := 3;
 
    Sample_Rec_Filepath : constant String := "/sample_rec.raw";
-
 
    --  Enums utils --
    pragma Warnings (Off, "use clause for package");

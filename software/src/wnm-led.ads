@@ -20,12 +20,15 @@
 -------------------------------------------------------------------------------
 
 with HAL; use HAL;
+with WNM.Time;
 
 package WNM.LED is
 
    procedure Turn_On (B : LEDs) with Inline_Always;
    procedure Turn_Off (B : LEDs) with Inline_Always;
    procedure Turn_Off_All with Inline_Always;
-   function Brightness (B : LEDS) return UInt8;
+   function Brightness (B : LEDs) return UInt8;
+
+   function Update return WNM.Time.Time_Ms;
 
 end WNM.LED;

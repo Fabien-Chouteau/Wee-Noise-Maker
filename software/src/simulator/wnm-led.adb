@@ -19,10 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-
 package body WNM.LED is
 
    LED_Brightness : array (LEDs) of UInt8 := (others => 0);
+   Next_Start : WNM.Time.Time_Ms := WNM.Time.Clock + LED_Task_Period_Ms;
 
    -------------
    -- Turn_On --
@@ -55,7 +55,20 @@ package body WNM.LED is
    -- Brightness --
    ----------------
 
-   function Brightness (B : LEDS) return UInt8
+   function Brightness (B : LEDs) return UInt8
    is (LED_Brightness (B));
+
+   ------------
+   -- Update --
+   ------------
+
+   function Update return WNM.Time.Time_Ms is
+   begin
+      if WNM.Time.Clock >= Next_Start then
+         Next_Start := Next_Start + LED_Task_Period_Ms;
+      end if;
+
+      return Next_Start;
+   end Update;
 
 end WNM.LED;

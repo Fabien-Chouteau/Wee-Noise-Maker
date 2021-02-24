@@ -25,6 +25,7 @@ with WNM.GUI.Menu.Sample_Trim;
 with WNM.GUI.Menu.Text_Dialog;
 with WNM.GUI.Menu.Assign_To_Track;
 with WNM.GUI.Menu.Yes_No_Dialog;
+with WNM.GUI.Menu.FM_Settings;
 with WNM.Sample_Stream;
 with WNM.Synth;
 
@@ -66,6 +67,7 @@ package body WNM.GUI.Menu.Create_Sample is
       Exit_Value : Window_Exit_Value)
    is
       New_State : Create_Sample_State;
+      use WNM.Audio;
    begin
 
       --  Transition to the new state
@@ -74,10 +76,23 @@ package body WNM.GUI.Menu.Create_Sample is
 
             if Exit_Value = Success then
                New_State := Rec_In_Progress;
+
+               if WNM.Synth.Get_Passthrough = Audio.FM then
+                  New_State := FM_Tune;
+               else
+                  New_State := Rec_In_Progress;
+               end if;
             else
                WNM.Synth.Set_Passthrough (This.Input_Before);
                Menu.Pop (Exit_Value);
                return;
+            end if;
+
+         when FM_Tune =>
+            if Exit_Value = Success then
+               New_State := Rec_In_Progress;
+            else
+               New_State := Select_Source;
             end if;
 
          when Rec_In_Progress =>
@@ -154,7 +169,13 @@ package body WNM.GUI.Menu.Create_Sample is
       case New_State is
          when Select_Source =>
             Sample_Src_Select.Push_Window;
+         when FM_Tune =>
+            FM_Settings.Push_Window;
          when Rec_In_Progress =>
+            Synth.Start_Recording
+              (Filename => Sample_Rec_Filepath,
+               Source   => Sample_Src_Select.Src,
+               Max_Size => 332000 * 10 * 2);
             Recording.Push_Window;
          when Trim =>
             Sample_Trim.Push_Window;

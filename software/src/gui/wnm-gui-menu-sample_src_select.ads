@@ -19,11 +19,13 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-private with WNM.Synth;
+with WNM.Synth;
 
 package WNM.GUI.Menu.Sample_Src_Select is
 
    procedure Push_Window;
+
+   function Src return WNM.Synth.Rec_Source;
 
 private
 

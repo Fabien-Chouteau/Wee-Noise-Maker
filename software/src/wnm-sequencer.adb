@@ -99,7 +99,8 @@ package body WNM.Sequencer is
 
 --      Octave : MIDI.Octaves := 4;
 
---     function To_Key (B : Keyboard_Buttons; Oct : MIDI.Octaves) return MIDI.MIDI_Key is
+--     function To_Key (B : Keyboard_Buttons; Oct : MIDI.Octaves)
+--  return MIDI.MIDI_Key is
 --       (case B is
 --           when B9  => MIDI.Key (Oct, MIDI.C),
 --           when B2  => MIDI.Key (Oct, MIDI.Cs),
@@ -139,7 +140,8 @@ package body WNM.Sequencer is
       Current_Seq_State := Transition (Current_Seq_State, Play_Event);
       if Current_Seq_State in Play | Play_And_Rec | Edit | Play_And_Edit then
          Current_Step := Sequencer_Steps'First;
-         Microstep := 0;
+         Microstep := 1;
+         Execute_Step;
       end if;
    end Play_Pause;
 
@@ -181,7 +183,8 @@ package body WNM.Sequencer is
             WNM.Synth.Trig (Button);
             Current_Track := Button;
          when Play_And_Rec =>
-            Sequences (Pattern_Sequencer.Current_Pattern)(Button)(Step).Trig := Always;
+            Sequences (Pattern_Sequencer.Current_Pattern) (Button) (Step).Trig
+              := Always;
             Current_Track := Button;
             if Microstep /= 1 then
                WNM.Synth.Trig (Button);
@@ -189,8 +192,9 @@ package body WNM.Sequencer is
          when Play_And_Edit | Edit =>
 
             declare
-               S : Step_Rec renames Sequences (Pattern_Sequencer.Current_Pattern)
-                                              (Current_Track)
+               S : Step_Rec renames Sequences
+                 (Pattern_Sequencer.Current_Pattern)
+                 (Current_Track)
                  (To_Value (Button));
             begin
                if S.Trig /= None then
@@ -333,11 +337,11 @@ package body WNM.Sequencer is
             when Fill =>
                Condition := WNM.UI.FX_On (B1);
             when Percent_25 =>
-               condition := Random <= 25;
+               Condition := Random <= 25;
             when Percent_50 =>
-               condition := Random <= 50;
+               Condition := Random <= 50;
             when Percent_75 =>
-               condition := Random <= 75;
+               Condition := Random <= 75;
          end case;
 
          if Condition then
@@ -345,7 +349,9 @@ package body WNM.Sequencer is
 
             declare
                Repeat_Span : constant Sample_Time :=
-                 Samples_Per_Beat /  (case Sequences (Pattern) (Track) (Step).Repeat_Rate is
+                 Samples_Per_Beat /  (case Sequences (Pattern)
+                                      (Track) (Step).Repeat_Rate
+                                      is
                                          when Rate_1_1  => 1,
                                          when Rate_1_2  => 2,
                                          when Rate_1_3  => 3,
@@ -398,7 +404,8 @@ package body WNM.Sequencer is
                --  At the middle of the step we play the recorded notes
             when 1 =>
                if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
-                  Process_Step (Pattern_Sequencer.Current_Pattern, Current_Step);
+                  Process_Step
+                    (Pattern_Sequencer.Current_Pattern, Current_Step);
                end if;
          end case;
          Microstep := Microstep + 1;
@@ -416,7 +423,7 @@ package body WNM.Sequencer is
       Success : Boolean;
       Track   : Tracks;
    begin
-      if now >= Next_Start then
+      if Now >= Next_Start then
          Execute_Step;
       end if;
 
@@ -436,7 +443,8 @@ package body WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean is
    begin
-      return Sequences (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig /= None;
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig /= None;
    end Set;
 
    ---------
@@ -445,7 +453,8 @@ package body WNM.Sequencer is
 
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean is
    begin
-      return Sequences (Pattern_Sequencer.Current_Pattern)(Track)(Step).Trig /= None;
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern)(Track)(Step).Trig /= None;
    end Set;
 
    ----------
@@ -454,7 +463,8 @@ package body WNM.Sequencer is
 
    function Trig (Step : Sequencer_Steps) return Trigger is
    begin
-      return Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig;
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig;
    end Trig;
 
    ---------------
@@ -463,7 +473,8 @@ package body WNM.Sequencer is
 
    procedure Trig_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig);
+      Next (Sequences
+            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig);
    end Trig_Next;
 
    ---------------
@@ -472,7 +483,8 @@ package body WNM.Sequencer is
 
    procedure Trig_Prev (Step : Sequencer_Steps) is
    begin
-      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig);
+      Prev (Sequences
+            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig);
    end Trig_Prev;
 
    ------------
@@ -481,7 +493,8 @@ package body WNM.Sequencer is
 
    function Repeat (Step : Sequencer_Steps) return WNM.Repeat is
    begin
-      return Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat;
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat;
    end Repeat;
 
    -----------------
@@ -490,7 +503,8 @@ package body WNM.Sequencer is
 
    procedure Repeat_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat);
+      Next (Sequences
+            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat);
    end Repeat_Next;
 
    -----------------
@@ -499,7 +513,8 @@ package body WNM.Sequencer is
 
    procedure Repeat_Prev (Step : Sequencer_Steps) is
    begin
-      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat);
+      Prev (Sequences
+            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat);
    end Repeat_Prev;
 
    -----------------
@@ -508,9 +523,9 @@ package body WNM.Sequencer is
 
    function Repeat_Rate (Step : Sequencer_Steps) return WNM.Repeat_Rate is
    begin
-      return Sequences (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat_Rate;
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat_Rate;
    end Repeat_Rate;
-
 
    ----------------------
    -- Repeat_Rate_Next --
@@ -518,7 +533,10 @@ package body WNM.Sequencer is
 
    procedure Repeat_Rate_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat_Rate);
+      Next (Sequences
+            (Pattern_Sequencer.Current_Pattern)
+            (Current_Track)
+            (Step).Repeat_Rate);
    end Repeat_Rate_Next;
 
    ----------------------
@@ -527,16 +545,35 @@ package body WNM.Sequencer is
 
    procedure Repeat_Rate_Prev (Step : Sequencer_Steps) is
    begin
-      Prev (Sequences (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Repeat_Rate);
+      Prev (Sequences
+            (Pattern_Sequencer.Current_Pattern)
+            (Current_Track)
+            (Step).Repeat_Rate);
    end Repeat_Rate_Prev;
 
-
 begin
-   for Pattern in Patterns loop
-      for Track in Tracks loop
-         for Step in Sequencer_Steps loop
-            Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_1);
-         end loop;
-      end loop;
-   end loop;
+   --  for Pattern in Patterns loop
+   --     for Track in Tracks loop
+   --        for Step in Sequencer_Steps loop
+   --           Sequences (Pattern) (Track) (Step) := (Always, 0, Rate_1_1);
+   --        end loop;
+   --     end loop;
+   --  end loop;
+
+   Sequences (B1) (B1) (1)  := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B2) (2)  := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B3) (3)  := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B4) (4)  := (Always, 0, Rate_1_8);
+   Sequences (B1) (B5) (5)  := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B6) (6)  := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B7) (7)  := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B8) (8)  := (Always, 0, Rate_1_8);
+   Sequences (B1) (B9) (9)  := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B10) (10) := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B11) (11) := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B12) (12) := (Always, 0, Rate_1_8);
+   Sequences (B1) (B13) (13) := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B14) (14) := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B15) (15) := (Always, 0, Rate_1_8);
+   --  Sequences (B1) (B16) (16) := (Always, 0, Rate_1_8);
 end WNM.Sequencer;

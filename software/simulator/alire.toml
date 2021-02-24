@@ -13,3 +13,6 @@ sdlada = "*"
 hal = "*"
 littlefs = "*"
 bbqueue = "*"
+
+[[depends-on]]  # This line was added by `alr with`
+virtapu = "*"  # This line was added by `alr with`
