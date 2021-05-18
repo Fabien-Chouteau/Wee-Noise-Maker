@@ -101,7 +101,7 @@ package body WNM.File_System is
    -- For_Each_File_In_Dir --
    --------------------------
 
-   procedure For_Each_File_In_Dir (Dirpath : String)is
+   procedure For_Each_File_In_Dir (Dirpath : String) is
       Dir : aliased LFS_Dir;
       Err : int;
       Info : aliased Entry_Info;
@@ -122,7 +122,6 @@ package body WNM.File_System is
       end if;
    end For_Each_File_In_Dir;
 
-
    Err : int;
 
    Do_Reset : constant Boolean := True;
@@ -138,7 +137,6 @@ begin
    if Err /= 0 then
       raise Program_Error with "Mount error:" & Err'Img;
    end if;
-
 
    if Do_Reset then
       WNM.Factory_Reset.Reset (FS);

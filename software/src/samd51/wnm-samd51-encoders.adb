@@ -15,7 +15,7 @@ package body WNM.SAMD51.Encoders is
    package Atomic_Int is new Atomic.Generic_Signed32 (Integer);
 
    LA : SAM.Port.GPIO_Point renames SAM.Device.PB22;
-   LB : SAM.Port.GPIO_Point renames SAM.Device.PB17;
+   LB : SAM.Port.GPIO_Point renames SAM.Device.PA14;
    RA : SAM.Port.GPIO_Point renames SAM.Device.PA18;
    RB : SAM.Port.GPIO_Point renames SAM.Device.PA19;
 
@@ -27,8 +27,8 @@ package body WNM.SAMD51.Encoders is
    Seq_RA : UInt8 := 0;
    Seq_RB : UInt8 := 0;
 
-   procedure Extint1_Handler;
-   pragma Export (C, Extint1_Handler, "__eic_extint_1_interrupt_handler");
+   procedure Extint14_Handler;
+   pragma Export (C, Extint14_Handler, "__eic_extint_14_interrupt_handler");
 
    procedure Extint2_Handler;
    pragma Export (C, Extint2_Handler, "__eic_extint_2_interrupt_handler");
@@ -97,14 +97,14 @@ package body WNM.SAMD51.Encoders is
    -- Extint1_Handler --
    ---------------------
 
-   procedure Extint1_Handler is
+   procedure Extint14_Handler is
    begin
-      SAM.EIC.Clear_Interrupt (1);
+      SAM.EIC.Clear_Interrupt (14);
       Cortex_M.NVIC.Clear_Pending
-        (SAM.Interrupt_Names.eic_extint_1_interrupt);
+        (SAM.Interrupt_Names.eic_extint_14_interrupt);
 
       Left_Handling;
-   end Extint1_Handler;
+   end Extint14_Handler;
 
    ---------------------
    -- Extint2_Handler --
@@ -181,7 +181,7 @@ package body WNM.SAMD51.Encoders is
 
       LB.Set_Mode (HAL.GPIO.Input);
       LB.Set_Pull_Resistor (HAL.GPIO.Pull_Up);
-      LB.Set_Function (SAM.Functions.PB17_EIC_EXTINT1);
+      LB.Set_Function (SAM.Functions.PA14_EIC_EXTINT14);
 
       RA.Set_Mode (HAL.GPIO.Input);
       RA.Set_Pull_Resistor (HAL.GPIO.Pull_Up);
@@ -192,13 +192,13 @@ package body WNM.SAMD51.Encoders is
       RB.Set_Function (SAM.Functions.PA19_EIC_EXTINT3);
 
       Cortex_M.NVIC.Enable_Interrupt
-        (SAM.Interrupt_Names.eic_extint_1_interrupt);
-      Cortex_M.NVIC.Enable_Interrupt
         (SAM.Interrupt_Names.eic_extint_2_interrupt);
       Cortex_M.NVIC.Enable_Interrupt
         (SAM.Interrupt_Names.eic_extint_3_interrupt);
       Cortex_M.NVIC.Enable_Interrupt
         (SAM.Interrupt_Names.eic_extint_6_interrupt);
+      Cortex_M.NVIC.Enable_Interrupt
+        (SAM.Interrupt_Names.eic_extint_14_interrupt);
    end Initialize;
 
 begin

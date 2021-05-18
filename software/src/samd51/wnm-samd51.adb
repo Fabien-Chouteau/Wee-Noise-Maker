@@ -9,6 +9,7 @@ with HAL.GPIO;
 with SAM.Clock_Generator.IDs;
 with SAM.Functions;
 with SAM.EIC;
+with SAM.CMCC;
 
 package body WNM.Samd51 is
 
@@ -122,7 +123,7 @@ package body WNM.Samd51 is
                          SAM.EIC.Both,
                          Enable_Interrupt => True,
                          Debouncer => False);
-      SAM.EIC.Configure (1,
+      SAM.EIC.Configure (14,
                          SAM.EIC.Both,
                          Enable_Interrupt => True,
                          Debouncer => False);
@@ -152,5 +153,7 @@ begin
 
    Init_I2C;
    Init_EIC;
+
+   SAM.CMCC.Enable_Cache;
 
 end WNM.Samd51;

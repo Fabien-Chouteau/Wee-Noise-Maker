@@ -40,7 +40,7 @@ package body WNM.Factory_Reset is
    begin
       APU.Set_Rhythm (120, WNM.Sample_Frequency / Buf'Length);
       APU.Set_Mode (1, VirtAPU.Pulse);
-      APU.Set_Volume (1, 10);
+      APU.Set_Volume (1, 1);
       APU.Set_Sweep (Chan_Id     => 1,
                      Kind        => VirtAPU.Down,
                      Sweep_Len   => 2,

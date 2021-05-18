@@ -21,6 +21,7 @@
 
 with WNM.Time;
 with WNM.Synth;
+with WNM.MIDI;
 
 package WNM.Sequencer is
 
@@ -85,5 +86,21 @@ package WNM.Sequencer is
    function Repeat_Rate (Step : Sequencer_Steps) return WNM.Repeat_Rate;
    procedure Repeat_Rate_Next (Step : Sequencer_Steps);
    procedure Repeat_Rate_Prev (Step : Sequencer_Steps);
+
+   function Note (Step : Sequencer_Steps) return MIDI.MIDI_Key;
+   procedure Note_Next (Step : Sequencer_Steps);
+   procedure Note_Prev (Step : Sequencer_Steps);
+
+   function Velo (Step : Sequencer_Steps) return MIDI.MIDI_Data;
+   procedure Velo_Next (Step : Sequencer_Steps);
+   procedure Velo_Prev (Step : Sequencer_Steps);
+
+   type CC_Id is (A, B, C, D);
+
+   function CC_Enabled (Step : Sequencer_Steps; Id : CC_Id) return Boolean;
+   procedure CC_Toggle (Step : Sequencer_Steps; Id : CC_Id);
+   function CC_Value (Step : Sequencer_Steps; Id : CC_Id) return MIDI.MIDI_Data;
+   procedure CC_Value_Inc (Step : Sequencer_Steps; Id : CC_Id);
+   procedure CC_Value_Dec (Step : Sequencer_Steps; Id : CC_Id);
 
 end WNM.Sequencer;

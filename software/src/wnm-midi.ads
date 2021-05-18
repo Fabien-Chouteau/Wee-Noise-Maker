@@ -1,20 +1,30 @@
-with Interfaces; use Interfaces;
+with HAL; use HAL;
 
-package MIDI is
+package WNM.MIDI is
 
-   type Command_Kind is (Note_On,
-                         Note_Off,
+   type Command_Kind is (Note_Off,
+                         Note_On,
                          Aftertouch,
                          Continous_Controller,
                          Patch_Change,
                          Channel_Pressure,
-                         Pitch_Bend);
+                         Pitch_Bend)
+     with Size => 4;
 
-   subtype MIDI_Data is Unsigned_8 range 2#0000_0000# .. 2#0111_1111#;
+   for Command_Kind use (Note_Off             => 16#8#,
+                         Note_On              => 16#9#,
+                         Aftertouch           => 16#A#,
+                         Continous_Controller => 16#B#,
+                         Patch_Change         => 16#C#,
+                         Channel_Pressure     => 16#D#,
+                         Pitch_Bend           => 16#E#);
+
+   subtype MIDI_Data is UInt8 range 2#0000_0000# .. 2#0111_1111#;
    subtype MIDI_Key is MIDI_Data;
    type MIDI_Channel is mod 2**4 with Size => 4;
 
-   type Command (Kind : Command_Kind := Note_On) is record
+   type Message (Kind : Command_Kind := Note_On) is record
+      Chan : MIDI_Channel;
       case Kind is
          when Note_On | Note_Off | Aftertouch =>
             Key      : MIDI_Key;
@@ -29,18 +39,100 @@ package MIDI is
          when Pitch_Bend =>
             Bend : MIDI_Data;
       end case;
+   end record
+     with Size => 3 * 8;
+
+   for Message use record
+      Kind             at 0 range 4 .. 7;
+      Chan             at 0 range 0 .. 3;
+      Key              at 1 range 0 .. 7;
+      Velocity         at 2 range 0 .. 7;
+      Controller       at 1 range 0 .. 7;
+      Controller_Value at 2 range 0 .. 7;
+      Instrument       at 1 range 0 .. 7;
+      Pressure         at 1 range 0 .. 7;
+      Bend             at 1 range 0 .. 7;
    end record;
 
-   type Message (Kind : Command_Kind := Note_On) is record
-      Channel : MIDI_Channel;
-      Cmd     : Command (Kind);
-   end record;
-
-   type Octaves is new Unsigned_8 range 1 .. 8;
+   type Octaves is new UInt8 range 1 .. 8;
    type Notes is (C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B);
 
+   subtype MIDI_USB_Event is HAL.UInt32;
+
+   function Make_Note_On (C : MIDI_Channel;
+                          K : MIDI_Key;
+                          V : MIDI_Data)
+                          return MIDI_USB_Event;
+
+   function Make_Note_On (C : MIDI_Channel;
+                          N : Notes;
+                          O : Octaves;
+                          V : MIDI_Data)
+                          return MIDI_USB_Event;
+
+   function Make_Note_Off (C : MIDI_Channel;
+                           K : MIDI_Key;
+                           V : MIDI_Data)
+                          return MIDI_USB_Event;
+
+   function Make_Note_Off (C : MIDI_Channel;
+                           N : Notes;
+                           O : Octaves;
+                           V : MIDI_Data)
+                           return MIDI_USB_Event;
+
+   function Make_CC (C          : MIDI_Channel;
+                     Controller : MIDI_Data;
+                     Value      : MIDI_Data)
+                     return MIDI_USB_Event;
+
+   --------------
+   -- To_Track --
+   --------------
+
+   function To_Track (Chan : MIDI_Channel) return Tracks
+   is (case Chan is
+          when 0      => B1,
+          when 1      => B2,
+          when 2      => B3,
+          when 3      => B4,
+          when 4      => B5,
+          when 5      => B6,
+          when 6      => B7,
+          when 7      => B8,
+          when 8      => B9,
+          when 9      => B10,
+          when 10     => B11,
+          when 11     => B12,
+          when 12     => B13,
+          when 13     => B14,
+          when 14     => B15,
+          when 15     => B16);
+   --------------------
+   -- To_MIDI_Channel --
+   ---------------------
+   function To_MIDI_Channel (Chan : Tracks) return MIDI_Channel
+   is (case Chan is
+          when B1  => 0,
+          when B2  => 1,
+          when B3  => 2,
+          when B4  => 3,
+          when B5  => 4,
+          when B6  => 5,
+          when B7  => 6,
+          when B8  => 7,
+          when B9  => 8,
+          when B10 => 9,
+          when B11 => 10,
+          when B12 => 11,
+          when B13 => 12,
+          when B14 => 13,
+          when B15 => 14,
+          when B16 => 15);
+
    function Key (Oct : Octaves; N : Notes) return MIDI_Key
-   is (MIDI_Key (12 + Natural (Oct) * 12 + Notes'Pos (N) - Notes'Pos (Notes'First)));
+   is (MIDI_Key (12 + Natural (Oct) * 12 +
+                   Notes'Pos (N) - Notes'Pos (Notes'First)));
 
    A0  : constant MIDI_Key := 16#15#;
    As0 : constant MIDI_Key := 16#16#;
@@ -271,4 +363,5 @@ package MIDI is
       125 => 11175.3034058561,
       126 => 11839.8215267723,
       127 =>  12543.8539514160);
-end MIDI;
+
+end WNM.MIDI;

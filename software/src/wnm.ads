@@ -19,7 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with MIDI;
 with Enum_Next;
 
 package WNM is
@@ -43,15 +42,19 @@ package WNM is
    subtype Patterns is Keyboard_Button;
 
    type Trigger is (None, Always, Fill, Percent_25, Percent_50, Percent_75);
+   function Img (T : Trigger) return String;
+
    type Repeat is mod 9;
+
    type Repeat_Rate is (Rate_1_1, Rate_1_2, Rate_1_3, Rate_1_4, Rate_1_5,
                         Rate_1_6, Rate_1_8, Rate_1_10, Rate_1_12, Rate_1_16,
                         Rate_1_20, Rate_1_24, Rate_1_32);
+   function Img (R : Repeat_Rate) return String;
 
-   function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
-     with Inline_Always;
-   function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
-     with Inline_Always;
+   --  function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
+   --    with Inline_Always;
+   --  function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
+   --    with Inline_Always;
 
    subtype Beat_Per_Minute is Positive range 50 .. 200;
    subtype Sequencer_Steps is Keyboard_Value;
@@ -71,7 +74,7 @@ package WNM is
    Mono_Buffer_Size_In_Bytes   : constant := Samples_Per_Buffer * 2;
    Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Buffer * 4;
 
-   Audio_Queue_Size : constant := 3;
+   Audio_Queue_Size : constant := 5;
 
    Sample_Rec_Filepath : constant String := "/sample_rec.raw";
 

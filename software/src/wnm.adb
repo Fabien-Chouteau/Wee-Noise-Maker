@@ -21,6 +21,39 @@
 
 package body WNM is
 
+   ---------
+   -- Img --
+   ---------
+
+   function Img (T : Trigger) return String
+   is (case T is
+          when None       => "None",
+          when Always     => "Always",
+          when Fill       => "Fill",
+          when Percent_25 => "25%",
+          when Percent_50 => "50%",
+          when Percent_75 => "75%");
+
+   ---------
+   -- Img --
+   ---------
+
+   function Img (R : Repeat_Rate) return String
+   is (case R is
+       when Rate_1_1  => "1/1",
+       when Rate_1_2  => "1/2",
+       when Rate_1_3  => "1/3",
+       when Rate_1_4  => "1/4",
+       when Rate_1_5  => "1/5",
+       when Rate_1_6  => "1/6",
+       when Rate_1_8  => "1/8",
+       when Rate_1_10 => "1/10",
+       when Rate_1_12 => "1/12",
+       when Rate_1_16 => "1/16",
+       when Rate_1_20 => "1/20",
+       when Rate_1_24 => "1/24",
+       when Rate_1_32 => "1/32");
+
    --------------
    -- To_Value --
    --------------
@@ -53,49 +86,50 @@ package body WNM is
           when 15 => B15,
           when 16 => B16);
 
-   --------------
-   -- To_Track --
-   --------------
+   --  --------------
+   --  -- To_Track --
+   --  --------------
+   --
+   --  function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
+   --  is (case Chan is
+   --         when 0      => B1,
+   --         when 1      => B2,
+   --         when 2      => B3,
+   --         when 3      => B4,
+   --         when 4      => B5,
+   --         when 5      => B6,
+   --         when 6      => B7,
+   --         when 7      => B8,
+   --         when 8      => B9,
+   --         when 9      => B10,
+   --         when 10     => B11,
+   --         when 11     => B12,
+   --         when 12     => B13,
+   --         when 13     => B14,
+   --         when 14     => B15,
+   --         when 15     => B16);
+   --
+   --  ---------------------
+   --  -- To_MIDI_Channel --
+   --  ---------------------
+   --
+   --  function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
+   --  is (case Chan is
+   --         when B1  => 0,
+   --         when B2  => 1,
+   --         when B3  => 2,
+   --         when B4  => 3,
+   --         when B5  => 4,
+   --         when B6  => 5,
+   --         when B7  => 6,
+   --         when B8  => 7,
+   --         when B9  => 8,
+   --         when B10 => 9,
+   --         when B11 => 10,
+   --         when B12 => 11,
+   --         when B13 => 12,
+   --         when B14 => 13,
+   --         when B15 => 14,
+   --         when B16 => 15);
 
-   function To_Track (Chan : MIDI.MIDI_Channel) return Tracks
-   is (case Chan is
-          when 0      => B1,
-          when 1      => B2,
-          when 2      => B3,
-          when 3      => B4,
-          when 4      => B5,
-          when 5      => B6,
-          when 6      => B7,
-          when 7      => B8,
-          when 8      => B9,
-          when 9      => B10,
-          when 10     => B11,
-          when 11     => B12,
-          when 12     => B13,
-          when 13     => B14,
-          when 14     => B15,
-          when 15     => B16);
-
-   ---------------------
-   -- To_MIDI_Channel --
-   ---------------------
-
-   function To_MIDI_Channel (Chan : Tracks) return MIDI.MIDI_Channel
-   is (case Chan is
-          when B1  => 0,
-          when B2  => 1,
-          when B3  => 2,
-          when B4  => 3,
-          when B5  => 4,
-          when B6  => 5,
-          when B7  => 6,
-          when B8  => 7,
-          when B9  => 8,
-          when B10 => 9,
-          when B11 => 10,
-          when B12 => 11,
-          when B13 => 12,
-          when B14 => 13,
-          when B15 => 14,
-          when B16 => 15);
 end WNM;

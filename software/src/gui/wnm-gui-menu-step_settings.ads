@@ -25,7 +25,8 @@ package WNM.GUI.Menu.Step_Settings is
 
 private
 
-   type Settings is (Condition, Repeat, Repeat_Rate);
+   type Settings is (Condition, Note, Repeat, Repeat_Rate, Velo,
+                     CC_A, CC_B, CC_C, CC_D);
 
    type Step_Settings_Menu is new Menu_Window with record
       Current_Setting : Settings := Settings'First;

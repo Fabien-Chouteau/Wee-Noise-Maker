@@ -26,7 +26,7 @@ with WNM;                        use WNM;
 --  with WNM.Sample_Library;         use WNM.Sample_Library;
 with WNM.Audio;                  use WNM.Audio;
 with WNM.File_System;            use WNM.File_System;
-
+with WNM.MIDI.Queues;
 --  with Hex_Dump;
 --  with Semihosting;
 
@@ -48,7 +48,7 @@ package body WNM.Synth is
    --    (others => Invalid_Sample_Entry)
    --    with Atomic_Components;
 
-   Passthrough : Input_Kind := None;
+   Passthrough : Input_Kind := Line_In;
 
    Next_Start : WNM.Time.Time_Ms := WNM.Time.Time_Ms'First;
    Glob_Sample_Clock : Sample_Time := 0 with Volatile;
@@ -57,6 +57,7 @@ package body WNM.Synth is
                                   Dst : out Mono_Buffer);
 
    function Is_It_On (Track : Stream_Track) return Boolean;
+   procedure Process_MIDI_Events;
 
    ------------------
    -- Sample_Clock --
@@ -107,49 +108,16 @@ package body WNM.Synth is
    -----------
 
    procedure Event (Msg : MIDI.Message) is
-      --  Track : constant WNM.Tracks := WNM.To_Track (Msg.Channel);
+      Track : constant WNM.Tracks := WNM.MIDI.To_Track (Msg.Chan);
    begin
-      null;
-      --  case Msg.Kind is
-      --     when MIDI.Note_On =>
-      --        if Track = B1 then
-      --           Start (Filepath    => (case Msg.Cmd.Key is
-      --                                     when MIDI.C4  => "/sdcard/drums/Clap.raw",
-      --                                     when MIDI.Cs4 => "/sdcard/drums/Clave.raw",
-      --                                     when MIDI.D4  => "/sdcard/drums/Cymbal-high.raw",
-      --                                     when MIDI.Ds4 => "/sdcard/drums/Hat_closed.raw",
-      --                                     when MIDI.E4  => "/sdcard/drums/Hat_long.raw",
-      --                                     when MIDI.F4  => "/sdcard/drums/Hi_Tom.raw",
-      --                                     when MIDI.Fs4 => "/sdcard/drums/Kick_long.raw",
-      --                                     when MIDI.G4  => "/sdcard/drums/Kick_short.raw",
-      --                                     when MIDI.Gs4 => "/sdcard/drums/Lo_Tom.raw",
-      --                                     when MIDI.A4  => "/sdcard/drums/Md_Tom.raw",
-      --                                     when MIDI.As4 => "/sdcard/drums/Rim_Shot.raw",
-      --                                     when MIDI.B4  => "/sdcard/drums/Snare_lo1.raw",
-      --                                     when MIDI.C5  => "/sdcard/drums/Snare_lo2.raw",
-      --                                     when MIDI.Cs5 => "/sdcard/drums/Snare_lo3.raw",
-      --                                     when MIDI.D5  => "/sdcard/drums/Cowbell.raw",
-      --                                     when MIDI.Ds5 => "/sdcard/drums/Maracas.raw",
-      --                                     when MIDI.E5  => "/sdcard/drums/Hi_Conga.raw",
-      --                                     when MIDI.F5  => "/sdcard/drums/Md_Conga.raw",
-      --                                     when MIDI.Fs5 => "/sdcard/quotes/wake.raw",
-      --                                     when MIDI.G5  => "/sdcard/quotes/darkside.raw",
-      --                                     when MIDI.Gs5 => "/sdcard/quotes/failure2_x.raw",
-      --                                     when MIDI.A5  => "/sdcard/quotes/failure3.raw",
-      --                                     when MIDI.As5 => "/sdcard/quotes/halbye.raw",
-      --                                     when MIDI.B5  => "/sdcard/quotes/learn.raw",
-      --                                     when MIDI.C6  => "/sdcard/quotes/trap.raw",
-      --                                     when others   => "/sdcard/test.raw"),
-      --                  Start_Point => 0,
-      --                  End_Point   => Natural'Last,
-      --                  Track       => To_Stream_Track (Track),
-      --                  Looping     => False);
-      --        end if;
-      --     when  MIDI.Note_Off =>
-      --        null;
-      --     when others =>
-      --        null;
-      --  end case;
+      case Msg.Kind is
+         when MIDI.Note_On =>
+            Trig (Track);
+         when  MIDI.Note_Off =>
+            null;
+         when others =>
+            null;
+      end case;
    end Event;
 
    ----------
@@ -343,6 +311,16 @@ package body WNM.Synth is
    function Volume (Track : WNM.Tracks) return Natural
    is (Natural (Volume_For_Track (Track)));
 
+   -------------------------
+   -- Process_MIDI_Events --
+   -------------------------
+
+   procedure Process_MIDI_Events is
+      procedure Pop is new WNM.MIDI.Queues.Synth_Pop (Event);
+   begin
+      Pop;
+   end Process_MIDI_Events;
+
    ------------
    -- Update --
    ------------
@@ -446,7 +424,7 @@ package body WNM.Synth is
                case Recording_Source is
                when None =>
                   null;
-               when Line_In | FM =>
+               when Line_In =>
                   Copy_Stereo_To_Mono (In_L, In_R, Sample_Buf);
                when Master_Output =>
                   Copy_Stereo_To_Mono (Out_L, Out_R, Sample_Buf);
@@ -466,6 +444,8 @@ package body WNM.Synth is
    begin
       if Now >= Next_Start then
          Next_Start := Next_Start + 0;
+
+         Process_MIDI_Events;
 
          Generate_Audio;
       end if;

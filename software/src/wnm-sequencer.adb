@@ -19,27 +19,33 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
---  with MIDI;
 with WNM.Short_Term_Sequencer;
 with WNM.Pattern_Sequencer;
 with WNM.UI;
+with WNM.MIDI.Queues;
 with HAL;                   use HAL;
 
 package body WNM.Sequencer is
 
-   --  use type MIDI.Octaves;
+   type CC_Val_Array is array (CC_Id) of MIDI.MIDI_Data;
+   type CC_Ena_Array is array (CC_Id) of Boolean;
 
    type Step_Rec is record
       Trig        : Trigger;
       Repeat      : WNM.Repeat;
       Repeat_Rate : WNM.Repeat_Rate;
+
+      Note : MIDI.MIDI_Key := MIDI.C4;
+      Velo : MIDI.MIDI_Data := 40;
+      CC_Ena : CC_Ena_Array := (others => False);
+      CC_Val : CC_Val_Array := (others => 0);
    end record;
 
    type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
    type Pattern is array (Tracks) of Sequence;
    Sequences : array (Patterns) of Pattern;
 
-   Sequencer_BPM : Beat_Per_Minute := 90;
+   Sequencer_BPM : Beat_Per_Minute := 120;
 
    Current_Step      : Sequencer_Steps := Sequencer_Steps'First with Atomic;
    Current_Seq_State : Sequencer_State := Pause with Atomic;
@@ -65,6 +71,10 @@ package body WNM.Sequencer is
                                   Rec_Event,
                                   Rec_Long_Event,
                                   Rec_Release_Event);
+
+   ----------------
+   -- Transition --
+   ----------------
 
    function Transition (State : Sequencer_State;
                         Evt   : Sequencer_State_Event)
@@ -96,6 +106,26 @@ package body WNM.Sequencer is
                                   when Rec_Event         => Play_And_Rec,
                                   when Rec_Long_Event    => Play_And_Rec,
                                   when Rec_Release_Event => Play));
+
+   ------------------------
+   -- Do_Preview_Trigger --
+   ------------------------
+
+   procedure Do_Preview_Trigger (T : Tracks) is
+      use WNM.Synth;
+   begin
+      WNM.MIDI.Queues.Sequencer_Push
+        ((MIDI.Note_On,
+         WNM.MIDI.To_MIDI_Channel (T),
+         MIDI.C4,
+         40));
+      WNM.Short_Term_Sequencer.Push
+        ((MIDI.Note_Off,
+         WNM.MIDI.To_MIDI_Channel (Track),
+         MIDI.C4,
+         0),
+         Sample_Clock + Samples_Per_Beat);
+   end Do_Preview_Trigger;
 
 --      Octave : MIDI.Octaves := 4;
 
@@ -180,17 +210,19 @@ package body WNM.Sequencer is
    begin
       case Current_Seq_State is
          when Pause | Play =>
-            WNM.Synth.Trig (Button);
+            Do_Preview_Trigger (Button);
+
             Current_Track := Button;
+
          when Play_And_Rec =>
             Sequences (Pattern_Sequencer.Current_Pattern) (Button) (Step).Trig
               := Always;
             Current_Track := Button;
             if Microstep /= 1 then
-               WNM.Synth.Trig (Button);
+               Do_Preview_Trigger (Button);
             end if;
-         when Play_And_Edit | Edit =>
 
+         when Play_And_Edit | Edit =>
             declare
                S : Step_Rec renames Sequences
                  (Pattern_Sequencer.Current_Pattern)
@@ -327,9 +359,14 @@ package body WNM.Sequencer is
 
       Condition : Boolean := False;
       Now : constant Sample_Time := Sample_Clock;
+
+      Note_Duration : constant Sample_Time := Samples_Per_Beat / 4;
    begin
       for Track in Tracks loop
-         case Sequences (Pattern)(Track)(Step).Trig is
+         declare
+            S : Step_Rec renames Sequences (Pattern) (Track) (Step);
+         begin
+            case S.Trig is
             when None =>
                Condition := False;
             when Always =>
@@ -342,37 +379,78 @@ package body WNM.Sequencer is
                Condition := Random <= 50;
             when Percent_75 =>
                Condition := Random <= 75;
-         end case;
+            end case;
 
-         if Condition then
-            WNM.Synth.Trig (Track);
+            if Condition then
+               WNM.MIDI.Queues.Sequencer_Push
+                 ((MIDI.Note_On,
+                  WNM.MIDI.To_MIDI_Channel (Track),
+                  S.Note,
+                  S.Velo));
+               declare
+                  Repeat_Span : constant Sample_Time :=
+                    Samples_Per_Beat /  (case Sequences (Pattern)
+                                         (Track) (Step).Repeat_Rate
+                                         is
+                                            when Rate_1_1  => 1,
+                                            when Rate_1_2  => 2,
+                                            when Rate_1_3  => 3,
+                                            when Rate_1_4  => 4,
+                                            when Rate_1_5  => 5,
+                                            when Rate_1_6  => 6,
+                                            when Rate_1_8  => 8,
+                                            when Rate_1_10 => 10,
+                                            when Rate_1_12 => 12,
+                                            when Rate_1_16 => 16,
+                                            when Rate_1_20 => 20,
+                                            when Rate_1_24 => 24,
+                                            when Rate_1_32 => 32);
 
-            declare
-               Repeat_Span : constant Sample_Time :=
-                 Samples_Per_Beat /  (case Sequences (Pattern)
-                                      (Track) (Step).Repeat_Rate
-                                      is
-                                         when Rate_1_1  => 1,
-                                         when Rate_1_2  => 2,
-                                         when Rate_1_3  => 3,
-                                         when Rate_1_4  => 4,
-                                         when Rate_1_5  => 5,
-                                         when Rate_1_6  => 6,
-                                         when Rate_1_8  => 8,
-                                         when Rate_1_10 => 10,
-                                         when Rate_1_12 => 12,
-                                         when Rate_1_16 => 16,
-                                         when Rate_1_20 => 20,
-                                         when Rate_1_24 => 24,
-                                         when Rate_1_32 => 32);
-               Repeat_Time : Sample_Time := Now + Repeat_Span;
-            begin
-               for Rep in 1 .. Sequences (Pattern) (Track) (Step).Repeat loop
-                  WNM.Short_Term_Sequencer.Push (Track, Repeat_Time);
-                  Repeat_Time := Repeat_Time + Repeat_Span;
-               end loop;
-            end;
-         end if;
+                  Repeat_Duration : constant Sample_Time :=
+                    (if S.Repeat /= 0 and then Repeat_Span < Note_Duration
+                     then Repeat_Span
+                     else Note_Duration);
+
+                  Repeat_Time : Sample_Time := Now + Repeat_Span;
+               begin
+                  --  Note-Off for the first Note-On, its duration depends if
+                  --  there is a repeat and the repeat rate.
+                  WNM.Short_Term_Sequencer.Push
+                    ((MIDI.Note_Off,
+                     WNM.MIDI.To_MIDI_Channel (Track),
+                     S.Note,
+                     0),
+                     Now + Repeat_Duration);
+
+                  for Rep in 1 .. S.Repeat loop
+                     WNM.Short_Term_Sequencer.Push
+                       ((MIDI.Note_On,
+                        WNM.MIDI.To_MIDI_Channel (Track),
+                        S.Note,
+                        S.Velo),
+                        Repeat_Time);
+                     WNM.Short_Term_Sequencer.Push
+                       ((MIDI.Note_Off,
+                        WNM.MIDI.To_MIDI_Channel (Track),
+                        S.Note,
+                        0),
+                        Repeat_Time + Repeat_Duration);
+
+                     Repeat_Time := Repeat_Time + Repeat_Span;
+                  end loop;
+               end;
+            end if;
+
+            for Id in CC_Id loop
+               if S.CC_Ena (Id) then
+                  WNM.MIDI.Queues.Sequencer_Push
+                    ((MIDI.Continous_Controller,
+                      WNM.MIDI.To_MIDI_Channel (Track),
+                      0,
+                      S.CC_Val (Id)));
+               end if;
+            end loop;
+         end;
       end loop;
    end Process_Step;
 
@@ -421,17 +499,17 @@ package body WNM.Sequencer is
 
       Now     : constant Sample_Time := Sample_Clock;
       Success : Boolean;
-      Track   : Tracks;
+      Msg     : WNM.MIDI.Message;
    begin
       if Now >= Next_Start then
          Execute_Step;
       end if;
 
       loop
-         WNM.Short_Term_Sequencer.Pop (Now, Track, Success);
+         WNM.Short_Term_Sequencer.Pop (Now, Msg, Success);
          exit when not Success;
 
-         WNM.Synth.Trig (Track);
+         WNM.MIDI.Queues.Sequencer_Push (Msg);
       end loop;
 
       return Time.Time_Ms'First;
@@ -551,28 +629,193 @@ package body WNM.Sequencer is
             (Step).Repeat_Rate);
    end Repeat_Rate_Prev;
 
-begin
-   --  for Pattern in Patterns loop
-   --     for Track in Tracks loop
-   --        for Step in Sequencer_Steps loop
-   --           Sequences (Pattern) (Track) (Step) := (Always, 0, Rate_1_1);
-   --        end loop;
-   --     end loop;
-   --  end loop;
+   ----------
+   -- Note --
+   ----------
 
-   Sequences (B1) (B1) (1)  := (Always, 3, Rate_1_8);
+   function Note (Step : Sequencer_Steps) return MIDI.MIDI_Key is
+   begin
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Note;
+   end Note;
+
+   ---------------
+   -- Note_Next --
+   ---------------
+
+   procedure Note_Next (Step : Sequencer_Steps) is
+      CC : MIDI.MIDI_Key renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).Note;
+   begin
+      if CC /= MIDI.MIDI_Key'Last then
+         CC := CC + 1;
+      end if;
+   end Note_Next;
+
+   ---------------
+   -- Note_Prev --
+   ---------------
+
+   procedure Note_Prev (Step : Sequencer_Steps) is
+      CC : MIDI.MIDI_Key renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).Note;
+   begin
+      if CC /= MIDI.MIDI_Key'First then
+         CC := CC - 1;
+      end if;
+   end Note_Prev;
+
+   ----------
+   -- Velo --
+   ----------
+
+   function Velo (Step : Sequencer_Steps) return MIDI.MIDI_Data is
+      V : MIDI.MIDI_Data renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).Velo;
+   begin
+      return V;
+   end Velo;
+
+   ---------------
+   -- Velo_Next --
+   ---------------
+
+   procedure Velo_Next (Step : Sequencer_Steps) is
+      V : MIDI.MIDI_Data renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).Velo;
+   begin
+      if V /= MIDI.MIDI_Data'Last then
+         V := V + 1;
+      end if;
+   end Velo_Next;
+
+   ---------------
+   -- Velo_Prev --
+   ---------------
+
+   procedure Velo_Prev (Step : Sequencer_Steps) is
+      V : MIDI.MIDI_Data renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).Velo;
+   begin
+      if V /= MIDI.MIDI_Data'First then
+         V := V - 1;
+      end if;
+   end Velo_Prev;
+
+   ----------------
+   -- CC_Enabled --
+   ----------------
+
+   function CC_Enabled (Step : Sequencer_Steps; Id : CC_Id) return Boolean is
+   begin
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Ena (Id);
+   end CC_Enabled;
+
+   ---------------
+   -- CC_Toggle --
+   ---------------
+
+   procedure CC_Toggle (Step : Sequencer_Steps; Id : CC_Id) is
+      CC : Boolean renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Ena (Id);
+   begin
+      CC := not CC;
+   end CC_Toggle;
+
+   --------------
+   -- CC_Value --
+   --------------
+
+   function CC_Value (Step : Sequencer_Steps; Id : CC_Id) return MIDI.MIDI_Data
+   is
+   begin
+      return Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Val (Id);
+   end CC_Value;
+
+   ------------------
+   -- CC_Value_Inc --
+   ------------------
+
+   procedure CC_Value_Inc (Step : Sequencer_Steps; Id : CC_Id) is
+      CC : MIDI.MIDI_Data renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Val (Id);
+   begin
+      if CC /= MIDI.MIDI_Data'Last then
+         CC := CC + 1;
+      end if;
+
+      --  Enable when the value is changed
+      Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Ena (Id) := True;
+   end CC_Value_Inc;
+
+   ------------------
+   -- CC_Value_Dec --
+   ------------------
+
+   procedure CC_Value_Dec (Step : Sequencer_Steps; Id : CC_Id) is
+      CC : MIDI.MIDI_Data renames Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Val (Id);
+   begin
+      if CC /= MIDI.MIDI_Data'First then
+         CC := CC - 1;
+      end if;
+
+      --  Enable when the value is changed
+      Sequences
+        (Pattern_Sequencer.Current_Pattern)
+        (Current_Track)
+        (Step).CC_Ena (Id) := True;
+   end CC_Value_Dec;
+
+
+begin
+   for Pattern in Patterns loop
+      for Track in Tracks loop
+         for Step in Sequencer_Steps loop
+            Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_1,
+                                                   others => <>);
+         end loop;
+      end loop;
+   end loop;
+
+   --  Sequences (B1) (B1) (1)  := (Always, 3, Rate_1_8, others => <>);
    --  Sequences (B1) (B2) (2)  := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B3) (3)  := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B4) (4)  := (Always, 0, Rate_1_8);
-   Sequences (B1) (B5) (5)  := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B5) (5)  := (Always, 3, Rate_1_8, others => <>);
    --  Sequences (B1) (B6) (6)  := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B7) (7)  := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B8) (8)  := (Always, 0, Rate_1_8);
-   Sequences (B1) (B9) (9)  := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B9) (9)  := (Always, 3, Rate_1_8, others => <>);
    --  Sequences (B1) (B10) (10) := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B11) (11) := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B12) (12) := (Always, 0, Rate_1_8);
-   Sequences (B1) (B13) (13) := (Always, 3, Rate_1_8);
+   --  Sequences (B1) (B13) (13) := (Always, 3, Rate_1_8, others => <>);
    --  Sequences (B1) (B14) (14) := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B15) (15) := (Always, 0, Rate_1_8);
    --  Sequences (B1) (B16) (16) := (Always, 0, Rate_1_8);

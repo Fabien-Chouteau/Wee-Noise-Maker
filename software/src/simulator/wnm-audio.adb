@@ -170,7 +170,8 @@ begin
       raise Program_Error with "Radio stream error...";
    end if;
 
-   if GNAT.OS_Lib.Getenv ("OS").all = "Windows_NT" then -- Memory leak right here...
+   if GNAT.OS_Lib.Getenv ("OS").all = "Windows_NT" -- Memory leak right here...
+   then
       GNAT.OS_Lib.Setenv ("SDL_AUDIODRIVER", "directsound");
    end if;
 

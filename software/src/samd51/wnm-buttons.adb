@@ -20,27 +20,62 @@
 -------------------------------------------------------------------------------
 
 with HAL.GPIO;
-
-with SAM.Port;
-with SAM.Device;
+with HAL.I2C; use HAL.I2C;
 
 with WNM.Samd51.Encoders;
-with WNM.Time;
+--  with WNM.Time;
 
 with HAL; use HAL;
 
 package body WNM.Buttons is
 
-   Col_In    : SAM.Port.GPIO_Point renames SAM.Device.PA23; -- Feather D13
-   Row_Out   : SAM.Port.GPIO_Point renames SAM.Device.PA22; -- Feather D12
-   Row_Latch : SAM.Port.GPIO_Point renames SAM.Device.PA21; -- Feather D11
-   Clk       : SAM.Port.GPIO_Point renames SAM.Device.PA20; -- Feather D10
+   IO_Ext_Addr : constant := 16#74#;
+   Reg_Input_0 : constant := 16#00#;
+   Reg_Output_1 : constant := 16#03#;
+   Reg_Config_0 : constant := 16#06#;
+   Reg_Config_1 : constant := 16#07#;
 
-   Key_State : constant array (Button) of Raw_Button_State := (others => Up);
+   Col_State : UInt8_Array (1 .. 5) := (others => 0);
 
-   Rows : UInt8_Array (1 .. 8) := (others => 0);
-
+   procedure Write_Reg (Reg : UInt8; Val : UInt8);
+   procedure Read_Reg (Reg : UInt8; Val : out UInt8);
    procedure Initialize;
+
+   ---------------
+   -- Write_Reg --
+   ---------------
+
+   procedure Write_Reg (Reg : UInt8; Val : UInt8) is
+      Status : HAL.I2C.I2C_Status;
+   begin
+      Samd51.I2C_Port.Master_Transmit (Addr    => IO_Ext_Addr,
+                                       Data    => (0 => Reg, 1 => Val),
+                                       Status  => Status);
+
+      if Status /= Ok then
+         raise Program_Error;
+      end if;
+   end Write_Reg;
+
+   --------------
+   -- Read_Reg --
+   --------------
+
+   procedure Read_Reg (Reg : UInt8; Val : out UInt8) is
+      Status : HAL.I2C.I2C_Status;
+      Data : UInt8_Array (0 .. 0);
+   begin
+      Samd51.I2C_Port.Mem_Read (Addr          => IO_Ext_Addr,
+                                Mem_Addr      => UInt16 (Reg),
+                                Mem_Addr_Size => HAL.I2C.Memory_Size_8b,
+                                Data          => Data,
+                                Status        => Status);
+
+      if Status /= Ok then
+         raise Program_Error;
+      end if;
+      Val := Data (Data'First);
+   end Read_Reg;
 
    ----------------
    -- Initialize --
@@ -48,21 +83,11 @@ package body WNM.Buttons is
 
    procedure Initialize is
    begin
-      Col_In.Clear;
-      Col_In.Set_Mode (HAL.GPIO.Output);
-      Col_In.Set_Pull_Resistor (HAL.GPIO.Floating);
+      --  Config IO bank 0 as input
+      Write_Reg (Reg_Config_0, 16#FF#); -- 1 for output
 
-      Row_Out.Clear;
-      Row_Out.Set_Mode (HAL.GPIO.Input);
-      Row_Out.Set_Pull_Resistor (HAL.GPIO.Floating);
-
-      Row_Latch.Clear;
-      Row_Latch.Set_Mode (HAL.GPIO.Output);
-      Row_Latch.Set_Pull_Resistor (HAL.GPIO.Floating);
-
-      Clk.Clear;
-      Clk.Set_Mode (HAL.GPIO.Output);
-      Clk.Set_Pull_Resistor (HAL.GPIO.Floating);
+      --  Config IO bank 1 as output
+      Write_Reg (Reg_Config_1, 16#00#); -- 0 for output
    end Initialize;
 
    ----------
@@ -70,88 +95,63 @@ package body WNM.Buttons is
    ----------
 
    procedure Scan is
-
-      --------------
-      -- Do_Clock --
-      --------------
-
-      procedure Do_Clock is
-      begin
-         Clk.Clear;
-         WNM.Time.Delay_Ms (1);
-         Clk.Set;
-         WNM.Time.Delay_Ms (1);
-      end Do_Clock;
-
-      -------------
-      -- Col_Set --
-      -------------
-
-      procedure Col_Set (Val : UInt8) is
-         Col : UInt8 := Val;
-      begin
-         for I in 1 .. 8 loop
-            if (Col and 1) /= 0 then
-               Col_In.Set;
-            else
-               Col_In.Clear;
-            end if;
-            Do_Clock;
-            Col := Shift_Right (Col, 1);
-         end loop;
-      end Col_Set;
-
-      -------------
-      -- Row_Get --
-      -------------
-
-      procedure Row_Get (Val : out UInt8) is
-      begin
-         Row_Latch.Clear;
-         WNM.Time.Delay_Ms (1);
-         Row_Latch.Set;
-         Val := 0;
-         for I in 1 .. 8 loop
-            if Row_Out.Set then
-               Val := Val or 1;
-            end if;
-            Val := Shift_Left (Val, 1);
-            Do_Clock;
-         end loop;
-      end Row_Get;
-
-      Col : UInt8 := 1;
+      Col_Pin : UInt8 := 1;
    begin
 
-      if True then
-         return;
-      end if;
+      for Col of Col_State loop
+         Write_Reg (Reg_Output_1, Col_Pin);
 
-      Col_Set (0);
-      WNM.Time.Delay_Ms (1);
-      for Elt of Rows loop
-         Col_Set (Col);
-         Row_Get (Elt);
-         Col := Shift_Left (Col, 1);
-         WNM.Time.Delay_Ms (5);
+         Read_Reg (Reg_Input_0, Col);
+
+         --  Set the next column
+         Col_Pin := Shift_Left (Col_Pin, 1);
       end loop;
-      Col_Set (0);
-
    end Scan;
 
+   Row1 : constant := 2#00001#;
+   Row2 : constant := 2#00010#;
+   Row3 : constant := 2#00100#;
+   Row4 : constant := 2#10000#;
+   Row5 : constant := 2#01000#;
    -----------
    -- State --
    -----------
 
    function State (B : Button) return Raw_Button_State
-   is (Key_State (B));
+   is (if (case B is
+              when B1 => (Col_State (4) and Row4) /= 0,
+              when B2 => (Col_State (3) and Row4) /= 0,
+              when B3 => (Col_State (2) and Row4) /= 0,
+              when B4 => (Col_State (1) and Row4) /= 0,
+              when B5 => (Col_State (1) and Row2) /= 0,
+              when B6 => (Col_State (2) and Row2) /= 0,
+              when B7 => (Col_State (3) and Row2) /= 0,
+              when B8 => (Col_State (4) and Row2) /= 0,
+              when B9 => (Col_State (4) and Row5) /= 0,
+              when B10 => (Col_State (3) and Row5) /= 0,
+              when B11 => (Col_State (2) and Row5) /= 0,
+              when B12 => (Col_State (1) and Row5) /= 0,
+              when B13 => (Col_State (1) and Row3) /= 0,
+              when B14 => (Col_State (2) and Row3) /= 0,
+              when B15 => (Col_State (3) and Row3) /= 0,
+              when B16 => (Col_State (4) and Row3) /= 0,
+              when Rec => (Col_State (5) and Row3) /= 0,
+              when Play => (Col_State (5) and Row2) /= 0,
+              when Menu => (Col_State (4) and Row1) /= 0,
+              when Func => (Col_State (5) and Row1) /= 0,
+              when Track_Button => (Col_State (5) and Row4) /= 0,
+              when Pattern => (Col_State (5) and Row5) /= 0,
+              when Encoder_L => (Col_State (3) and Row1) /= 0,
+              when Encoder_R => (Col_State (2) and Row1) /= 0)
+       then Down
+       else Up);
 
    ----------------
    -- Is_Pressed --
    ----------------
 
    function Is_Pressed (B : Button) return Boolean
-   is (Key_State (B) = Down);
+   is (State (B) = Down);
 
 
    ----------

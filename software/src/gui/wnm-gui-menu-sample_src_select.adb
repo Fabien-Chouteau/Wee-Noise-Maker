@@ -36,8 +36,8 @@ package body WNM.GUI.Menu.Sample_Src_Select is
       case Src is
          when Line_In =>
             WNM.Synth.Set_Passthrough (Audio.Line_In);
-         when FM =>
-            WNM.Synth.Set_Passthrough (Audio.FM);
+         --  when FM =>
+         --     WNM.Synth.Set_Passthrough (Audio.FM);
          when Master_Output =>
             WNM.Synth.Set_Passthrough (Audio.None);
       end case;

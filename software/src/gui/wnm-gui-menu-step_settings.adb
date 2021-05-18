@@ -42,14 +42,33 @@ package body WNM.GUI.Menu.Step_Settings is
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This : in out Step_Settings_Menu)
    is
+      function CC_Letter (ID : Sequencer.CC_Id) return String
+      is (case ID is
+             when A => "A",
+             when B => "B",
+             when C => "C",
+             when D => "D");
+
+      function CC_String (Id : Sequencer.CC_Id) return String
+      is (if Sequencer.CC_Enabled (UI.Current_Editting_Trig, Id)
+          then CC_Letter (Id) & Sequencer.CC_Value (UI.Current_Editting_Trig,
+                                                    Id)'Img
+          else CC_Letter (Id) & "- disabled -");
    begin
       Draw_Menu_Box ((case This.Current_Setting is
-                        when Condition   => Sequencer.Trig (UI.Current_Editting_Trig)'Img,
-                        when Repeat      => Sequencer.Repeat (UI.Current_Editting_Trig)'Img,
-                        when Repeat_Rate => Sequencer.Repeat_Rate (UI.Current_Editting_Trig)'Img),
+                        when Condition   => Img (Sequencer.Trig (UI.Current_Editting_Trig)),
+                        when Note        => "Note:" & Sequencer.Note (UI.Current_Editting_Trig)'Img,
+                        when Repeat      => "Repeat:" & Sequencer.Repeat (UI.Current_Editting_Trig)'Img,
+                        when Repeat_Rate => "Rate:" & Img (Sequencer.Repeat_Rate (UI.Current_Editting_Trig)),
+                        when Velo        => "Velocity: " & Sequencer.Velo (UI.Current_Editting_Trig)'Img,
+                        when CC_A        => CC_String (A),
+                        when CC_B        => CC_String (B),
+                        when CC_C        => CC_String (C),
+                        when CC_D        => CC_String (D)),
                      Top => This.Current_Setting /= Settings'First,
                      Bottom => This.Current_Setting /= Settings'Last);
    end Draw;
@@ -65,7 +84,13 @@ package body WNM.GUI.Menu.Step_Settings is
    begin
       case Event.Kind is
          when Left_Press =>
-            null;
+            case This.Current_Setting is
+               when CC_A => Sequencer.CC_Toggle (UI.Current_Editting_Trig, A);
+               when CC_B => Sequencer.CC_Toggle (UI.Current_Editting_Trig, B);
+               when CC_C => Sequencer.CC_Toggle (UI.Current_Editting_Trig, C);
+               when CC_D => Sequencer.CC_Toggle (UI.Current_Editting_Trig, D);
+               when others => null;
+            end case;
          when Right_Press =>
             Menu.Exit_Menu;
          when Encoder_Right =>
@@ -75,6 +100,12 @@ package body WNM.GUI.Menu.Step_Settings is
                      WNM.Sequencer.Trig_Next (UI.Current_Editting_Trig);
                   else
                      WNM.Sequencer.Trig_Prev (UI.Current_Editting_Trig);
+                  end if;
+               when Note =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Note_Next (UI.Current_Editting_Trig);
+                  else
+                     WNM.Sequencer.Note_Prev (UI.Current_Editting_Trig);
                   end if;
                when Repeat =>
                   if Event.Value > 0 then
@@ -87,6 +118,28 @@ package body WNM.GUI.Menu.Step_Settings is
                      WNM.Sequencer.Repeat_Rate_Next (UI.Current_Editting_Trig);
                   else
                      WNM.Sequencer.Repeat_Rate_Prev (UI.Current_Editting_Trig);
+                  end if;
+               when Velo =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Velo_Next (UI.Current_Editting_Trig);
+                  else
+                     WNM.Sequencer.Velo_Prev (UI.Current_Editting_Trig);
+                  end if;
+               when CC_A | CC_B | CC_C | CC_D =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.CC_Value_Inc (UI.Current_Editting_Trig,
+                                                 (case This.Current_Setting is
+                                                     when CC_A => A,
+                                                     when CC_B => B,
+                                                     when CC_C => C,
+                                                     when others => D));
+                  else
+                     WNM.Sequencer.CC_Value_Dec (UI.Current_Editting_Trig,
+                                                 (case This.Current_Setting is
+                                                     when CC_A => A,
+                                                     when CC_B => B,
+                                                     when CC_C => C,
+                                                     when others => D));
                   end if;
             end case;
          when Encoder_Left =>

@@ -20,17 +20,18 @@
 -------------------------------------------------------------------------------
 
 with WNM.Synth;
+with WNM.MIDI;
 
 package WNM.Short_Term_Sequencer is
 
-   subtype Data is Tracks;
+   subtype Data is WNM.MIDI.Message;
 
    procedure Push (D : Data; Expiration : Synth.Sample_Time);
    procedure Pop (Now : Synth.Sample_Time; D : out Data; Success : out Boolean);
 
 private
 
-   MAX_EVENT_NUMBER : constant := 64;
+   MAX_EVENT_NUMBER : constant := 256;
 
    type Event;
 

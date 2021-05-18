@@ -38,7 +38,7 @@ __vectors:
         .word __unknown_interrupt_handler /* 10 */
         .word __unknown_interrupt_handler /* 11 */
         .word __eic_extint_0_interrupt_handler /* 12 */
-        .word __eic_extint_1_interrupt_handler /* 13 */
+        .word __unknown_interrupt_handler /* 13 */
         .word __eic_extint_2_interrupt_handler /* 14 */
         .word __eic_extint_3_interrupt_handler /* 15 */
         .word __unknown_interrupt_handler /* 16 */
@@ -51,7 +51,7 @@ __vectors:
         .word __unknown_interrupt_handler /* 23 */
         .word __unknown_interrupt_handler /* 24 */
         .word __unknown_interrupt_handler /* 25 */
-        .word __unknown_interrupt_handler /* 26 */
+        .word __eic_extint_14_interrupt_handler /* 26 */
         .word __unknown_interrupt_handler /* 27 */
         .word __unknown_interrupt_handler /* 28 */
         .word __unknown_interrupt_handler /* 29 */

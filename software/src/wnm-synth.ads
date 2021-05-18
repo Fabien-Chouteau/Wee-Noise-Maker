@@ -21,11 +21,11 @@
 
 with Interfaces;
 
-with MIDI;
 with WNM;
 with WNM.Sample_Library;
 with WNM.Time;
 with WNM.Audio;
+with WNM.MIDI;
 
 package WNM.Synth is
 
@@ -71,7 +71,7 @@ package WNM.Synth is
    -- Recording --
    ---------------
 
-   type Rec_Source is (None, Line_In, FM, Master_Output);
+   type Rec_Source is (None, Line_In, Master_Output);
 
    function Now_Recording return Rec_Source;
 

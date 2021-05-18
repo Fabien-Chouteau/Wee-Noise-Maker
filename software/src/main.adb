@@ -31,9 +31,11 @@ with WNM.Sample_Stream;
 with WNM.Sample_Library;
 with WNM.Synth;
 
+with Atomic.Generic32;
+with HAL; use HAL;
+
 procedure Main is
 begin
-
    WNM.SDCard.Initialize;
 
    WNM.Sample_Library.Load;

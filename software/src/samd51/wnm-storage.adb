@@ -10,6 +10,7 @@ with SAM.Device;
 with SAM.Functions;
 with SAM.Main_Clock;
 with SAM.QSPI;
+with SAM.CMCC;
 
 with WNM.Samd51;
 pragma Unreferenced (WNM.Samd51);
@@ -100,9 +101,13 @@ package body WNM.Storage is
       pragma Unreferenced (C);
       Data : UInt8_Array (1 .. Natural (Size)) with Address => Buffer;
    begin
+      SAM.CMCC.Disable_Cache;
+      SAM.CMCC.Invalidate_Cache;
 
       Wait_Util_Ready;
       SAM.QSPI.Read_Memory (UInt32 (Off + Block * Block_Size), Data);
+
+      SAM.CMCC.Enable_Cache;
       return 0;
    end Read;
 
@@ -120,10 +125,12 @@ package body WNM.Storage is
       pragma Unreferenced (C);
       Data : UInt8_Array (0 .. Natural (Size - 1)) with Address => Buffer;
 
-
       First : Natural := Data'First;
       Last : Natural;
    begin
+      SAM.CMCC.Disable_Cache;
+      SAM.CMCC.Invalidate_Cache;
+
       --  We have to write page by page
       while First in Data'Range loop
          Last := Natural'Min (First + Page_Size - 1, Data'Last);
@@ -136,6 +143,8 @@ package body WNM.Storage is
 
          First := Last + 1;
       end loop;
+
+      SAM.CMCC.Enable_Cache;
       return 0;
    end Prog;
 
@@ -149,10 +158,15 @@ package body WNM.Storage is
    is
       pragma Unreferenced (C);
    begin
+      SAM.CMCC.Disable_Cache;
+      SAM.CMCC.Invalidate_Cache;
+
       Wait_Util_Ready;
       Write_Enable;
       SAM.QSPI.Erase (SFLASH_CMD_ERASE_SECTOR, UInt32 (Block * Block_Size));
       --  Write_Disable; -- not needed?
+
+      SAM.CMCC.Enable_Cache;
       return 0;
    end Erase;
 
@@ -193,7 +207,13 @@ package body WNM.Storage is
    function Status2 return UInt8 is
       Status : UInt8_Array (1 .. 1);
    begin
+      SAM.CMCC.Disable_Cache;
+      SAM.CMCC.Invalidate_Cache;
+
       SAM.QSPI.Read (SFLASH_CMD_READ_STATUS2, Status);
+
+      SAM.CMCC.Enable_Cache;
+
       return Status (Status'First);
    end Status2;
 
@@ -288,33 +308,6 @@ package body WNM.Storage is
       end;
       Write_Disable;
       Wait_Util_Ready;
-
-      --  TEST --
-      --  declare
-      --     Data : UInt8_Array (0 .. 64);
-      --  begin
-      --
-      --     --  SAM.QSPI.Read_Memory (0, Data);
-      --
-      --     Wait_Util_Ready;
-      --     Write_Enable;
-      --     SAM.QSPI.Erase (SFLASH_CMD_ERASE_SECTOR, 0);
-      --     --  Write_Disable; -- not needed?
-      --
-      --     Wait_Util_Ready;
-      --     SAM.QSPI.Read_Memory (0, Data);
-      --
-      --     Data := (0 => Data (0) + 1, others => 42);
-      --
-      --     Wait_Util_Ready;
-      --     Write_Enable;
-      --     SAM.QSPI.Write_Memory (0, Data);
-      --     --  Write_Disable; -- not needed?
-      --
-      --     Wait_Util_Ready;
-      --     SAM.QSPI.Read_Memory (0, Data);
-      --     pragma Unreferenced (Data);
-      --  end;
    end Init_QSPI;
 
 begin

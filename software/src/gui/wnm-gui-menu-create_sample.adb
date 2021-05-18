@@ -77,11 +77,12 @@ package body WNM.GUI.Menu.Create_Sample is
             if Exit_Value = Success then
                New_State := Rec_In_Progress;
 
-               if WNM.Synth.Get_Passthrough = Audio.FM then
-                  New_State := FM_Tune;
-               else
-                  New_State := Rec_In_Progress;
-               end if;
+               --  if WNM.Synth.Get_Passthrough = Audio.FM then
+               --     New_State := FM_Tune;
+               --  else
+               --     New_State := Rec_In_Progress;
+               --  end if;
+               New_State := Rec_In_Progress;
             else
                WNM.Synth.Set_Passthrough (This.Input_Before);
                Menu.Pop (Exit_Value);
