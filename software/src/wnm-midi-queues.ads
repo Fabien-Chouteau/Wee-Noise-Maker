@@ -1,3 +1,4 @@
+with BBqueue.Buffers;
 
 package WNM.MIDI.Queues is
 
@@ -7,9 +8,8 @@ package WNM.MIDI.Queues is
       with procedure Process (Msg : Message);
    procedure Synth_Pop;
 
-   generic
-      with procedure Process (Msg : Message);
-   procedure MIDI_Out_Pop;
+   procedure MIDI_Out_Read (G : in out BBqueue.Buffers.Read_Grant);
+   procedure MIDI_Out_Release (G : in out BBqueue.Buffers.Read_Grant);
 
 private
 
@@ -30,6 +30,6 @@ private
      with Pre => not Empty (Q);
 
    Synth_Queue : Message_Queue (256);
-   MIDI_Out_Queue : Message_Queue (256);
+   MIDI_Out_Queue : BBqueue.Buffers.Buffer (1024);
 
 end WNM.MIDI.Queues;

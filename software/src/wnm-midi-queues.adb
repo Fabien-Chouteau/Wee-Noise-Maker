@@ -1,4 +1,8 @@
+with System;
+
 package body WNM.MIDI.Queues is
+
+   procedure Push_To_Out_Queue (Msg : Message);
 
    --------------------
    -- Sequencer_Push --
@@ -7,7 +11,7 @@ package body WNM.MIDI.Queues is
    procedure Sequencer_Push (Msg : Message) is
    begin
       Push (Synth_Queue, Msg);
-      Push (MIDI_Out_Queue, Msg);
+      Push_To_Out_Queue (Msg);
    end Sequencer_Push;
 
    ---------------
@@ -20,17 +24,6 @@ package body WNM.MIDI.Queues is
          Process (Pop (Synth_Queue));
       end loop;
    end Synth_Pop;
-
-   ------------------
-   -- MIDI_Out_Pop --
-   ------------------
-
-   procedure MIDI_Out_Pop is
-   begin
-      while not Empty (MIDI_Out_Queue) loop
-         Process (Pop (MIDI_Out_Queue));
-      end loop;
-   end MIDI_Out_Pop;
 
    ------------
    -- Inc_In --
@@ -95,5 +88,47 @@ package body WNM.MIDI.Queues is
       Inc_Out (Q);
       return Ret;
    end Pop;
+
+
+   -----------------------
+   -- Push_To_Out_Queue --
+   -----------------------
+
+   procedure Push_To_Out_Queue (Msg : Message) is
+      use BBqueue;
+      use BBqueue.Buffers;
+
+      WG : BBqueue.Buffers.Write_Grant;
+   begin
+      Grant (MIDI_Out_Queue, WG, Size => 3);
+
+      if State (WG) = Valid then
+         declare
+            Addr : constant System.Address := Slice (WG).Addr;
+            Dst : Message with Import, Address => Addr;
+         begin
+            Dst := Msg;
+         end;
+         Commit (MIDI_Out_Queue, WG);
+      end if;
+   end Push_To_Out_Queue;
+
+   -------------------
+   -- MIDI_Out_Read --
+   -------------------
+
+   procedure MIDI_Out_Read (G : in out BBqueue.Buffers.Read_Grant) is
+   begin
+      BBqueue.Buffers.Read (MIDI_Out_Queue, G);
+   end MIDI_Out_Read;
+
+   ----------------------
+   -- MIDI_Out_Release --
+   ----------------------
+
+   procedure MIDI_Out_Release (G : in out BBqueue.Buffers.Read_Grant) is
+   begin
+      BBqueue.Buffers.Release (MIDI_Out_Queue, G);
+   end MIDI_Out_Release;
 
 end WNM.MIDI.Queues;

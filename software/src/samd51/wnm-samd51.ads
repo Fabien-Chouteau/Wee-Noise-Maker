@@ -26,6 +26,8 @@ package WNM.Samd51 is
    --  want a dedicated handler for the LED SPI.
    DMA_LED_SPI : constant SAM.DMAC.Channel_Id := 1;
 
+   DMA_MIDI_OUT : constant SAM.DMAC.Channel_Id := 5;
+
    I2C_Port : SAM.SERCOM.I2C.I2C_Device renames SAM.Device.I2C2;
    SCL   : SAM.Port.GPIO_Point renames SAM.Device.PA13;
    SDA   : SAM.Port.GPIO_Point renames SAM.Device.PA12;

@@ -1,20 +1,25 @@
+with HAL;      use HAL;
 with HAL.GPIO;
-with HAL.UART;
 
 with SAM.SERCOM.USART;
 with SAM.Port;
 with SAM.Clock_Generator.IDs;
 with SAM.Functions;
 with SAM.Main_Clock;
+with SAM.DMAC; use SAM.DMAC;
+with SAM.DMAC.Sources;
+
+with BBqueue.Buffers;
 
 with WNM.MIDI;
 with WNM.MIDI.Queues;
 
 package body WNM.Samd51.MIDI is
 
-   UART : SAM.SERCOM.USART.USART_Device renames SAM.Device.USART5;
-   RX   : SAM.Port.GPIO_Point renames SAM.Device.PB17;
-   TX   : SAM.Port.GPIO_Point renames SAM.Device.PB16;
+   UART      : SAM.SERCOM.USART.USART_Device renames SAM.Device.USART5;
+   RX        : SAM.Port.GPIO_Point renames SAM.Device.PB17;
+   TX        : SAM.Port.GPIO_Point renames SAM.Device.PB16;
+   Out_Grant : BBqueue.Buffers.Read_Grant;
 
    ----------------
    -- Initialize --
@@ -62,17 +67,25 @@ package body WNM.Samd51.MIDI is
       UART.Enable;
       UART.Enable_Transmitter;
 
-   --     Loop
-   --        declare
-   --           Status : HAL.UART.UART_Status;
-   --        begin
-   --           UART.Transmit (Data    => HAL.UART.UART_Data_8b'(0 => 16#90#,
-   --                                                            1 => 16#2A#,
-   --                                                            2 => 16#40#),
-   --                          Status  => Status);
-   --           WNM.Time.Delay_Ms (300);
-   --        end;
-   --     end loop;
+      -- DMA --
+
+      Configure (DMA_MIDI_OUT,
+                 Trig_Src       => SAM.DMAC.Sources.SERCOM5_TX,
+                 Trig_Action    => Burst,
+                 Priority       => 0,
+                 Burst_Len      => 1,
+                 Threshold      => BEAT_1,
+                 Run_In_Standby => False);
+
+      Configure_Descriptor (DMA_Descs (DMA_MIDI_OUT),
+                            Valid           => True,
+                            Event_Output    => Disable,
+                            Block_Action    => Interrupt,
+                            Beat_Size       => B_8bit,
+                            Src_Addr_Inc    => True,
+                            Dst_Addr_Inc    => False,
+                            Step_Selection  => Source,
+                            Step_Size       => X1);
    end Initialize;
 
    ------------
@@ -80,16 +93,34 @@ package body WNM.Samd51.MIDI is
    ------------
 
    function Update return Time.Time_Ms is
-      procedure Process (Msg : WNM.MIDI.Message) is
-         Status : HAL.UART.UART_Status;
-         Data    : HAL.UART.UART_Data_8b (0 .. 2) with Address => Msg'Address;
-      begin
-         UART.Transmit (Data, Status);
-      end Process;
-
-      procedure Pop is new  WNM.MIDI.Queues.MIDI_Out_Pop (Process);
+      use BBqueue;
+      use BBqueue.Buffers;
    begin
-      Pop;
+
+      if not Pending (DMA_MIDI_OUT) then
+
+         if State (Out_Grant) = BBqueue.Valid then
+            --  Release the previous slice, if any
+            WNM.MIDI.Queues.MIDI_Out_Release (Out_Grant);
+         end if;
+
+         --  Try to get a new slice
+         WNM.MIDI.Queues.MIDI_Out_Read (Out_Grant);
+
+         if State (Out_Grant) = BBqueue.Valid then
+
+            --  Start transfer with the new slice, if any
+
+            Set_Data_Transfer
+              (DMA_Descs (DMA_MIDI_OUT),
+               Block_Transfer_Count => UInt16 (Slice (Out_Grant).Length),
+               Src_Addr             => Slice (Out_Grant).Addr,
+               Dst_Addr             => UART.Data_Address);
+
+            Enable (DMA_MIDI_OUT);
+         end if;
+      end if;
+
       return Time.Time_Ms'First;
    end Update;
 
