@@ -22,6 +22,7 @@
 with WNM.Time;
 with WNM.Synth;
 with WNM.MIDI;
+with WNM.Sequence_Copy;
 
 package WNM.Sequencer is
 
@@ -54,7 +55,8 @@ package WNM.Sequencer is
    procedure Select_Track (Track : Tracks);
    --  Select the current track
 
-   procedure Copy_Current_Patern (To : Patterns);
+   procedure Do_Copy (T : in out WNM.Sequence_Copy.Copy_Transaction)
+     with Pre => WNM.Sequence_Copy.Is_Complete (T);
 
    function Track return Tracks;
 

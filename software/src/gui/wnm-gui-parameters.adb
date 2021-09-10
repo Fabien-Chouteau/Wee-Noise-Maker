@@ -1,4 +1,5 @@
 
+with WNM.Screen;
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
 
 package body WNM.GUI.Parameters is
@@ -26,7 +27,8 @@ package body WNM.GUI.Parameters is
       B     : Integer := 5;
       Limit : Integer;
    begin
-      Limit := Integer ((Float (Value - Min) / Float (Max - Min)) * 96.0);
+      Limit := Integer ((Float (Value - Min) / Float (Max - Min)) *
+                          Float (Screen.Width));
 
       Print (X_Offset    => B,
              Y_Offset    => Y_Offset (Slot),
@@ -64,7 +66,7 @@ package body WNM.GUI.Parameters is
       From : Integer;
       To   : Integer;
       Cnt  : Integer;
-      Mid  : constant Integer := 96 / 2;
+      Mid  : constant Integer := Screen.Width / 2;
    begin
       Cnt := Integer ((Float (abs Value) / 100.0) * Float (Mid));
 

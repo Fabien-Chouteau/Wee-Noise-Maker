@@ -25,6 +25,9 @@ with WNM.Screen;
 
 package WNM.GUI.Bitmap_Fonts is
 
+   Width : constant := 6;
+   Height : constant := 8;
+
    procedure Print (X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     C           : Character;

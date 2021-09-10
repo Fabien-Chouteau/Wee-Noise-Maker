@@ -258,14 +258,37 @@ package body WNM.Sequencer is
       Current_Track := Track;
    end Select_Track;
 
-   -------------------------
-   -- Copy_Current_Patern --
-   -------------------------
+   -------------
+   -- Do_Copy --
+   -------------
 
-   procedure Copy_Current_Patern (To : Patterns) is
+   procedure Do_Copy (T : in out WNM.Sequence_Copy.Copy_Transaction) is
+      use WNM.Sequence_Copy;
    begin
-      Sequences (To) := Sequences (Pattern_Sequencer.Current_Pattern);
-   end Copy_Current_Patern;
+      case T.From.Kind is
+         when WNM.Sequence_Copy.Pattern =>
+            Sequences (T.To.P) := Sequences (T.From.P);
+
+            --  Step back in destination address to allow for a new copy
+            --  imediately.
+            T.To.State := Sequence_Copy.None;
+         when Track =>
+            Sequences (T.To.P) (T.To.T) :=
+              Sequences (T.From.P) (T.From.T);
+
+            --  Step back in destination address to allow for a new copy
+            --  imediately.
+            T.To.State := Sequence_Copy.Pattern;
+         when Step =>
+            Sequences (T.To.P) (T.To.T) (T.To.S) :=
+              Sequences (T.From.P) (T.From.T) (T.From.S);
+
+            --  Step back in destination address to allow for a new copy
+            --  imediately.
+            T.To.State := Sequence_Copy.Track;
+      end case;
+
+   end Do_Copy;
 
    -----------
    -- Track --
@@ -793,7 +816,6 @@ package body WNM.Sequencer is
         (Current_Track)
         (Step).CC_Ena (Id) := True;
    end CC_Value_Dec;
-
 
 begin
    for Pattern in Patterns loop

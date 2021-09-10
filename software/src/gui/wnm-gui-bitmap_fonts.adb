@@ -86,7 +86,7 @@ package body WNM.GUI.Bitmap_Fonts is
          end loop;
       end loop Draw_Loop;
 
-      X_Offset := X_Offset + 6;
+      X_Offset := X_Offset + Width;
    end Print;
 
    -----------
@@ -108,7 +108,7 @@ package body WNM.GUI.Bitmap_Fonts is
 
          Screen.Fill_Rect ((Position => (Invert_From, Y_Offset),
                             Width    => Stop - Invert_From,
-                            Height   => 7));
+                            Height   => Height));
       end if;
 
       for C of Str loop
@@ -127,7 +127,7 @@ package body WNM.GUI.Bitmap_Fonts is
 
          Screen.Fill_Rect ((Position => (Start, Y_Offset),
                             Width    => Invert_To - Start,
-                            Height   => 7));
+                            Height   => Height));
       end if;
    end Print;
 

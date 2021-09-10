@@ -37,6 +37,8 @@ with WNM.Buttons;
 with WNM.LED;
 with HAL; use HAL;
 
+with WNM.GUI.Popup;
+
 package body WNM.UI is
 
    procedure Signal_Event (B : Button; Evt : Buttton_Event);
@@ -76,13 +78,14 @@ package body WNM.UI is
       end if;
 
       case Current_Input_Mode is
-         when Note =>
+
+      when Note =>
             case Evt is
                when On_Press =>
                   case B is
                      when Func =>
                         --  Switch to Func mode
-                        Current_Input_Mode := FX_Or_Copy;
+                        Current_Input_Mode := FX_Alt;
                      when Play =>
                         Sequencer.Play_Pause;
                      when Rec =>
@@ -137,12 +140,26 @@ package body WNM.UI is
             if B in B1 .. B16 and Evt = On_Press then
                WNM.Synth.Toggle_Mute (To_Value (B));
             end if;
-         when FX_Or_Copy =>
+
+         when FX_Alt =>
             case Evt is
                when On_Press =>
                   case B is
                      when Keyboard_Button =>
                         Toggle_FX (B);
+                     when Pattern_Button =>
+                        Copy_T := WNM.Sequence_Copy.Start_Copy_Pattern;
+                        Current_Input_Mode := Copy;
+                     when Track_Button =>
+                        Copy_T := WNM.Sequence_Copy.Start_Copy_Track
+                          (WNM.Pattern_Sequencer.Current_Pattern);
+
+                        Current_Input_Mode := Copy;
+                     when Step_Button =>
+                        Copy_T := WNM.Sequence_Copy.Start_Copy_Step
+                          (WNM.Pattern_Sequencer.Current_Pattern, Track);
+
+                        Current_Input_Mode := Copy;
                      when others =>
                         null;
                   end case;
@@ -154,31 +171,32 @@ package body WNM.UI is
                   null;
             end case;
 
+         when Copy =>
+            if Evt = On_Release and then B = Func then
+               Current_Input_Mode := Default_Input_Mode;
+            elsif Evt = On_Press then
+               WNM.Sequence_Copy.Apply (Copy_T, B);
+               if WNM.Sequence_Copy.Is_Complete (Copy_T) then
+                  WNM.GUI.Popup.Display ("  copied  ", 500);
+                  WNM.Sequencer.Do_Copy (Copy_T);
+               end if;
+            end if;
+
          when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Sequencer.Select_Track (To_Value (B));
             elsif B = Track_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
+
          when Pattern_Select =>
-            if B = Rec and then Evt in On_Press | On_Long_Press then
-               Current_Input_Mode := Pattern_Copy;
-            elsif B in B1 .. B16 and then Evt = On_Press then
+            if B in B1 .. B16 and then Evt = On_Press then
                Pattern_Sequencer.Add_To_Sequence (To_Value (B));
             elsif B = Pattern_Button and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
-         when Pattern_Copy =>
-            if B = Rec and then Evt = On_Release then
-               Current_Input_Mode := Pattern_Select;
-            elsif B in B1 .. B16 and then Evt = On_Press then
-               Sequencer.Copy_Current_Patern (To => To_Value (B));
-               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
-            elsif B = Pattern_Button and then Evt = On_Release then
-               Pattern_Sequencer.End_Sequence_Edit;
-               Current_Input_Mode := Default_Input_Mode;
-            end if;
+
          when Step_Edit =>
             if B in B1 .. B16 and then Evt = On_Press then
                Editting_Step := To_Value (B);
@@ -222,7 +240,7 @@ package body WNM.UI is
       In_Edit : constant Boolean := Sequencer.State in Play_And_Edit | Edit;
 
       In_Pattern_Select : constant Boolean :=
-        Current_Input_Mode in Pattern_Select | Pattern_Copy;
+        Current_Input_Mode in Pattern_Select;
    begin
       return (case B is
               when B1           => In_Edit,
@@ -384,7 +402,7 @@ package body WNM.UI is
       case Current_Input_Mode is
 
          -- FX selection mode --
-         when FX_Or_Copy =>
+         when FX_Alt =>
             --  The FX LED will be on if there's at least one FX enabled
 
             for B in B1 .. B16 loop
@@ -402,7 +420,7 @@ package body WNM.UI is
             end loop;
 
             --  Pattern select --
-         when Pattern_Select | Pattern_Copy =>
+         when Pattern_Select =>
             for B in B1 .. B16 loop
                if Pattern_Sequencer.Current_Pattern = To_Value (B) then
                   LED.Turn_On (B);

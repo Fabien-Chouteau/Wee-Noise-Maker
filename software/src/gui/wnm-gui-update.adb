@@ -26,10 +26,12 @@ with WNM.GUI.Parameters;
 with WNM.Screen;
 with WNM.UI;
 with WNM.Sequencer;         use WNM.Sequencer;
+with WNM.Sequence_Copy;     use WNM.Sequence_Copy;
 with WNM.Pattern_Sequencer; use WNM.Pattern_Sequencer;
 with WNM.Master_Volume;
 with WNM.GUI.Menu;
 with WNM.GUI.Logo;
+with WNM.GUI.Popup;
 --  with WNM.Sample_Library;    use WNM.Sample_Library;
 
 --  with Quick_Synth;           use Quick_Synth;
@@ -39,6 +41,39 @@ package body WNM.GUI.Update is
    Anim_Step : HAL.UInt32 := 0;
 
    Next_Start : Time.Time_Ms := Time.Time_Ms'First;
+
+   function Header_Str return String is
+      Pat : constant Keyboard_Value := Current_Pattern;
+      Trk : constant Keyboard_Value := Track;
+      Stp : constant Keyboard_Value := UI.Current_Editting_Trig;
+
+      function To_Str (V : Keyboard_Value) return String
+      is (case V is
+             when 1 => "01",
+             when 2 => "02",
+             when 3 => "03",
+             when 4 => "04",
+             when 5 => "05",
+             when 6 => "06",
+             when 7 => "07",
+             when 8 => "08",
+             when 9 => "09",
+             when 10 => "10",
+             when 11 => "11",
+             when 12 => "12",
+             when 13 => "13",
+             when 14 => "14",
+             when 15 => "15",
+             when 16 => "16"
+         );
+
+      Result : String (1 .. 11) := "P00:T00:S00";
+   begin
+      Result (2 .. 3) := To_Str (Pat);
+      Result (6 .. 7) := To_Str (Trk);
+      Result (10 .. 11) := To_Str (Stp);
+      return Result;
+   end Header_Str;
 
    ------------
    -- Update --
@@ -67,6 +102,12 @@ package body WNM.GUI.Update is
          return Next_Start;
       end if;
 
+      -- Header --
+      B := 1;
+      Print (X_Offset    => B,
+             Y_Offset    => 0,
+             Str         => Header_Str);
+
       if Menu.In_Menu then
          Menu.Draw;
       else
@@ -86,49 +127,56 @@ package body WNM.GUI.Update is
          when WNM.UI.Track_Select =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0,
+                   Y_Offset    => 0 + 8,
                    Str         => "Select track");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9,
-                   Str         => "Current:" & To_Value (Track)'Img);
+                   Y_Offset    => 9 + 8,
+                   Str         => "Current: " & Img (Track));
          when WNM.UI.Pattern_Select =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0,
+                   Y_Offset    => 0 + 8,
                    Str         => "Chain patterns");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9,
-                   Str         => "Current:" & To_Value (Current_Pattern)'Img);
-         when WNM.UI.Pattern_Copy =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => 0,
-                   Str         => "Copy pattern");
+                   Y_Offset    => 9 + 8,
+                   Str         => "Current: " & Img (Current_Pattern));
          when WNM.UI.Note =>
+            null;
+         when WNM.UI.FX_Alt =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0,
-                   Str         => "Trk:" & To_Value (Track)'Img);
-            B := 54;
-            Print (X_Offset    => B,
-                   Y_Offset    => 0,
-                   Str         => "Pat:" & To_Value (Current_Pattern)'Img);
-            B := 1;
-            --  Print (X_Offset    => B,
-            --         Y_Offset    => 9,
-            --         Str         => Entry_Name (Sample_Of_Track (Track)));
-         when WNM.UI.FX_Select =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => 0,
-                   Str         => "Enable FX",
+                   Y_Offset    => 0 + 8,
+                   Str         => "FX/Copy",
                    Invert_From => 0);
+         when WNM.UI.Copy =>
+            declare
+               Blink : constant Boolean := (Anim_Step mod 10) < 5;
+               FB : constant String := (if Blink then "  " else "??");
+               TB : constant String :=
+                 (if Is_Complete (WNM.UI.Copy_T.From) and then blink
+                  then "  " else "??");
+            begin
+               B := 1;
+               Print (X_Offset    => B,
+                      Y_Offset    => 0 + 8,
+                      Str         => "Copy " & WNM.UI.Copy_T.From.Kind'Img);
+               B := 1;
+               Print (X_Offset    => B,
+                      Y_Offset    => 8 + 8,
+                      Str         => "From " & Image (WNM.UI.Copy_T.From, FB));
+               B := 1;
+               Print (X_Offset    => B,
+                      Y_Offset    => 16 + 8,
+                      Str         => "To   " & Image (WNM.UI.Copy_T.To, TB));
+            end;
          when WNM.UI.Step_Edit =>
             null; --  Step edit is a menu
          end case;
       end if;
+
+      WNM.GUI.Popup.Update;
 
       WNM.Screen.Update;
 

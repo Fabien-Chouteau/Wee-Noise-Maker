@@ -28,6 +28,11 @@ with wnm_logo_wave_4;
 
 package body WNM.GUI.Logo is
 
+   Left : constant Positive := (Screen.Width - wnm_logo_text.Data.W) / 2;
+   Top  : constant Positive := (Screen.Height
+                                - wnm_logo_text.Data.H
+                                - wnm_logo_wave_1.Data.H) / 2;
+
    --------------------
    -- Draw_On_Screen --
    --------------------
@@ -35,19 +40,19 @@ package body WNM.GUI.Logo is
    procedure Draw_On_Screen (Anim_Step : HAL.UInt2) is
    begin
       WNM.Screen.Clear;
-      Copy_Bitmap (wnm_logo_text.Data, 6, 2 + 8);
+      Copy_Bitmap (wnm_logo_text.Data, Left, Top);
 
-      WNM.Screen.Draw_Line (Start     => (6, 11 + 8),
-                            Stop      => (32, 11 + 8));
-      WNM.Screen.Draw_Line (Start     => (63, 11 + 8),
-                            Stop      => (89, 11 + 8));
+      WNM.Screen.Draw_Line (Start     => (Left, Top + 9),
+                            Stop      => (Left + 28, Top + 9));
+      WNM.Screen.Draw_Line (Start     => (Left + 57, Top + 9),
+                            Stop      => (Left + 83, Top + 9));
 
       Copy_Bitmap ((case Anim_Step is
                       when 0 => wnm_logo_wave_1.Data,
                       when 1 => wnm_logo_wave_2.Data,
                       when 2 => wnm_logo_wave_3.Data,
                       when 3 => wnm_logo_wave_4.Data),
-                   33, 9 + 8);
+                   Left + 27, Top + 7);
    end Draw_On_Screen;
 
 end WNM.GUI.Logo;

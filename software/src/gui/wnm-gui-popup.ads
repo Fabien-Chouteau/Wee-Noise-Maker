@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2021 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -21,36 +21,21 @@
 
 with WNM.Time;
 
-with WNM.Sequence_Copy;
+package WNM.GUI.Popup is
 
-package WNM.UI is
+   Text_Length : constant := 10;
+   subtype Popup_Text is String (1 .. Text_Length);
 
-   function Update return Time.Time_Ms;
+   procedure Display (T : Popup_Text; Duration : Time.Time_Ms);
 
-   type Input_Mode_Type is (Note,
-                            Volume_BPM,
-                            FX_Alt,
-                            Copy,
-                            Track_Select,
-                            Pattern_Select,
-                            Step_Edit);
-
-   function Input_Mode return Input_Mode_Type;
-
-   function Current_Editting_Trig return Sequencer_Steps;
-
-   function FX_On (B : Keyboard_Button) return Boolean;
-
-   Copy_T : WNM.Sequence_Copy.Copy_Transaction;
+   procedure Update;
 
 private
 
-   type Buttton_Event is (On_Press,
-                          On_Long_Press,
-                          On_Release,
-                          Waiting_For_Long_Press);
+   type Popup_State is (Disabled, Text_Popup);
 
-   function Has_Long_Press (B : Button) return Boolean;
-   --  Can this button trigger a On_Long_Press event?
+   State  : Popup_State := Disabled;
+   Text   : Popup_Text := (others => ' ');
+   Expire : Time.Time_Ms := 0;
 
-end WNM.UI;
+end WNM.GUI.Popup;

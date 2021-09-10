@@ -34,34 +34,32 @@ package body WNM.GUI.Menu.Drawing is
    is
       X : Integer := 3;
    begin
-      Screen.Clear;
-
       if Top then
          Screen.Set_Pixel ((0, 0 + 8));
          Screen.Set_Pixel ((1, 1 + 8));
 
-         Screen.Set_Pixel ((95, 0 + 8));
-         Screen.Set_Pixel ((94, 1 + 8));
+         Screen.Set_Pixel ((Screen.Width - 1, 0 + 8));
+         Screen.Set_Pixel ((Screen.Width - 2, 1 + 8));
       end if;
 
       --  Top line
       Screen.Draw_Line (Start => (2, 2 + 8),
-                        Stop  => (93, 2 + 8));
+                        Stop  => (Screen.Width - 3, 2 + 8));
       --  Bottom line
       Screen.Draw_Line (Start => (2, 12 + 8),
-                        Stop  => (93, 12 + 8));
+                        Stop  => (Screen.Width - 3, 12 + 8));
 
       --  Side left
       Screen.Draw_Line (Start => (0, 4 + 8),
                         Stop  => (0, 10 + 8));
       --  Side right
-      Screen.Draw_Line (Start => (95, 4 + 8),
-                        Stop  => (95, 10 + 8));
+      Screen.Draw_Line (Start => (Screen.Width - 1, 4 + 8),
+                        Stop  => (Screen.Width - 1, 10 + 8));
 
       Screen.Set_Pixel ((1, 3 + 8));
       Screen.Set_Pixel ((1, 11 + 8));
-      Screen.Set_Pixel ((94, 3 + 8));
-      Screen.Set_Pixel ((94, 11 + 8));
+      Screen.Set_Pixel ((Screen.Width - 2, 3 + 8));
+      Screen.Set_Pixel ((Screen.Width - 2, 11 + 8));
 
       Print (X_Offset    => X,
              Y_Offset    => 4 + 8,
@@ -72,9 +70,9 @@ package body WNM.GUI.Menu.Drawing is
          Screen.Set_Pixel ((0, 14 + 8));
          Screen.Set_Pixel ((1, 13 + 8));
 
-         Screen.Set_Pixel ((94, 13 + 8));
-         Screen.Set_Pixel ((95, 14 + 8));
-         Screen.Set_Pixel ((95, 15 + 8));
+         Screen.Set_Pixel ((Screen.Width - 2, 13 + 8));
+         Screen.Set_Pixel ((Screen.Width - 1, 14 + 8));
+         Screen.Set_Pixel ((Screen.Width - 1, 15 + 8));
       end if;
    end Draw_Menu_Box;
 
