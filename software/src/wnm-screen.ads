@@ -23,8 +23,8 @@ with Interfaces;
 
 package WNM.Screen is
 
-   Width  : constant := 96;
-   Height : constant := 16;
+   Width  : constant := 128;
+   Height : constant := 64;
 
    procedure Update;
 

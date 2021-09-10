@@ -9,10 +9,8 @@ maintainers-logins = ["Fabien-Chouteau"]
 executables = ["wee_noise_maker_sim"]
 
 [[depends-on]]
-sdlada = "*"
 hal = "*"
 littlefs = "*"
 bbqueue = "*"
-
-[[depends-on]]  # This line was added by `alr with`
-virtapu = "*"  # This line was added by `alr with`
+virtapu = "*"
+asfml = "*"

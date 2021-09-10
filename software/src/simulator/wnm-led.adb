@@ -19,6 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM_Sim;
+
+with Sf.Graphics.Color;
+
 package body WNM.LED is
 
    LED_Brightness : array (LEDs) of UInt8 := (others => 0);
@@ -67,6 +71,21 @@ package body WNM.LED is
       if WNM.Time.Clock >= Next_Start then
          Next_Start := Next_Start + LED_Task_Period_Ms;
       end if;
+
+      for L in LEDs loop
+         if LED_Brightness (L) /= 0 then
+            case L is
+              when B1 .. B8 | B9 .. B16 =>
+               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfBlue;
+              when Rec =>
+               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfRed;
+              when Play =>
+               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfGreen;
+         end case;
+         else
+            WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfTransparent;
+         end if;
+      end loop;
 
       return Next_Start;
    end Update;

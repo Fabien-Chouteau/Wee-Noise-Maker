@@ -21,19 +21,21 @@
 
 with HAL.Bitmap;
 
+with WNM.Screen;
+
 package WNM.GUI.Bitmap_Fonts is
 
    procedure Print (X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     C           : Character;
-                    Invert_From : Integer := 96;
-                    Invert_To   : Integer := 96)
+                    Invert_From : Integer := WNM.Screen.Width;
+                    Invert_To   : Integer := WNM.Screen.Width)
    with Pre => Invert_From <= Invert_To;
 
    procedure Print (X_Offset    : in out Integer;
                     Y_Offset    : Integer;
                     Str         : String;
-                    Invert_From : Integer := 96;
-                    Invert_To   : Integer := 96)
+                    Invert_From : Integer := WNM.Screen.Width;
+                    Invert_To   : Integer := WNM.Screen.Width)
    with Pre => Invert_From <= Invert_To;
 end WNM.GUI.Bitmap_Fonts;

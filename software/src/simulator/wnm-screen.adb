@@ -19,60 +19,49 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL; use HAL;
+with Interfaces; use Interfaces;
 
-with Interfaces.C;
+with WNM_Sim;
 
-with SDL.Video.Windows;
-with SDL.Video.Windows.Makers;
-with SDL.Video.Renderers;
-with SDL.Video.Renderers.Makers;
-with SDL.Video.Rectangles;
-with SDL.Images;
-
-use SDL.Video;
-
-with WNM.Buttons;
-with WNM.LED;
+with sf.Graphics.Color;
 
 package body WNM.Screen is
 
-   SDL_Width : constant := 800;
-   SDL_Height : constant := 600;
+   --  SDL_Width : constant := 800;
+   --  SDL_Height : constant := 600;
+   --
+   --  Button_X_Offset : constant := 10;
+   --  Button_Y_Offset : constant := 120;
+   --  Button_Size : constant := 50;
+   --  Button_X_Margin : constant := 5;
+   --  Button_Y_Margin : constant := 20;
+   --  LED_Size : constant := 10;
+   --
+   --  Screen_Pixel_Size : constant := 4;
+   --
+   --  Button_Col : constant array (Button) of Natural :=
+   --    (Pattern | Track_Button | Encoder_L => 0,
+   --     B1   | B9 | Encoder_R              => 1,
+   --     B2   | B10 | Menu                  => 2,
+   --     B3   | B11                         => 3,
+   --     B4   | B12                         => 4,
+   --     B5   | B13                         => 5,
+   --     B6   | B14                         => 6,
+   --     B7   | B15                         => 7,
+   --     B8   | B16                         => 8,
+   --     Play | Rec                         => 9,
+   --     others                             => 10);
+   --
+   --  Button_Row : constant array (Button) of Natural :=
+   --    (Encoder_L | Encoder_R | Menu   => 0,
+   --     B1 .. B8 | Play | Track_Button => 1,
+   --     B9 .. B16 | Rec | Pattern      => 2,
+   --     others                         => 3);
+   --
 
-   Button_X_Offset : constant := 10;
-   Button_Y_Offset : constant := 120;
-   Button_Size : constant := 50;
-   Button_X_Margin : constant := 5;
-   Button_Y_Margin : constant := 20;
-   LED_Size : constant := 10;
-
-   Screen_Pixel_Size : constant := 4;
-
-   Button_Col : constant array (Button) of Natural :=
-     (Pattern | Track_Button | Encoder_L => 0,
-      B1   | B9 | Encoder_R              => 1,
-      B2   | B10 | Menu                  => 2,
-      B3   | B11                         => 3,
-      B4   | B12                         => 4,
-      B5   | B13                         => 5,
-      B6   | B14                         => 6,
-      B7   | B15                         => 7,
-      B8   | B16                         => 8,
-      Play | Rec                         => 9,
-      others                             => 10);
-
-   Button_Row : constant array (Button) of Natural :=
-     (Encoder_L | Encoder_R | Menu   => 0,
-      B1 .. B8 | Play | Track_Button => 1,
-      B9 .. B16 | Rec | Pattern      => 2,
-      others                         => 3);
-
-   Screen_Pixels : array (0 .. 95, 0 .. 15) of Boolean :=
-     (others => (others => False));
-
-   W          : SDL.Video.Windows.Window;
-   Renderer   : SDL.Video.Renderers.Renderer;
+   Screen_Pixels : array
+     (0 .. WNM.Screen.Width - 1, 0 .. WNM.Screen.Height - 1)
+     of Boolean := (others => (others => False));
 
    procedure Initialize;
 
@@ -82,24 +71,7 @@ package body WNM.Screen is
 
    procedure Initialize is
    begin
-      if not SDL.Initialise (Flags => SDL.Enable_Screen) then
-         raise Program_Error with "SDL Video init failed";
-      end if;
-
-      SDL.Video.Windows.Makers.Create
-        (W, "Wee Noise Maker Simulator",
-         0,
-         0,
-         SDL_Width,
-         SDL_Height,
-         Flags    => SDL.Video.Windows.Windowed);
-
-      SDL.Video.Renderers.Makers.Create (Renderer, W);
-
-      if not SDL.Images.Initialise then
-         raise Program_Error with "SDL Image init failed";
-      end if;
-
+      null;
    end Initialize;
 
    ------------
@@ -107,98 +79,22 @@ package body WNM.Screen is
    ------------
 
    procedure Update is
-      use Interfaces.C;
+      use sf.Graphics.Color;
 
-      procedure Draw_Keyboard is
-      begin
-         Renderer.Set_Draw_Colour ((255, 0, 0, 127));
-
-         for B in Button loop
-            declare
-               Rect : constant Rectangles.Rectangle :=
-                 (Button_X_Offset +
-                    int (Button_Col (B) * (Button_Size + Button_X_Margin)),
-                  Button_Y_Offset +
-                    int (Button_Row (B) * (Button_Size + Button_Y_Margin)),
-                  Button_Size,
-                  Button_Size);
-            begin
-               if Buttons.Is_Pressed (B) then
-                  Renderer.Fill (Rect);
-               else
-                  Renderer.Draw (Rect);
-               end if;
-            end;
-         end loop;
-      end Draw_Keyboard;
-
-      procedure Draw_LEDs is
-      begin
-         for L in LEDs loop
-            declare
-               Rect : constant Rectangles.Rectangle :=
-                 (Button_X_Offset +
-                    int (Button_Col (L) * (Button_Size + Button_X_Margin) +
-                     Button_Size / 2 - LED_Size / 2),
-                  Button_Y_Offset +
-                    int (Button_Row (L) * (Button_Size + Button_Y_Margin) -
-                     LED_Size),
-                  LED_Size,
-                  LED_Size);
-            begin
-               if LED.Brightness (L) /= 0 then
-                  --  Renderer.Set_Draw_Colour
-                  --    ((0, Colour_Component (LED.Brightness (L)) * 100, 0, 255));
-                  Renderer.Set_Draw_Colour ((0, 255, 0, 255));
-                  Renderer.Fill (Rect);
-               end if;
-               Renderer.Set_Draw_Colour ((0, 255, 0, 255));
-               Renderer.Draw (Rect);
-            end;
-         end loop;
-
-      end Draw_LEDs;
-
-      -----------------
-      -- Draw_Screen --
-      -----------------
-
-      procedure Draw_Screen is
-      begin
-         Renderer.Set_Draw_Colour ((0, 255, 255, 255));
-         for X in Screen_Pixels'Range (1) loop
-            for Y in Screen_Pixels'Range (2) loop
-               declare
-                  Rect : constant Rectangles.Rectangle :=
-                    (int (X * Screen_Pixel_Size),
-                     int (Y * Screen_Pixel_Size),
-                     Screen_Pixel_Size,
-                     Screen_Pixel_Size);
-               begin
-                  if Screen_Pixels (X, Y) then
-                     Renderer.Fill (Rect);
-
-                  --  Uncomment to see small dot instead of empty pixels (useful
-                  --  for debugging).
-                  --
-                  --  else
-                  --     Renderer.Draw
-                  --       (Rectangles.Point'(Rect.X + Screen_Pixel_Size / 2,
-                  --        Rect.Y + Screen_Pixel_Size / 2));
-                  end if;
-               end;
-            end loop;
-         end loop;
-      end Draw_Screen;
+      FB : array (0 .. (Width * Height) - 1) of sfColor
+        with Address => WNM_Sim.Frame_Buffer'Address;
+      Pix_Color : constant sfColor := fromRGB (0, 153, 255);
+      BG_Color  : constant sfColor := fromRGB (0, 0, 0);
    begin
-      Renderer.Set_Draw_Colour ((0, 0, 0, 255));
-      Renderer.Clear;
+      FB := (others => BG_Color);
 
-      Draw_Keyboard;
-      Draw_LEDs;
-      Draw_Screen;
-
-      Renderer.Present;
+      for X in Screen_Pixels'Range (1) loop
+         for Y in Screen_Pixels'Range (2) loop
+            if Screen_Pixels (X, Y) then
+               FB (X + Y * Width) := Pix_Color;
+            end if;
+         end loop;
+      end loop;
    end Update;
 
    -----------
@@ -207,6 +103,7 @@ package body WNM.Screen is
 
    procedure Clear is
    begin
+      null;
       Screen_Pixels := (others => (others => False));
    end Clear;
 

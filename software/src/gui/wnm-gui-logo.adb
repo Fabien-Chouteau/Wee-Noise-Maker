@@ -35,19 +35,19 @@ package body WNM.GUI.Logo is
    procedure Draw_On_Screen (Anim_Step : HAL.UInt2) is
    begin
       WNM.Screen.Clear;
-      Copy_Bitmap (wnm_logo_text.Data, 6, 2);
+      Copy_Bitmap (wnm_logo_text.Data, 6, 2 + 8);
 
-      WNM.Screen.Draw_Line (Start     => (6, 11),
-                            Stop      => (32, 11));
-      WNM.Screen.Draw_Line (Start     => (63, 11),
-                            Stop      => (89, 11));
+      WNM.Screen.Draw_Line (Start     => (6, 11 + 8),
+                            Stop      => (32, 11 + 8));
+      WNM.Screen.Draw_Line (Start     => (63, 11 + 8),
+                            Stop      => (89, 11 + 8));
 
       Copy_Bitmap ((case Anim_Step is
                       when 0 => wnm_logo_wave_1.Data,
                       when 1 => wnm_logo_wave_2.Data,
                       when 2 => wnm_logo_wave_3.Data,
                       when 3 => wnm_logo_wave_4.Data),
-                   33, 9);
+                   33, 9 + 8);
    end Draw_On_Screen;
 
 end WNM.GUI.Logo;

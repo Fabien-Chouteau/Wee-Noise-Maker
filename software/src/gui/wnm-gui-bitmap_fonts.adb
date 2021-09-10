@@ -21,8 +21,7 @@
 
 with font_5x7;
 
-with WNM.Screen;
-use WNM;
+with WNM; use WNM;
 
 package body WNM.GUI.Bitmap_Fonts is
 
@@ -34,8 +33,8 @@ package body WNM.GUI.Bitmap_Fonts is
      (X_Offset    : in out Integer;
       Y_Offset    : Integer;
       C           : Character;
-      Invert_From : Integer := 96;
-      Invert_To   : Integer := 96)
+      Invert_From : Integer := WNM.Screen.Width;
+      Invert_To   : Integer := WNM.Screen.Width)
    is
       Index : constant Integer := Character'Pos (C) - Character'Pos ('!');
       Bitmap_Offset : constant Integer := Index * 5;
@@ -73,7 +72,7 @@ package body WNM.GUI.Bitmap_Fonts is
       Draw_Loop : for X in 0 .. 5 loop
          for Y in 0 .. 6 loop
 
-            if Y + Y_Offset in 0 .. 15 then
+            if Y + Y_Offset in 0 .. Screen.Height - 1 then
                if X + X_Offset > Screen.Width - 1 then
                   exit Draw_Loop;
                elsif X + X_Offset >= 0
@@ -98,8 +97,8 @@ package body WNM.GUI.Bitmap_Fonts is
      (X_Offset    : in out Integer;
       Y_Offset    : Integer;
       Str         : String;
-      Invert_From : Integer := 96;
-      Invert_To   : Integer := 96)
+      Invert_From : Integer := WNM.Screen.Width;
+      Invert_To   : Integer := WNM.Screen.Width)
    is
       Stop  : Integer;
       Start : Integer;

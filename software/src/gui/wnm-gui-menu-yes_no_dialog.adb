@@ -58,12 +58,12 @@ package body WNM.GUI.Menu.Yes_No_Dialog is
       X : Natural := 1;
    begin
       Print (X_Offset => X,
-             Y_Offset => 0,
+             Y_Offset => 8,
              Str      => Dialog_Title);
 
       X := 1;
       Print (X_Offset => X,
-             Y_Offset => 9,
+             Y_Offset => 17,
              Str      => "-> " & (if This.Yes then "Yes" else "No"));
    end Draw;
 

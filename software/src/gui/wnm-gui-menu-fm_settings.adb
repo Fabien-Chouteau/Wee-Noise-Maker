@@ -49,20 +49,20 @@ package body WNM.GUI.Menu.FM_Settings is
          when WNM.FM_Tuner.Seeking_Up =>
             X := X + Integer (Animation_Step mod 10);
             Print (X_Offset    => X,
-                   Y_Offset    => 5,
+                   Y_Offset    => 5 + 8,
                    Str         => ">>>");
          when WNM.FM_Tuner.Seeking_Down =>
             X := X - Integer (Animation_Step mod 10);
             Print (X_Offset    => X,
-                   Y_Offset    => 5,
+                   Y_Offset    => 5 + 8,
                    Str         => "<<<");
          when WNM.FM_Tuner.Tunning =>
             Print (X_Offset    => X,
-                   Y_Offset    => 5,
+                   Y_Offset    => 5 + 8,
                    Str         => "...");
          when WNM.FM_Tuner.Tuned =>
             Print (X_Offset    => X,
-                   Y_Offset    => 5,
+                   Y_Offset    => 5 + 8,
                    Str         => WNM.FM_Tuner.Channel'Img);
       end case;
       Animation_Step := Animation_Step + 1;

@@ -1,73 +1,78 @@
+with Ada.Text_IO;
+
 with GNAT.OS_Lib;
-with Interfaces.C; use Interfaces.C;
+
+with Sf.Audio; use Sf.Audio;
+with Sf.Audio.SoundStream; use Sf.Audio.SoundStream;
+with Sf; use Sf;
 
 with BBqueue;
 
 with System.Storage_Elements; use System.Storage_Elements;
 
-with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
+--  with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
 
 package body WNM.Audio is
 
-   procedure SDL_Audio_Callback (Userdata : System.Address;
-                                 Stream   : System.Address;
-                                 Len      : Interfaces.C.int);
-   pragma Export (C, SDL_Audio_Callback, "sdl_audio_callback");
+   ------------- SFML
 
-   function Init_SDL_Audio (Sample_Rate : Interfaces.C.int;
-                            Sample_Cnt  : Interfaces.C.int)
-                            return Interfaces.C.int;
-   pragma Import (C, Init_SDL_Audio, "init_sdl_audio");
+   Stream : sfSoundStream_Ptr;
+
+   Stream_Data : array (1 .. Mono_Buffer'Length * 2) of aliased sfInt16;
+
+   function SFML_Audio_Callback (chunk  : access sfSoundStreamChunk;
+                                 Unused : System.Address)
+                                 return sfBool
+     with Convention => C;
+
+   ---------------
 
    Buffer_Count : constant BBqueue.Buffer_Offset := Audio_Queue_Size;
 
    Out_L : array (1 .. Buffer_Count) of Mono_Buffer;
    Out_R : array (1 .. Buffer_Count) of Mono_Buffer;
-   In_L : array (1 .. Buffer_Count) of Mono_Buffer;
-   In_R : array (1 .. Buffer_Count) of Mono_Buffer;
+   In_L : array (1 .. Buffer_Count) of Mono_Buffer := (others => (others => 0));
+   In_R : array (1 .. Buffer_Count) of Mono_Buffer := (others => (others => 0));
 
    Out_Queue : BBqueue.Offsets_Only (Buffer_Count);
    In_Queue : BBqueue.Offsets_Only (Buffer_Count);
 
-   Radio_Input_File : Ada.Streams.Stream_IO.File_Type;
-   Radio_Input_Stream : Ada.Streams.Stream_IO.Stream_Access;
+   --  Radio_Input_File : Ada.Streams.Stream_IO.File_Type;
+   --  Radio_Input_Stream : Ada.Streams.Stream_IO.Stream_Access;
 
-   ------------------------
-   -- SDL_Audio_Callback --
-   ------------------------
+   -------------------------
+   -- SFML_Audio_Callback --
+   -------------------------
 
-   procedure SDL_Audio_Callback (Userdata : System.Address;
-                                 Stream   : System.Address;
-                                 Len      : Interfaces.C.int)
+   function SFML_Audio_Callback (chunk  : access sfSoundStreamChunk;
+                                 Unused : System.Address)
+                                 return sfBool
    is
       use BBqueue;
-
-      pragma Unreferenced (Userdata);
-      Output : Stereo_Buffer with Address => Stream;
 
       Out_Read : Read_Grant;
       In_Write : Write_Grant;
 
+      Stream_Index : Natural := Stream_Data'First;
+
    begin
-      if Len /= WNM.Samples_Per_Buffer * 2 * 2 then
-         raise Program_Error with "Unexpected SDL buffer len:" & Len'Img;
-      end if;
 
       -- Output --
 
       Read (Out_Queue, Out_Read, 1);
 
       if State (Out_Read) /= Valid then
-         Output := (others => (0, 0));
+         Stream_Data := (others => 0);
       else
 
          declare
             Out_Index : constant Buffer_Offset :=
               Out_L'First + Slice (Out_Read).From;
          begin
-            for X in Output'Range loop
-               Output (X).L := Out_L (Out_Index) (X);
-               Output (X).R := Out_R (Out_Index) (X);
+            for X in Mono_Buffer'Range loop
+               Stream_Data (Stream_Index) := sfInt16 (Out_L (Out_Index) (X));
+               Stream_Data (Stream_Index + 1) := sfInt16 (Out_R (Out_Index) (X));
+               Stream_Index := Stream_Index + 2;
             end loop;
          end;
 
@@ -78,27 +83,31 @@ package body WNM.Audio is
 
       Grant (In_Queue, In_Write, 1);
 
-      if State (In_Write) /= Valid then
-         return;
+      if State (In_Write) = Valid then
+         declare
+            In_Index : constant Buffer_Offset :=
+              In_L'First + Slice (In_Write).From;
+
+            Line_In : Stereo_Buffer;
+         begin
+
+            Line_In := (others => (0, 0));
+            --  Line_In := Stereo_Buffer'Input (Radio_Input_Stream);
+
+            for X in Line_In'Range loop
+               In_L (In_Index) (X) := Line_In (X).L;
+               In_R (In_Index) (X) := Line_In (X).R;
+            end loop;
+
+            Commit (In_Queue, In_Write, 1);
+         end;
       end if;
 
-      declare
-         In_Index : constant Buffer_Offset :=
-           In_L'First + Slice (In_Write).From;
+      chunk.Samples := Stream_Data (Stream_Data'First)'Access;
+      chunk.NbSamples := Stream_Data'Length;
+      return True;
+   end SFML_Audio_Callback;
 
-         Radio : Stereo_Buffer;
-      begin
-
-         Radio := Stereo_Buffer'Input (Radio_Input_Stream);
-
-         for X in Output'Range loop
-            In_L (In_Index) (X) := Radio (X).L;
-            In_R (In_Index) (X) := Radio (X).R;
-         end loop;
-
-         Commit (In_Queue, In_Write, 1);
-      end;
-   end SDL_Audio_Callback;
 
    --------------------
    -- Generate_Audio --
@@ -160,23 +169,22 @@ package body WNM.Audio is
 
 begin
 
-   Ada.Streams.Stream_IO.Open (Radio_Input_File,
-                               Ada.Streams.Stream_IO.In_File,
-                               "/home/chouteau/Downloads/radio_in.raw");
-
-   Radio_Input_Stream := Ada.Streams.Stream_IO.Stream (Radio_Input_File);
-
-   if Radio_Input_Stream = null then
-      raise Program_Error with "Radio stream error...";
+   if GNAT.OS_Lib.Getenv ("OS").all = "Windows_NT" then
+      --  Select driver for openal on Windows
+      GNAT.OS_Lib.Setenv ("ALSOFT_DRIVERS", "dsound");
    end if;
 
-   if GNAT.OS_Lib.Getenv ("OS").all = "Windows_NT" -- Memory leak right here...
-   then
-      GNAT.OS_Lib.Setenv ("SDL_AUDIODRIVER", "directsound");
-   end if;
+   Stream := create (onGetData    => SFML_Audio_Callback'Access,
+                     onSeek       => null,
+                     channelCount => 2,
+                     sampleRate   => WNM.Sample_Frequency,
+                     userData     => System.Null_Address);
 
-   if Init_SDL_Audio (Sample_Frequency, Samples_Per_Buffer) /= 0 then
-      raise Program_Error with "SDL Audio init failed";
+   if Stream = null then
+      Ada.Text_IO.Put_Line ("Could not create audio stream");
+      GNAT.OS_Lib.OS_Exit (1);
+   else
+      play (Stream);
    end if;
 
 end WNM.Audio;

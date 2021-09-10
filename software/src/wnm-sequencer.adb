@@ -71,6 +71,7 @@ package body WNM.Sequencer is
                                   Rec_Event,
                                   Rec_Long_Event,
                                   Rec_Release_Event);
+   procedure Do_Preview_Trigger (T : Tracks);
 
    ----------------
    -- Transition --
@@ -207,19 +208,20 @@ package body WNM.Sequencer is
    --------------
 
    procedure On_Press (Button : Keyboard_Button) is
+      V : constant Keyboard_Value := To_Value (Button);
    begin
       case Current_Seq_State is
          when Pause | Play =>
-            Do_Preview_Trigger (Button);
+            Do_Preview_Trigger (V);
 
-            Current_Track := Button;
+            Current_Track := V;
 
          when Play_And_Rec =>
-            Sequences (Pattern_Sequencer.Current_Pattern) (Button) (Step).Trig
+            Sequences (Pattern_Sequencer.Current_Pattern) (V) (Step).Trig
               := Always;
-            Current_Track := Button;
+            Current_Track := V;
             if Microstep /= 1 then
-               Do_Preview_Trigger (Button);
+               Do_Preview_Trigger (V);
             end if;
 
          when Play_And_Edit | Edit =>

@@ -1,16 +1,8 @@
--- begin auto-gpr-with --
---  This section was automatically added by Alire
-with "atomic.gpr";
-with "bbqueue.gpr";
-with "hal.gpr";
-with "littlefs.gpr";
-with "sdlada.gpr";
-with "virtapu.gpr";
--- end auto-gpr-with --
+with "config/wee_noise_maker_sim_config.gpr";
 
 project Wee_Noise_Maker_Sim is
 
-   for Languages use ("Ada", "C");
+   for Languages use ("Ada");
    for Source_Dirs use ("../src",
                         "../src/gui",
                         "../src/generated",

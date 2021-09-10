@@ -19,135 +19,48 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with SDL.Events;           use SDL.Events;
-with SDL.Events.Events;    use SDL.Events.Events;
-with SDL.Events.Keyboards; use SDL.Events.Keyboards;
-
-with GNAT.OS_Lib;
-with SDL.Events.Mice;
-
-with Interfaces; use Interfaces;
+with WNM_Sim;
 
 package body WNM.Buttons is
 
    Key_State : array (Button) of Raw_Button_State := (others => Up);
-   Encoder_Right, Encoder_Left : Integer := 0;
 
-   procedure Initialize;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize is
-   begin
-      null;
-   end Initialize;
+   To_SFML_Key : constant array (Button) of WNM_Sim.SFML_Keys
+     := (B1 => WNM_Sim.B1,
+         B2 => WNM_Sim.B2,
+         B3 => WNM_Sim.B3,
+         B4 => WNM_Sim.B4,
+         B5 => WNM_Sim.B5,
+         B6 => WNM_Sim.B6,
+         B7 => WNM_Sim.B7,
+         B8 => WNM_Sim.B8,
+         B9 => WNM_Sim.B9,
+         B10 => WNM_Sim.B10,
+         B11 => WNM_Sim.B11,
+         B12 => WNM_Sim.B12,
+         B13 => WNM_Sim.B13,
+         B14 => WNM_Sim.B14,
+         B15 => WNM_Sim.B15,
+         B16 => WNM_Sim.B16,
+         Rec => WNM_Sim.Rec,
+         Play => WNM_Sim.Play,
+         Menu => WNM_Sim.Menu,
+         Func => WNM_Sim.Func,
+         Step_Button => WNM_Sim.Step_Button,
+         Track_Button => WNM_Sim.Track_Button,
+         Pattern_Button => WNM_Sim.Pattern_Button,
+         Encoder_L => WNM_Sim.Encoder_L,
+         Encoder_R => WNM_Sim.Encoder_R);
 
    ----------
    -- Scan --
    ----------
 
    procedure Scan is
-      Event   : SDL.Events.Events.Events;
-      State   : Raw_Button_State;
    begin
-      Encoder_Right := 0;
-      Encoder_Left := 0;
-
-      pragma Warnings (Off, "infinite loop");
-      while SDL.Events.Events.Poll (Event) loop
-
-         case Event.Common.Event_Type is
-            when Key_Down | Key_Up =>
-               if Event.Keyboard.Repeat = 0 then
-                  State := (if Event.Common.Event_Type = Key_Down
-                            then Down
-                            else Up);
-
-                  case Event.Keyboard.Key_Sym.Scan_Code is
-
-                  when Scan_Code_Return =>
-                     Key_State (Play) := State;
-                  when Scan_Code_Right_Shift =>
-                     Key_State (Rec) := State;
-
-                  when Scan_Code_W =>
-                     Key_State (B1) := State;
-                  when Scan_Code_E =>
-                     Key_State (B2) := State;
-                  when Scan_Code_R =>
-                     Key_State (B3) := State;
-                  when Scan_Code_T =>
-                     Key_State (B4) := State;
-                  when Scan_Code_Y =>
-                     Key_State (B5) := State;
-                  when Scan_Code_U =>
-                     Key_State (B6) := State;
-                  when Scan_Code_I =>
-                     Key_State (B7) := State;
-                  when Scan_Code_O =>
-                     Key_State (B8) := State;
-                  when Scan_Code_S =>
-                     Key_State (B9) := State;
-                  when Scan_Code_D =>
-                  Key_State (B10) := State;
-                  when Scan_Code_F =>
-                     Key_State (B11) := State;
-                  when Scan_Code_G =>
-                     Key_State (B12) := State;
-                  when Scan_Code_H =>
-                     Key_State (B13) := State;
-                  when Scan_Code_J =>
-                     Key_State (B14) := State;
-                  when Scan_Code_K =>
-                     Key_State (B15) := State;
-                  when Scan_Code_L =>
-                     Key_State (B16) := State;
-
-                  when Scan_Code_A =>
-                     Key_State (Pattern) := State;
-                  when Scan_Code_Q =>
-                     Key_State (Track_Button) := State;
-
-                  when Scan_Code_1 =>
-                     Key_State (Encoder_L) := State;
-                  when Scan_Code_2 =>
-                     Key_State (Encoder_R) := State;
-                  when Scan_Code_3 =>
-                     Key_State (Menu) := State;
-                  when Scan_Code_4 =>
-                     Key_State (Func) := State;
-
-                  when Scan_Code_Up =>
-                     if State = Down then
-                        Encoder_Left := Encoder_Left - 1;
-                     end if;
-                  when Scan_Code_Down =>
-                     if State = Down then
-                        Encoder_Left := Encoder_Left + 1;
-                     end if;
-                  when Scan_Code_Left =>
-                     if State = Down then
-                        Encoder_Right := Encoder_Right - 1;
-                     end if;
-                  when Scan_Code_Right =>
-                     if State = Down then
-                        Encoder_Right := Encoder_Right + 1;
-                     end if;
-
-                  when Scan_Code_Escape =>
-                     GNAT.OS_Lib.OS_Exit (0);
-                  when others =>
-                     null;
-                  end case;
-               end if;
-            when SDL.Events.Mice.Wheel =>
-               Encoder_Left := Integer (Event.Mouse_Wheel.X);
-               Encoder_Right := Integer (Event.Mouse_Wheel.Y);
-            when others =>
-               null;
-         end case;
+      for B in Button loop
+         Key_State (B) :=
+           (if WNM_Sim.SFML_Pressed (To_SFML_Key (B)) then Down else Up);
       end loop;
    end Scan;
 
@@ -171,8 +84,10 @@ package body WNM.Buttons is
    ----------
 
    function Left_Diff return Integer is
+      Res : constant Integer := WNM_Sim.Encoder_Left;
    begin
-      return Encoder_Left;
+      WNM_Sim.Encoder_Left := 0;
+      return Res;
    end Left_Diff;
 
    -----------
@@ -180,10 +95,10 @@ package body WNM.Buttons is
    -----------
 
    function Right_Diff return Integer is
+      Res : constant Integer := WNM_Sim.Encoder_Right;
    begin
-      return Encoder_Right;
+      WNM_Sim.Encoder_Right := 0;
+      return Res;
    end Right_Diff;
 
-begin
-   Initialize;
 end WNM.Buttons;

@@ -26,7 +26,7 @@ package WNM is
    type Button is (B1, B2, B3, B4, B5, B6, B7, B8,
                    B9, B10, B11, B12, B13, B14, B15, B16,
                    Rec, Play,
-                   Menu, Func, Track_Button, Pattern,
+                   Menu, Func, Step_Button, Track_Button, Pattern_Button,
                    Encoder_L, Encoder_R);
 
    subtype Keyboard_Button is Button range B1 .. B16;
@@ -38,8 +38,8 @@ package WNM is
    function To_Value (B : Keyboard_Button) return Keyboard_Value;
    function To_Button (V : Keyboard_Value) return Keyboard_Button;
 
-   subtype Tracks is Keyboard_Button;
-   subtype Patterns is Keyboard_Button;
+   subtype Tracks is Keyboard_Value;
+   subtype Patterns is Keyboard_Value;
 
    type Trigger is (None, Always, Fill, Percent_25, Percent_50, Percent_75);
    function Img (T : Trigger) return String;
@@ -88,4 +88,23 @@ package WNM is
    use Repeat_Rate_Next;
    pragma Warnings (On, "use clause for package");
 
+   function Img (V : Keyboard_Value) return String
+   is (case V is
+          when 1 => "01",
+          when 2 => "02",
+          when 3 => "03",
+          when 4 => "04",
+          when 5 => "05",
+          when 6 => "06",
+          when 7 => "07",
+          when 8 => "08",
+          when 9 => "09",
+          when 10 => "10",
+          when 11 => "11",
+          when 12 => "12",
+          when 13 => "13",
+          when 14 => "14",
+          when 15 => "15",
+          when 16 => "16")
+   with Inline_Always;
 end WNM;

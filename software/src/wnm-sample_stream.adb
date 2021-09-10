@@ -37,22 +37,22 @@ package body WNM.Sample_Stream is
 
    function To_Stream_Track (T : Tracks) return Stream_Track
    is (case T is
-          when B1 => ST_1,
-          when B2 => ST_2,
-          when B3 => ST_3,
-          when B4 => ST_4,
-          when B5 => ST_5,
-          when B6 => ST_6,
-          when B7 => ST_7,
-          when B8 => ST_8,
-          when B9 => ST_9,
-          when B10 => ST_10,
-          when B11 => ST_11,
-          when B12 => ST_12,
-          when B13 => ST_13,
-          when B14 => ST_14,
-          when B15 => ST_15,
-          when B16 => ST_16);
+          when 1 => ST_1,
+          when 2 => ST_2,
+          when 3 => ST_3,
+          when 4 => ST_4,
+          when 5 => ST_5,
+          when 6 => ST_6,
+          when 7 => ST_7,
+          when 8 => ST_8,
+          when 9 => ST_9,
+          when 10 => ST_10,
+          when 11 => ST_11,
+          when 12 => ST_12,
+          when 13 => ST_13,
+          when 14 => ST_14,
+          when 15 => ST_15,
+          when 16 => ST_16);
 
    --------------
    -- To_Track --
@@ -60,22 +60,22 @@ package body WNM.Sample_Stream is
 
    function To_Track (ST : Stream_Track) return Tracks
    is (case ST is
-          when ST_1   => B1,
-          when ST_2   => B2,
-          when ST_3   => B3,
-          when ST_4   => B4,
-          when ST_5   => B5,
-          when ST_6   => B6,
-          when ST_7   => B7,
-          when ST_8   => B8,
-          when ST_9   => B9,
-          when ST_10  => B10,
-          when ST_11  => B11,
-          when ST_12  => B12,
-          when ST_13  => B13,
-          when ST_14  => B14,
-          when ST_15  => B15,
-          when others => B16);
+          when ST_1   => 1,
+          when ST_2   => 2,
+          when ST_3   => 3,
+          when ST_4   => 4,
+          when ST_5   => 5,
+          when ST_6   => 6,
+          when ST_7   => 7,
+          when ST_8   => 8,
+          when ST_9   => 9,
+          when ST_10  => 10,
+          when ST_11  => 11,
+          when ST_12  => 12,
+          when ST_13  => 13,
+          when ST_14  => 14,
+          when ST_15  => 15,
+          when others => 16);
 
    ------------------
    -- Close_Stream --

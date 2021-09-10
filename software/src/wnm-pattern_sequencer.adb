@@ -25,9 +25,9 @@ package body WNM.Pattern_Sequencer is
    subtype Sequence_Range is Positive range 1 .. Max_Patterns_In_Sequence;
 
    Sequence_Of_Pattern : array (Sequence_Range) of Patterns
-     := (others => B1);
+     := (others => 1);
 
-   Is_In_Sequence : array (Patterns) of Boolean := (B1     => True,
+   Is_In_Sequence : array (Patterns) of Boolean := (1     => True,
                                                     others => False);
    Current_Pattern_Index : Sequence_Range := 1;
    Last_In_Sequence      : Sequence_Range := 1;

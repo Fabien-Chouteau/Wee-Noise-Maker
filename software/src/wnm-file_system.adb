@@ -124,7 +124,7 @@ package body WNM.File_System is
 
    Err : int;
 
-   Do_Reset : constant Boolean := True;
+   Do_Reset : constant Boolean := False;
 begin
    if Do_Reset then
       Err := Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all);

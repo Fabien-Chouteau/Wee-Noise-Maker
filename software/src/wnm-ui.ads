@@ -27,7 +27,8 @@ package WNM.UI is
 
    type Input_Mode_Type is (Note,
                             Volume_BPM,
-                            FX_Select,
+                            FX_Or_Copy,
+                            Copy,
                             Track_Select,
                             Pattern_Select,
                             Pattern_Copy,
@@ -37,7 +38,7 @@ package WNM.UI is
 
    function Current_Editting_Trig return Sequencer_Steps;
 
-   function FX_On (B : Tracks) return Boolean;
+   function FX_On (B : Keyboard_Button) return Boolean;
 
 private
 

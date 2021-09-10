@@ -82,19 +82,19 @@ package body WNM.GUI.Menu.Sample_Trim is
 --               Y_Offset    => 0,
 --               Str         => "Trim sample");
 
-      Screen.Draw_Line (Start     => (Start, 12),
-                        Stop      => (Stop, 12));
-      Screen.Draw_Line (Start     => (Start, 9),
-                        Stop      => (Start, 15));
-      Screen.Draw_Line (Start     => (Stop, 9),
-                        Stop      => (Stop, 15));
+      Screen.Draw_Line (Start     => (Start, 12 + 8),
+                        Stop      => (Stop, 12 + 8));
+      Screen.Draw_Line (Start     => (Start, 9 + 8),
+                        Stop      => (Start, 15 + 8));
+      Screen.Draw_Line (Start     => (Stop, 9 + 8),
+                        Stop      => (Stop, 15 + 8));
       X := 5;
       Print (X_Offset    => X,
-             Y_Offset    => 0,
+             Y_Offset    => 0 + 8,
              Str         => This.Start'Img);
       X := 5;
       Print (X_Offset    => X,
-             Y_Offset    => 8,
+             Y_Offset    => 8 + 8,
              Str         => This.Stop'Img);
    end Draw;
 

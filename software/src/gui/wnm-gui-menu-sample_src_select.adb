@@ -69,12 +69,12 @@ package body WNM.GUI.Menu.Sample_Src_Select is
       X : Integer := 5;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 0,
+             Y_Offset    => 0 + 8,
              Str         => "Source:");
 
       X := 5;
       Print (X_Offset    => X,
-             Y_Offset    => 9,
+             Y_Offset    => 9 + 8,
              Str         => This.Src'Img);
 
       --  Print_Percentage (Down, "Volume", This.Volume);

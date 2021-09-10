@@ -45,7 +45,7 @@ package body WNM.UI is
 
    Default_Input_Mode : constant Input_Mode_Type := Note;
 
-   FX_Is_On : array (Tracks) of Boolean := (others => False);
+   FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
    Editting_Step : Sequencer_Steps := 1;
@@ -82,7 +82,7 @@ package body WNM.UI is
                   case B is
                      when Func =>
                         --  Switch to Func mode
-                        Current_Input_Mode := FX_Select;
+                        Current_Input_Mode := FX_Or_Copy;
                      when Play =>
                         Sequencer.Play_Pause;
                      when Rec =>
@@ -91,7 +91,7 @@ package body WNM.UI is
                         Sequencer.On_Press (B);
                      when Track_Button =>
                         Current_Input_Mode := Track_Select;
-                     when Pattern =>
+                     when Pattern_Button =>
                         Current_Input_Mode := Pattern_Select;
                      when Menu =>
                         if not GUI.Menu.In_Menu then
@@ -135,9 +135,9 @@ package body WNM.UI is
             end if;
 
             if B in B1 .. B16 and Evt = On_Press then
-               WNM.Synth.Toggle_Mute (B);
+               WNM.Synth.Toggle_Mute (To_Value (B));
             end if;
-         when FX_Select =>
+         when FX_Or_Copy =>
             case Evt is
                when On_Press =>
                   case B is
@@ -156,7 +156,7 @@ package body WNM.UI is
 
          when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
-               Sequencer.Select_Track (B);
+               Sequencer.Select_Track (To_Value (B));
             elsif B = Track_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -164,8 +164,8 @@ package body WNM.UI is
             if B = Rec and then Evt in On_Press | On_Long_Press then
                Current_Input_Mode := Pattern_Copy;
             elsif B in B1 .. B16 and then Evt = On_Press then
-               Pattern_Sequencer.Add_To_Sequence (B);
-            elsif B = Pattern and then Evt = On_Release then
+               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+            elsif B = Pattern_Button and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -173,9 +173,9 @@ package body WNM.UI is
             if B = Rec and then Evt = On_Release then
                Current_Input_Mode := Pattern_Select;
             elsif B in B1 .. B16 and then Evt = On_Press then
-               Sequencer.Copy_Current_Patern (To => B);
-               Pattern_Sequencer.Add_To_Sequence (B);
-            elsif B = Pattern and then Evt = On_Release then
+               Sequencer.Copy_Current_Patern (To => To_Value (B));
+               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+            elsif B = Pattern_Button and then Evt = On_Release then
                Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -194,7 +194,7 @@ package body WNM.UI is
    -- Toggle_FX --
    ---------------
 
-   procedure Toggle_FX (B : Tracks) is
+   procedure Toggle_FX (B : Keyboard_Button) is
    begin
       FX_Is_On (B) := not FX_Is_On (B);
    end Toggle_FX;
@@ -210,7 +210,7 @@ package body WNM.UI is
    -- FX_On --
    -----------
 
-   function FX_On (B : Tracks) return Boolean
+   function FX_On (B : Keyboard_Button) return Boolean
    is (FX_Is_On (B));
 
    --------------------
@@ -225,30 +225,31 @@ package body WNM.UI is
         Current_Input_Mode in Pattern_Select | Pattern_Copy;
    begin
       return (case B is
-              when B1        => In_Edit,
-              when B2        => In_Edit,
-              when B3        => In_Edit,
-              when B4        => In_Edit,
-              when B5        => In_Edit,
-              when B6        => In_Edit,
-              when B7        => In_Edit,
-              when B8        => In_Edit,
-              when B9        => In_Edit,
-              when B10       => In_Edit,
-              when B11       => In_Edit,
-              when B12       => In_Edit,
-              when B13       => In_Edit,
-              when B14       => In_Edit,
-              when B15       => In_Edit,
-              when B16       => In_Edit,
-              when Rec       => not In_Pattern_Select,
-              when Play      => True,
-              when Func      => False,
-              when Track_Button     => False,
-              when Pattern   => False,
-              when Menu      => False,
-              when Encoder_L => True,
-              when Encoder_R => True);
+              when B1           => In_Edit,
+              when B2           => In_Edit,
+              when B3           => In_Edit,
+              when B4           => In_Edit,
+              when B5           => In_Edit,
+              when B6           => In_Edit,
+              when B7           => In_Edit,
+              when B8           => In_Edit,
+              when B9           => In_Edit,
+              when B10          => In_Edit,
+              when B11          => In_Edit,
+              when B12          => In_Edit,
+              when B13          => In_Edit,
+              when B14          => In_Edit,
+              when B15          => In_Edit,
+              when B16          => In_Edit,
+              when Rec          => not In_Pattern_Select,
+              when Play         => True,
+              when Func         => False,
+              when Step_Button  => False,
+              when Track_Button => False,
+              when Pattern_Button      => False,
+              when Menu         => False,
+              when Encoder_L    => True,
+              when Encoder_R    => True);
    end Has_Long_Press;
 
 
@@ -383,7 +384,7 @@ package body WNM.UI is
       case Current_Input_Mode is
 
          -- FX selection mode --
-         when FX_Select =>
+         when FX_Or_Copy =>
             --  The FX LED will be on if there's at least one FX enabled
 
             for B in B1 .. B16 loop
@@ -395,7 +396,7 @@ package body WNM.UI is
             -- Track assign mode --
          when Track_Select =>
             for B in B1 .. B16 loop
-               if Sequencer.Track = B then
+               if Sequencer.Track = To_Value (B) then
                   LED.Turn_On (B);
                end if;
             end loop;
@@ -403,10 +404,10 @@ package body WNM.UI is
             --  Pattern select --
          when Pattern_Select | Pattern_Copy =>
             for B in B1 .. B16 loop
-               if Pattern_Sequencer.Current_Pattern = B then
+               if Pattern_Sequencer.Current_Pattern = To_Value (B) then
                   LED.Turn_On (B);
                end if;
-               if Pattern_Sequencer.Is_In_Pattern_Sequence (B) then
+               if Pattern_Sequencer.Is_In_Pattern_Sequence (To_Value (B)) then
                   LED.Turn_On (B);
                end if;
             end loop;
@@ -414,7 +415,7 @@ package body WNM.UI is
          --  Volume and BPM mode --
          when Volume_BPM =>
             for B in B1 .. B16 loop
-               if not WNM.Synth.Muted (B) then
+               if not WNM.Synth.Muted (To_Value (B)) then
                   LED.Turn_On (B);
                end if;
             end loop;
@@ -430,7 +431,7 @@ package body WNM.UI is
                   end loop;
                when Play | Play_And_Rec =>
                   for B in B1 .. B16 loop
-                     if Sequencer.Set (B, Sequencer.Step) then
+                     if Sequencer.Set (To_Value (B), Sequencer.Step) then
                         LED.Turn_On (B);
                      end if;
                   end loop;

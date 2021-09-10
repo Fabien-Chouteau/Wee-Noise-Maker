@@ -57,12 +57,12 @@ package body WNM.GUI.Menu.Assign_To_Track is
    begin
       X := 5;
       Print (X_Offset    => X,
-             Y_Offset    => 0,
+             Y_Offset    => 0 + 8,
              Str         => "Assign to track:");
 
       X := 5;
       Print (X_Offset    => X,
-             Y_Offset    => 9,
+             Y_Offset    => 9 + 8,
              Str         => This.Track'Img);
    end Draw;
 

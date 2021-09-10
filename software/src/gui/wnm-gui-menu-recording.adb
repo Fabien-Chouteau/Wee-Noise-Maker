@@ -54,7 +54,7 @@ package body WNM.GUI.Menu.Recording is
       X : Integer := 35;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 5,
+             Y_Offset    => 5 + 8,
              Str         => "Recording");
 
       Copy_Bitmap ((case Animation_Step mod 4 is
@@ -63,7 +63,7 @@ package body WNM.GUI.Menu.Recording is
                       when 2      => tape_3.Data,
                       when others => tape_4.Data),
                    X            => 0,
-                   Y            => 0,
+                   Y            => 0 + 8,
                    Invert_Color => True);
       Animation_Step := Animation_Step + 1;
    end Draw;

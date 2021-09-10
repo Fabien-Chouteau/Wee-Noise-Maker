@@ -10,7 +10,7 @@ package body WNM.GUI.Parameters is
    --------------
 
    function Y_Offset (Slot : Parameter_Slot) return Integer
-   is (if Slot = Up then 0 else 8);
+   is (if Slot = Up then 0 + 8 else 8 + 8);
 
    ---------------
    -- Print_Int --

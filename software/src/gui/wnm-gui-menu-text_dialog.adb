@@ -67,12 +67,12 @@ package body WNM.GUI.Menu.Text_Dialog is
       Select_X : constant Integer := X + (This.Index - This.Text'First) * 6;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 0,
+             Y_Offset    => 8,
              Str         => Dialog_Title);
 
       X := 1;
       Print (X_Offset    => X,
-             Y_Offset    => 9,
+             Y_Offset    => 9 + 8,
              Str         => This.Text (This.Text'First .. This.Text'First + This.Len - 1),
              Invert_From => (Select_X - 1),
              Invert_To   => (Select_X + 5));
