@@ -316,7 +316,7 @@ package body WNM.Synth is
 
       procedure Process (Out_L, Out_R : out Mono_Buffer;
                          In_L,  In_R  :     Mono_Buffer);
-
+      pragma Unreferenced (Process);
       -------------
       -- Process --
       -------------
@@ -425,7 +425,7 @@ package body WNM.Synth is
          Glob_Sample_Clock := Glob_Sample_Clock + Samples_Per_Buffer;
       end Process;
 
-      procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
+      --  procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
 
       Now : constant WNM.Time.Time_Ms := WNM.Time.Clock;
    begin
@@ -434,11 +434,117 @@ package body WNM.Synth is
 
          Process_MIDI_Events;
 
-         Generate_Audio;
+         --  Generate_Audio;
       end if;
 
       return Next_Start;
    end Update;
+
+   ------------------
+   -- Next_Samples --
+   ------------------
+
+   procedure Next_Samples (Output : out Audio.Stereo_Buffer;
+                           Input  :     Audio.Stereo_Buffer)
+   is
+      --  Len : File_System.File_Signed_Size;
+
+      procedure Mix (Mono_Samples : Mono_Buffer;
+                     ST           : Stream_Track);
+
+         ---------
+         -- Mix --
+         ---------
+
+      procedure Mix (Mono_Samples : Mono_Buffer;
+                     ST           : Stream_Track)
+      is
+         Val         : Integer_32;
+
+         Sample, Left, Right : Float;
+
+         Volume       : Float;
+         Pan          : Float;
+      begin
+         if ST = Always_On then
+            Volume := 1.0;
+            Pan    := 0.0;
+         else
+            Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
+            Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
+         end if;
+
+         for Index in Mono_Samples'Range loop
+
+            Sample := Float (Mono_Samples (Index));
+            Sample := Sample * Volume;
+
+            Right := Sample * (1.0 - Pan);
+            Left  := Sample * (1.0 + Pan);
+
+            Val := Integer_32 (Output (Index).L) + Integer_32 (Left);
+            if Val > Integer_32 (Mono_Sample'Last) then
+               Output (Index).L := Mono_Sample'Last;
+            elsif Val < Integer_32 (Integer_16'First) then
+               Output (Index).L := Mono_Sample'First;
+            else
+               Output (Index).L := Mono_Sample (Val);
+            end if;
+
+            Val := Integer_32 (Output (Index).R) + Integer_32 (Right);
+            if Val > Integer_32 (Mono_Sample'Last) then
+               Output (Index).R := Mono_Sample'Last;
+            elsif Val < Integer_32 (Integer_16'First) then
+               Output (Index).R := Mono_Sample'First;
+            else
+               Output (Index).R := Mono_Sample (Val);
+            end if;
+         end loop;
+      end Mix;
+
+   begin
+      if Passthrough /= None then
+         Output := Input;
+      else
+         Output := (others => (0, 0));
+      end if;
+
+      declare
+         Sample_Buf : Mono_Buffer;
+         Success : Boolean;
+      begin
+         for Track in Stream_Track loop
+            Next_Buffer (Track, Sample_Buf, Success);
+            if Success
+              and then
+                (Track = Always_On or else not Track_Muted (To_Track (Track)))
+            then
+               Mix (Sample_Buf, Track);
+            end if;
+         end loop;
+      end;
+
+      -- Recording --
+      --  if Recording_Source /= None then
+      --     declare
+      --        Sample_Buf : Mono_Buffer;
+      --     begin
+      --        case Recording_Source is
+      --           when None =>
+      --              null;
+      --           when Line_In =>
+      --              Copy_Stereo_To_Mono (In_L, In_R, Sample_Buf);
+      --           when Master_Output =>
+      --              Copy_Stereo_To_Mono (Out_L, Out_R, Sample_Buf);
+      --        end case;
+      --
+      --        Len := Write (Recording_File, Sample_Buf'Address, Sample_Buf'Length * 2);
+      --        Recording_Size := Recording_Size + Len;
+      --     end;
+      --  end if;
+
+      Glob_Sample_Clock := Glob_Sample_Clock + Samples_Per_Buffer;
+   end Next_Samples;
 
    ---------------------
    -- Set_Passthrough --

@@ -53,13 +53,15 @@ package body WNM.GUI.Menu.Sample_Select is
         or else
           This.From > This.To
       then
-         Draw_Menu_Box (Text   => "No samples...",
+         Draw_Menu_Box ("Sample select",
+                        Text   => "No samples...",
                         Top    => False,
                         Bottom => False);
          return;
       end if;
 
-      Draw_Menu_Box (Text   => Entry_Name (This.Index),
+      Draw_Menu_Box ("Sample select",
+                     Text   => Entry_Name (This.Index),
                      Top    => This.Index /= This.From,
                      Bottom => This.Index /= This.To);
    end Draw;

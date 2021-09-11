@@ -8,6 +8,8 @@ with WNM.Audio;
 with WNM.Synth;
 with WNM.Time; use WNM.Time;
 
+with WNM.GUI.Menu.Track_Settings;
+
 with WNM_Sim;
 pragma Unreferenced (WNM_Sim);
 
@@ -17,8 +19,9 @@ procedure Wee_Noise_Maker_Sim is
 begin
 
    WNM.Sample_Library.Load;
-
    WNM.Synth.Load_Samples;
+
+   WNM.GUI.Menu.Track_Settings.Push_Window;
 
    loop
       Next_Start := Time_Ms'Last;

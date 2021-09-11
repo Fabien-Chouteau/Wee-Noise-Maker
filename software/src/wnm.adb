@@ -27,12 +27,14 @@ package body WNM is
 
    function Img (T : Trigger) return String
    is (case T is
-          when None       => "None",
-          when Always     => "Always",
-          when Fill       => "Fill",
-          when Percent_25 => "25%",
-          when Percent_50 => "50%",
-          when Percent_75 => "75%");
+          when None        => "None",
+          when Always      => "Always",
+          when Fill        => "Fill",
+          when Percent_25  => "25%",
+          when Percent_50  => "50%",
+          when Percent_75  => "75%",
+          when One_Of_Two  => "1/2",
+          when One_Of_Three => "1/3");
 
    ---------
    -- Img --

@@ -41,11 +41,13 @@ package body WNM.GUI.Menu.Track_Settings is
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This : in out Track_Settings_Menu)
    is
    begin
-      Draw_Menu_Box ((case This.Current_Setting is
+      Draw_Menu_Box ("Track settings",
+                     (case This.Current_Setting is
                          when Volume => "Trk Volume:" & WNM.Synth.Volume (Track)'Img & "%",
                          when Pan    => "Trk Pan:" & WNM.Synth.Pan (Track)'Img),
                      Top => This.Current_Setting /= Settings'First,
@@ -56,7 +58,8 @@ package body WNM.GUI.Menu.Track_Settings is
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
+   overriding
+   procedure On_Event
      (This  : in out Track_Settings_Menu;
       Event : Menu_Event)
    is
@@ -65,7 +68,8 @@ package body WNM.GUI.Menu.Track_Settings is
          when Left_Press =>
             null;
          when Right_Press =>
-            Menu.Pop (Exit_Value => None);
+            --  Never exit the step settings
+            null;
          when Encoder_Right =>
             case This.Current_Setting is
                when Volume =>

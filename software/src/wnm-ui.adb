@@ -31,8 +31,6 @@ with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
 with WNM.GUI.Menu;
 with WNM.GUI.Menu.Root;
-with WNM.GUI.Menu.Track_Settings;
-with WNM.GUI.Menu.Step_Settings;
 with WNM.Buttons;
 with WNM.LED;
 with HAL; use HAL;
@@ -50,7 +48,8 @@ package body WNM.UI is
    FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
    Current_Input_Mode : Input_Mode_Type := Note;
 
-   Editting_Step : Sequencer_Steps := 1;
+   Editing_Step : Sequencer_Steps := 1;
+   Editing_Pattern : Patterns := 1;
 
    ----------------
    -- Input_Mode --
@@ -80,56 +79,59 @@ package body WNM.UI is
       case Current_Input_Mode is
 
       when Note =>
-            case Evt is
-               when On_Press =>
-                  case B is
-                     when Func =>
-                        --  Switch to Func mode
+         case Evt is
+            when On_Press =>
+               case B is
+                  when Func =>
+                     --  Switch to Func mode
                         Current_Input_Mode := FX_Alt;
-                     when Play =>
-                        Sequencer.Play_Pause;
-                     when Rec =>
-                        Sequencer.Rec_Pressed;
-                     when Keyboard_Button =>
-                        Sequencer.On_Press (B);
-                     when Track_Button =>
-                        Current_Input_Mode := Track_Select;
-                     when Pattern_Button =>
-                        Current_Input_Mode := Pattern_Select;
-                     when Menu =>
-                        if not GUI.Menu.In_Menu then
-                           GUI.Menu.Root.Push_Root_Window;
-                        end if;
-                     when others => null;
-                  end case;
-               when On_Long_Press =>
-                  case B is
-                     when Play =>
-                        --  Switch to volume/BPM config mode
-                        Current_Input_Mode := Volume_BPM;
-                     when Rec =>
-                        --  Switch to squence edition mode
-                        Sequencer.Rec_Long;
-                     when B1 .. B16 =>
+                  when Play =>
+                     Sequencer.Play_Pause;
+                  when Rec =>
+                     Sequencer.Rec_Pressed;
+                  when Keyboard_Button =>
+                     if Sequencer.State
+                       in Sequencer.Edit | Sequencer.Play_And_Edit
+                     then
+                        Editing_Step := To_Value (B);
+                     end if;
 
-                        GUI.Menu.Step_Settings.Push_Window;
-                        Current_Input_Mode := Step_Edit;
-                        Editting_Step := To_Value (B);
+                     Sequencer.On_Press (B);
+                  when Step_Button =>
+                     Current_Input_Mode := Step_Select;
+                  when Track_Button =>
+                     Current_Input_Mode := Track_Select;
+                  when Pattern_Button =>
+                     Current_Input_Mode := Pattern_Select;
+                  when Menu =>
+                     GUI.Menu.Root.Push_Root_Window;
+                  when others => null;
+               end case;
+            when On_Long_Press =>
+               case B is
+                  when Play =>
+                     --  Switch to volume/BPM config mode
+                     Current_Input_Mode := Volume_BPM;
+                  when Rec =>
+                     --  Switch to squence edition mode
+                     Sequencer.Rec_Long;
+                  when B1 .. B16 =>
 
-
-                     when others => null;
-                  end case;
-               when On_Release =>
-                  case B is
-                     when Keyboard_Button =>
-                        --  Release note or octave Up/Down
-                        Sequencer.On_Release (B);
-                     when Rec =>
-                        Sequencer.Rec_Release;
-                     when others => null;
-                  end case;
-               when others => null;
-            end case;
+                     GUI.Menu.Open (GUI.Menu.Step_Menu);
+                     Editing_Step := To_Value (B);
+                  when others => null;
+               end case;
+            when On_Release =>
+               case B is
+                  when Keyboard_Button =>
+                     --  Release note or octave Up/Down
+                     Sequencer.On_Release (B);
+                  when Rec =>
+                     Sequencer.Rec_Release;
+                  when others => null;
+               end case;
+            when others => null;
+         end case;
 
          when Volume_BPM =>
             if B = Play and Evt = On_Release then
@@ -182,27 +184,37 @@ package body WNM.UI is
                end if;
             end if;
 
+         when Step_Select =>
+            if B in B1 .. B16 and then Evt = On_Press then
+               Editing_Step := To_Value (B);
+               GUI.Menu.Open (GUI.Menu.Step_Menu);
+            elsif B = Step_Button and then Evt = On_Release then
+               Current_Input_Mode := Default_Input_Mode;
+            end if;
+
          when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Sequencer.Select_Track (To_Value (B));
+               GUI.Menu.Open (GUI.Menu.Track_Menu);
             elsif B = Track_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
 
          when Pattern_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
-               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+               Editing_Pattern := To_Value (B);
+               GUI.Menu.Open (GUI.Menu.Pattern_Menu);
+            elsif B = Rec and then Evt = On_Press then
+               Current_Input_Mode := Pattern_Chaining;
             elsif B = Pattern_Button and then Evt = On_Release then
-               Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
 
-         when Step_Edit =>
+         when Pattern_Chaining =>
             if B in B1 .. B16 and then Evt = On_Press then
-               Editting_Step := To_Value (B);
-            end if;
-
-            if not WNM.GUI.Menu.In_Menu then
+               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+            elsif B = Pattern_Button and then Evt = On_Release then
+               Pattern_Sequencer.End_Sequence_Edit;
                Current_Input_Mode := Default_Input_Mode;
             end if;
       end case;
@@ -217,12 +229,19 @@ package body WNM.UI is
       FX_Is_On (B) := not FX_Is_On (B);
    end Toggle_FX;
 
+   -----------------------------
+   -- Current_Editing_Pattern --
+   -----------------------------
+
+   function Current_Editing_Pattern return Patterns
+   is (Editing_Pattern);
+
    ---------------------------
-   -- Current_Editting_Trig --
+   -- Current_Editing_Trig --
    ---------------------------
 
-   function Current_Editting_Trig return Sequencer_Steps
-   is (Editting_Step);
+   function Current_Editing_Trig return Sequencer_Steps
+   is (Editing_Step);
 
    -----------
    -- FX_On --
@@ -351,30 +370,20 @@ package body WNM.UI is
       L_Enco := WNM.Buttons.Left_Diff;
       R_Enco := WNM.Buttons.Right_Diff;
 
-      if GUI.Menu.In_Menu then
-         if L_Enco /= 0 then
-            GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Left,
-                                Value => L_Enco));
-         end if;
-         if R_Enco /= 0 then
+      case Current_Input_Mode is
+         when Volume_BPM =>
+            WNM.Sequencer.Change_BPM (R_Enco);
+            WNM.Master_Volume.Change (L_Enco);
+         when others =>
+            if L_Enco /= 0 then
+               GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Left,
+                                   Value => L_Enco));
+            end if;
+            if R_Enco /= 0 then
             GUI.Menu.On_Event ((Kind  => GUI.Menu.Encoder_Right,
                                 Value => R_Enco));
-         end if;
-      else
-         case Current_Input_Mode is
-            when Volume_BPM =>
-               WNM.Sequencer.Change_BPM (R_Enco);
-               WNM.Master_Volume.Change (L_Enco);
-            when Track_Select =>
-               null;
-               --  Quick_Synth.Change_Pan (Sequencer.Track, R_Enco);
-               --  Quick_Synth.Change_Volume (Sequencer.Track, L_Enco);
-            when others =>
-               if L_Enco /= 0 or else R_Enco /= 0 then
-                  GUI.Menu.Track_Settings.Push_Window;
-               end if;
-         end case;
-      end if;
+            end if;
+      end case;
 
       --------------
       -- Set LEDs --
@@ -411,6 +420,14 @@ package body WNM.UI is
                end if;
             end loop;
 
+            -- Step select mode --
+         when Step_Select =>
+            for B in B1 .. B16 loop
+               if Editing_Step = To_Value (B) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
+
             -- Track assign mode --
          when Track_Select =>
             for B in B1 .. B16 loop
@@ -421,6 +438,13 @@ package body WNM.UI is
 
             --  Pattern select --
          when Pattern_Select =>
+            for B in B1 .. B16 loop
+               if Editing_Pattern = To_Value (B) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
+
+         when Pattern_Chaining =>
             for B in B1 .. B16 loop
                if Pattern_Sequencer.Current_Pattern = To_Value (B) then
                   LED.Turn_On (B);

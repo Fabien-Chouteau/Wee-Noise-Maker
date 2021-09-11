@@ -19,12 +19,28 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.GUI.Menu.Step_Settings;
+with WNM.GUI.Menu.Track_Settings;
+
 package body WNM.GUI.Menu is
 
    subtype Stack_Index is Natural range 1 .. 10;
 
    Stack : array (Stack_Index) of Any_Menu_Window := (others => null);
-   Stack_Cnt : Natural;
+   Stack_Cnt : Natural := 0;
+
+   procedure Open (Kind : Base_Menu_Kind) is
+   begin
+      Exit_Menu;
+      case Kind is
+         when Step_Menu =>
+            GUI.Menu.Step_Settings.Push_Window;
+         when Track_Menu =>
+            GUI.Menu.Track_Settings.Push_Window;
+         when Pattern_Menu =>
+            raise Program_Error with "not implemented";
+      end case;
+   end Open;
 
    -------------
    -- In_Menu --

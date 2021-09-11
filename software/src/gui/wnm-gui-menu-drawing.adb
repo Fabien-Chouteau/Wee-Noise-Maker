@@ -24,55 +24,68 @@ with WNM.Screen;
 
 package body WNM.GUI.Menu.Drawing is
 
+   Title_Y_Offset : constant := 10;
+   Box_Y_Offset : constant := 19;
+
    -------------------
    -- Draw_Menu_Box --
    -------------------
 
    procedure Draw_Menu_Box
-     (Text        : String;
+     (Title       : String;
+      Text        : String;
       Top, Bottom : Boolean)
    is
-      X : Integer := 3;
+      X : Integer;
    begin
-      if Top then
-         Screen.Set_Pixel ((0, 0 + 8));
-         Screen.Set_Pixel ((1, 1 + 8));
 
-         Screen.Set_Pixel ((Screen.Width - 1, 0 + 8));
-         Screen.Set_Pixel ((Screen.Width - 2, 1 + 8));
+      X := (Screen.Width - Title'Length * Bitmap_Fonts.Width) / 2;
+      Print (X_Offset    => X,
+             Y_Offset    => Title_Y_Offset,
+             Str         => Title);
+
+      Screen.Draw_Dot_H_Line (Box_Y_Offset - 1);
+
+      if Top then
+         Screen.Set_Pixel ((0, 0 + Box_Y_Offset));
+         Screen.Set_Pixel ((1, 1 + Box_Y_Offset));
+
+         Screen.Set_Pixel ((Screen.Width - 1, 0 + Box_Y_Offset));
+         Screen.Set_Pixel ((Screen.Width - 2, 1 + Box_Y_Offset));
       end if;
 
       --  Top line
-      Screen.Draw_Line (Start => (2, 2 + 8),
-                        Stop  => (Screen.Width - 3, 2 + 8));
+      Screen.Draw_Line (Start => (2, 2 + Box_Y_Offset),
+                        Stop  => (Screen.Width - 3, 2 + Box_Y_Offset));
       --  Bottom line
-      Screen.Draw_Line (Start => (2, 12 + 8),
-                        Stop  => (Screen.Width - 3, 12 + 8));
+      Screen.Draw_Line (Start => (2, 12 + Box_Y_Offset),
+                        Stop  => (Screen.Width - 3, 12 + Box_Y_Offset));
 
       --  Side left
-      Screen.Draw_Line (Start => (0, 4 + 8),
-                        Stop  => (0, 10 + 8));
+      Screen.Draw_Line (Start => (0, 4 + Box_Y_Offset),
+                        Stop  => (0, 10 + Box_Y_Offset));
       --  Side right
-      Screen.Draw_Line (Start => (Screen.Width - 1, 4 + 8),
-                        Stop  => (Screen.Width - 1, 10 + 8));
+      Screen.Draw_Line (Start => (Screen.Width - 1, 4 + Box_Y_Offset),
+                        Stop  => (Screen.Width - 1, 10 + Box_Y_Offset));
 
-      Screen.Set_Pixel ((1, 3 + 8));
-      Screen.Set_Pixel ((1, 11 + 8));
-      Screen.Set_Pixel ((Screen.Width - 2, 3 + 8));
-      Screen.Set_Pixel ((Screen.Width - 2, 11 + 8));
+      Screen.Set_Pixel ((1, 3 + Box_Y_Offset));
+      Screen.Set_Pixel ((1, 11 + Box_Y_Offset));
+      Screen.Set_Pixel ((Screen.Width - 2, 3 + Box_Y_Offset));
+      Screen.Set_Pixel ((Screen.Width - 2, 11 + Box_Y_Offset));
 
+      X := 3;
       Print (X_Offset    => X,
-             Y_Offset    => 4 + 8,
+             Y_Offset    => 4 + Box_Y_Offset,
              Str         => Text);
 
       if Bottom then
-         Screen.Set_Pixel ((0, 15 + 8));
-         Screen.Set_Pixel ((0, 14 + 8));
-         Screen.Set_Pixel ((1, 13 + 8));
+         Screen.Set_Pixel ((0, 15 + Box_Y_Offset));
+         Screen.Set_Pixel ((0, 14 + Box_Y_Offset));
+         Screen.Set_Pixel ((1, 13 + Box_Y_Offset));
 
-         Screen.Set_Pixel ((Screen.Width - 2, 13 + 8));
-         Screen.Set_Pixel ((Screen.Width - 1, 14 + 8));
-         Screen.Set_Pixel ((Screen.Width - 1, 15 + 8));
+         Screen.Set_Pixel ((Screen.Width - 2, 13 + Box_Y_Offset));
+         Screen.Set_Pixel ((Screen.Width - 1, 14 + Box_Y_Offset));
+         Screen.Set_Pixel ((Screen.Width - 1, 15 + Box_Y_Offset));
       end if;
    end Draw_Menu_Box;
 

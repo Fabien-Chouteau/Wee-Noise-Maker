@@ -43,35 +43,15 @@ package body WNM.GUI.Update is
    Next_Start : Time.Time_Ms := Time.Time_Ms'First;
 
    function Header_Str return String is
-      Pat : constant Keyboard_Value := Current_Pattern;
+      Pat : constant Keyboard_Value := UI.Current_Editing_Pattern;
       Trk : constant Keyboard_Value := Track;
-      Stp : constant Keyboard_Value := UI.Current_Editting_Trig;
-
-      function To_Str (V : Keyboard_Value) return String
-      is (case V is
-             when 1 => "01",
-             when 2 => "02",
-             when 3 => "03",
-             when 4 => "04",
-             when 5 => "05",
-             when 6 => "06",
-             when 7 => "07",
-             when 8 => "08",
-             when 9 => "09",
-             when 10 => "10",
-             when 11 => "11",
-             when 12 => "12",
-             when 13 => "13",
-             when 14 => "14",
-             when 15 => "15",
-             when 16 => "16"
-         );
+      Stp : constant Keyboard_Value := UI.Current_Editing_Trig;
 
       Result : String (1 .. 11) := "P00:T00:S00";
    begin
-      Result (2 .. 3) := To_Str (Pat);
-      Result (6 .. 7) := To_Str (Trk);
-      Result (10 .. 11) := To_Str (Stp);
+      Result (2 .. 3) := Img (Pat);
+      Result (6 .. 7) := Img (Trk);
+      Result (10 .. 11) := Img (Stp);
       return Result;
    end Header_Str;
 
@@ -107,11 +87,9 @@ package body WNM.GUI.Update is
       Print (X_Offset    => B,
              Y_Offset    => 0,
              Str         => Header_Str);
+      Screen.Draw_H_Line (8);
 
-      if Menu.In_Menu then
-         Menu.Draw;
-      else
-         case WNM.UI.Input_Mode is
+      case WNM.UI.Input_Mode is
          when WNM.UI.Volume_BPM =>
             BPM := Integer (WNM.Sequencer.BPM);
             Volume := Integer (WNM.Master_Volume.Value);
@@ -124,6 +102,15 @@ package body WNM.GUI.Update is
                                           Value => BPM,
                                           Min   => 50,
                                           Max   => 200);
+         when WNM.UI.Step_Select =>
+            B := 1;
+            Print (X_Offset    => B,
+                   Y_Offset    => 0 + 8,
+                   Str         => "Select step");
+            B := 1;
+            Print (X_Offset    => B,
+                   Y_Offset    => 9 + 8,
+                   Str         => "Current: " & Img (UI.Current_Editing_Trig));
          when WNM.UI.Track_Select =>
             B := 1;
             Print (X_Offset    => B,
@@ -137,13 +124,22 @@ package body WNM.GUI.Update is
             B := 1;
             Print (X_Offset    => B,
                    Y_Offset    => 0 + 8,
+                   Str         => "Select pattern");
+            B := 1;
+            Print (X_Offset    => B,
+                   Y_Offset    => 9 + 8,
+                   Str         => "Current: " & Img (Current_Pattern));
+         when WNM.UI.Pattern_Chaining =>
+            B := 1;
+            Print (X_Offset    => B,
+                   Y_Offset    => 0 + 8,
                    Str         => "Chain patterns");
             B := 1;
             Print (X_Offset    => B,
                    Y_Offset    => 9 + 8,
                    Str         => "Current: " & Img (Current_Pattern));
          when WNM.UI.Note =>
-            null;
+            Menu.Draw;
          when WNM.UI.FX_Alt =>
             B := 1;
             Print (X_Offset    => B,
@@ -171,10 +167,7 @@ package body WNM.GUI.Update is
                       Y_Offset    => 16 + 8,
                       Str         => "To   " & Image (WNM.UI.Copy_T.To, TB));
             end;
-         when WNM.UI.Step_Edit =>
-            null; --  Step edit is a menu
-         end case;
-      end if;
+      end case;
 
       WNM.GUI.Popup.Update;
 

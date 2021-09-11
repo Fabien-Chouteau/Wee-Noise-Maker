@@ -64,6 +64,9 @@ package WNM.Synth is
 
    function Update return WNM.Time.Time_Ms;
 
+   procedure Next_Samples (Output : out Audio.Stereo_Buffer;
+                           Input  :     Audio.Stereo_Buffer);
+
    procedure Set_Passthrough (Kind : Audio.Input_Kind);
    function Get_Passthrough return Audio.Input_Kind;
 

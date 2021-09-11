@@ -20,9 +20,9 @@ package WNM.Audio is
    type DAC_Volume is range 0 .. 100;
    procedure Set_Volume (Volume : DAC_Volume);
 
-   generic
-      with procedure Process (Out_L, Out_R : out Mono_Buffer;
-                              In_L,  In_R  :     Mono_Buffer);
-   procedure Generate_Audio;
+   --  generic
+   --     with procedure Process (Out_L, Out_R : out Mono_Buffer;
+   --                             In_L,  In_R  :     Mono_Buffer);
+   --  procedure Generate_Audio;
 
 end WNM.Audio;

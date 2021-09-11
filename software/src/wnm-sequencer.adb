@@ -55,6 +55,9 @@ package body WNM.Sequencer is
 
    Next_Start : Synth.Sample_Time := Synth.Sample_Time'First;
 
+   Pattern_Counter : array (Patterns) of UInt32;
+   --  Count how many times a pattern has played
+
    type Microstep_Cnt is mod 2;
    Microstep : Microstep_Cnt := 1;
 
@@ -387,6 +390,10 @@ package body WNM.Sequencer is
 
       Note_Duration : constant Sample_Time := Samples_Per_Beat / 4;
    begin
+      if Step = Sequencer_Steps'First then
+         Pattern_Counter (Pattern) := Pattern_Counter (Pattern) + 1;
+      end if;
+
       for Track in Tracks loop
          declare
             S : Step_Rec renames Sequences (Pattern) (Track) (Step);
@@ -404,6 +411,10 @@ package body WNM.Sequencer is
                Condition := Random <= 50;
             when Percent_75 =>
                Condition := Random <= 75;
+            when One_Of_Two =>
+               Condition := Pattern_Counter (Pattern) mod 2 = 0;
+            when One_Of_Three =>
+               Condition := Pattern_Counter (Pattern) mod 3 = 0;
             end case;
 
             if Condition then

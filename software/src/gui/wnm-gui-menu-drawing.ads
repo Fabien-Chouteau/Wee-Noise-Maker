@@ -22,7 +22,8 @@
 package WNM.GUI.Menu.Drawing is
 
    procedure Draw_Menu_Box
-     (Text        : String;
+     (Title       : String;
+      Text        : String;
       Top, Bottom : Boolean);
 
 end WNM.GUI.Menu.Drawing;

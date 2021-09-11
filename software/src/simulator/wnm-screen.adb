@@ -103,7 +103,6 @@ package body WNM.Screen is
 
    procedure Clear is
    begin
-      null;
       Screen_Pixels := (others => (others => False));
    end Clear;
 
@@ -177,6 +176,29 @@ package body WNM.Screen is
 
       Set_Pixel ((X, Y), On);
    end Draw_Line;
+
+   -----------------
+   -- Draw_H_Line --
+   -----------------
+
+   procedure Draw_H_Line (Y : Natural; On : Boolean := True) is
+   begin
+      for X in 0 .. Width - 1 loop
+         Screen_Pixels (X, Y) := On;
+      end loop;
+   end Draw_H_Line;
+
+   ---------------------
+   -- Draw_Dot_H_Line --
+   ---------------------
+
+   procedure Draw_Dot_H_Line (Y : Natural; On : Boolean := True) is
+   begin
+      for X in 0 .. Width - 1 loop
+         Screen_Pixels (X, Y) := (if (X mod 2) = 0 then On else not On);
+      end loop;
+   end Draw_Dot_H_Line;
+
 
    -----------------
    -- Copy_Bitmap --

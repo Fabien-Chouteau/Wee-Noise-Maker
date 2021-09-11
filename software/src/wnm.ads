@@ -41,7 +41,8 @@ package WNM is
    subtype Tracks is Keyboard_Value;
    subtype Patterns is Keyboard_Value;
 
-   type Trigger is (None, Always, Fill, Percent_25, Percent_50, Percent_75);
+   type Trigger is (None, Always, Fill, Percent_25, Percent_50, Percent_75,
+                    One_Of_Two, One_Of_Three);
    function Img (T : Trigger) return String;
 
    type Repeat is mod 9;
@@ -70,11 +71,11 @@ package WNM is
    --  alternative function.
 
    Sample_Frequency            : constant := 44_100;
-   Samples_Per_Buffer          : constant := 512;
+   Samples_Per_Buffer          : constant := 1024;
    Mono_Buffer_Size_In_Bytes   : constant := Samples_Per_Buffer * 2;
    Stereo_Buffer_Size_In_Bytes : constant := Samples_Per_Buffer * 4;
 
-   Audio_Queue_Size : constant := 5;
+   Audio_Queue_Size : constant := 3;
 
    Sample_Rec_Filepath : constant String := "/sample_rec.raw";
 
@@ -107,4 +108,5 @@ package WNM is
           when 15 => "15",
           when 16 => "16")
    with Inline_Always;
+
 end WNM;

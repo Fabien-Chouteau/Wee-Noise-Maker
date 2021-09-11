@@ -41,6 +41,9 @@ package WNM.Screen is
    procedure Fill_Rect (R : Rect; On : Boolean := True);
    procedure Draw_Line (Start, Stop : Point; On : Boolean := True);
 
+   procedure Draw_H_Line (Y : Natural; On : Boolean := True);
+   procedure Draw_Dot_H_Line (Y : Natural; On : Boolean := True);
+
    type Unsigned_8_Array is array (Positive range <>) of Interfaces.Unsigned_8;
 
    type Bitmap (Length_Byte : Positive) is record

@@ -31,13 +31,15 @@ package WNM.UI is
                             Volume_BPM,
                             FX_Alt,
                             Copy,
+                            Step_Select,
                             Track_Select,
                             Pattern_Select,
-                            Step_Edit);
+                            Pattern_Chaining);
 
    function Input_Mode return Input_Mode_Type;
 
-   function Current_Editting_Trig return Sequencer_Steps;
+   function Current_Editing_Pattern return Patterns;
+   function Current_Editing_Trig return Sequencer_Steps;
 
    function FX_On (B : Keyboard_Button) return Boolean;
 
