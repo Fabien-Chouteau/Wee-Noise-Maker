@@ -41,7 +41,8 @@ package body WNM.GUI.Menu.Sample_Select is
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This : in out Sample_Select_Window)
    is
    begin
@@ -54,23 +55,24 @@ package body WNM.GUI.Menu.Sample_Select is
           This.From > This.To
       then
          Draw_Menu_Box ("Sample select",
-                        Text   => "No samples...",
-                        Top    => False,
-                        Bottom => False);
+                        --  Text   => "No samples...",
+                        Count  => 1,
+                        Index  => 0);
          return;
       end if;
 
       Draw_Menu_Box ("Sample select",
-                     Text   => Entry_Name (This.Index),
-                     Top    => This.Index /= This.From,
-                     Bottom => This.Index /= This.To);
+                     --  Text  => Entry_Name (This.Index),
+                     Count => This.To - This.From + 1,
+                     Index => This.Index);
    end Draw;
 
    --------------
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
+   overriding
+   procedure On_Event
      (This  : in out Sample_Select_Window;
       Event : Menu_Event)
    is

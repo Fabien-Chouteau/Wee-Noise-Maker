@@ -178,6 +178,42 @@ package body WNM.Screen is
    end Draw_Line;
 
    -----------------
+   -- Draw_Circle --
+   -----------------
+
+   procedure Draw_Circle (Center : Point; Radius : Natural) is
+      F     : Integer := 1 - Radius;
+      ddF_X : Integer := 0;
+      ddF_Y : Integer := (-2) * Radius;
+      X     : Integer := 0;
+      Y     : Integer := Radius;
+   begin
+      Set_Pixel ((Center.X, Center.Y + Radius));
+      Set_Pixel ((Center.X, Center.Y - Radius));
+      Set_Pixel ((Center.X + Radius, Center.Y));
+      Set_Pixel ((Center.X - Radius, Center.Y));
+
+      while X < Y loop
+         if F >= 0 then
+            Y := Y - 1;
+            ddF_Y := ddF_Y + 2;
+            F := F + ddF_Y;
+         end if;
+         X := X + 1;
+         ddF_X := ddF_X + 2;
+         F := F + ddF_X + 1;
+         Set_Pixel ((Center.X + X, Center.Y + Y));
+         Set_Pixel ((Center.X - X, Center.Y + Y));
+         Set_Pixel ((Center.X + X, Center.Y - Y));
+         Set_Pixel ((Center.X - X, Center.Y - Y));
+         Set_Pixel ((Center.X + Y, Center.Y + X));
+         Set_Pixel ((Center.X - Y, Center.Y + X));
+         Set_Pixel ((Center.X + Y, Center.Y - X));
+         Set_Pixel ((Center.X - Y, Center.Y - X));
+      end loop;
+   end Draw_Circle;
+
+   -----------------
    -- Draw_H_Line --
    -----------------
 

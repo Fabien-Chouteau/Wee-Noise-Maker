@@ -19,31 +19,31 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.GUI.Menu.Track_Settings is
+package WNM.GUI.Menu.Pattern_Settings is
 
    procedure Push_Window;
 
 private
 
-   type Settings is (Volume, Pan);
+   type Settings is (Nothing);
    function Settings_Count is new Enum_Count (Settings);
 
-   type Track_Settings_Menu is new Menu_Window with record
+   type Pattern_Settings_Menu is new Menu_Window with record
       Current_Setting : Settings := Settings'First;
    end record;
 
    overriding
-   procedure Draw (This : in out Track_Settings_Menu);
+   procedure Draw (This : in out Pattern_Settings_Menu);
 
    overriding
-   procedure On_Event (This  : in out Track_Settings_Menu;
+   procedure On_Event (This  : in out Pattern_Settings_Menu;
                        Event : Menu_Event);
 
    overriding
-   procedure On_Pushed (This  : in out Track_Settings_Menu);
+   procedure On_Pushed (This  : in out Pattern_Settings_Menu);
 
    overriding
-   procedure On_Focus (This       : in out Track_Settings_Menu;
+   procedure On_Focus (This       : in out Pattern_Settings_Menu;
                        Exit_Value : Window_Exit_Value);
 
-end WNM.GUI.Menu.Track_Settings;
+end WNM.GUI.Menu.Pattern_Settings;

@@ -60,20 +60,45 @@ package body WNM.GUI.Menu.Step_Settings is
       is (if Sequencer.CC_Enabled (Trig, Id)
           then CC_Letter (Id) & Sequencer.CC_Value (Trig, Id)'Img
           else CC_Letter (Id) & "- disabled -");
+      pragma Unreferenced (CC_String);
    begin
       Draw_Menu_Box ("Step settings",
-                     (case This.Current_Setting is
-                        when Condition   => Img (Sequencer.Trig (Trig)),
-                        when Note        => "Note:" & Sequencer.Note (Trig)'Img,
-                        when Repeat      => "Repeat:" & Sequencer.Repeat (Trig)'Img,
-                        when Repeat_Rate => "Rate:" & Img (Sequencer.Repeat_Rate (Trig)),
-                        when Velo        => "Velocity: " & Sequencer.Velo (Trig)'Img,
-                        when CC_A        => CC_String (A),
-                        when CC_B        => CC_String (B),
-                        when CC_C        => CC_String (C),
-                        when CC_D        => CC_String (D)),
-                     Top => This.Current_Setting /= Settings'First,
-                     Bottom => This.Current_Setting /= Settings'Last);
+                     Count => Settings_Count,
+                     Index => Settings'Pos (This.Current_Setting));
+
+      case This.Current_Setting is
+         when Condition =>
+            Draw_Text ("Condition", Img (Sequencer.Trig (Trig)));
+
+         when Note      =>
+            Draw_MIDI_Val ("Note", Sequencer.Note (Trig));
+
+         when Repeat =>
+            Draw_Text ("Repeat Count", Sequencer.Repeat (Trig)'Img);
+
+         when Repeat_Rate =>
+            Draw_Text ("Repeat Rate", Img (Sequencer.Repeat_Rate (Trig)));
+
+         when Velo =>
+            Draw_MIDI_Val ("Velocity", Sequencer.Velo (Trig));
+
+         when CC_A .. CC_D =>
+            declare
+               Id : constant Sequencer.CC_Id :=
+                 (case This.Current_Setting is
+                  when CC_A => Sequencer.A,
+                  when CC_B => Sequencer.B,
+                  when CC_C => Sequencer.C,
+                  when others => Sequencer.D);
+            begin
+               if Sequencer.CC_Enabled (Trig, Id) then
+                  Draw_MIDI_Val ("CC " & CC_Letter (Id),
+                                 Sequencer.CC_Value (Trig, Id));
+               else
+                  Draw_Text ("CC " & CC_Letter (Id), "- Disabled -");
+               end if;
+            end;
+      end case;
    end Draw;
 
    --------------
@@ -152,10 +177,14 @@ package body WNM.GUI.Menu.Step_Settings is
             if Event.Value > 0 then
                if This.Current_Setting /= Settings'Last then
                   This.Current_Setting := Settings'Succ (This.Current_Setting);
+               else
+                  This.Current_Setting := Settings'First;
                end if;
             elsif Event.Value < 0 then
                if This.Current_Setting /= Settings'First then
                   This.Current_Setting := Settings'Pred (This.Current_Setting);
+               else
+                  This.Current_Setting := Settings'Last;
                end if;
             end if;
       end case;

@@ -20,12 +20,16 @@
 -------------------------------------------------------------------------------
 
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
-with WNM.Screen;
 
 package body WNM.GUI.Menu.Drawing is
 
    Title_Y_Offset : constant := 10;
-   Box_Y_Offset : constant := 19;
+   Scroll_Bar_Y_Offset : constant := 19;
+
+   Value_Text_Y : constant := Box_Bottom - 15;
+
+   Arrow_Y_Offset : constant :=
+     Box_Top + ((Box_Bottom - Box_Top + 1) - Bitmap_Fonts.Height) / 2;
 
    -------------------
    -- Draw_Menu_Box --
@@ -33,8 +37,8 @@ package body WNM.GUI.Menu.Drawing is
 
    procedure Draw_Menu_Box
      (Title       : String;
-      Text        : String;
-      Top, Bottom : Boolean)
+      Count       : Positive;
+      Index       : Natural)
    is
       X : Integer;
    begin
@@ -44,49 +48,153 @@ package body WNM.GUI.Menu.Drawing is
              Y_Offset    => Title_Y_Offset,
              Str         => Title);
 
-      Screen.Draw_Dot_H_Line (Box_Y_Offset - 1);
+      declare
+         X_Offset : constant Natural := (Screen.Width - Count * 3) / 2;
+      begin
+         for Item in 0 .. Count - 1 loop
+            Screen.Set_Pixel ((X_Offset + Item * 3, Scroll_Bar_Y_Offset));
+            Screen.Set_Pixel ((X_Offset + Item * 3 + 1, Scroll_Bar_Y_Offset));
+         end loop;
 
-      if Top then
-         Screen.Set_Pixel ((0, 0 + Box_Y_Offset));
-         Screen.Set_Pixel ((1, 1 + Box_Y_Offset));
+         Screen.Set_Pixel ((X_Offset + Index * 3, Scroll_Bar_Y_Offset + 1));
+         Screen.Set_Pixel ((X_Offset + Index * 3 + 1, Scroll_Bar_Y_Offset + 1));
+      end;
 
-         Screen.Set_Pixel ((Screen.Width - 1, 0 + Box_Y_Offset));
-         Screen.Set_Pixel ((Screen.Width - 2, 1 + Box_Y_Offset));
+      if Index < Count - 1 then
+         X := Box_Right + 1;
+         Print (X_Offset => X,
+                Y_Offset => Arrow_Y_Offset,
+                C        => '>');
       end if;
 
       --  Top line
-      Screen.Draw_Line (Start => (2, 2 + Box_Y_Offset),
-                        Stop  => (Screen.Width - 3, 2 + Box_Y_Offset));
+      Screen.Draw_Line (Start => (Box_Left + 2, Box_Top),
+                        Stop  => (Box_Right - 2, Box_Top));
       --  Bottom line
-      Screen.Draw_Line (Start => (2, 12 + Box_Y_Offset),
-                        Stop  => (Screen.Width - 3, 12 + Box_Y_Offset));
+      Screen.Draw_Line (Start => (Box_Left + 2, Box_Bottom),
+                        Stop  => (Box_Right - 2, Box_Bottom));
 
       --  Side left
-      Screen.Draw_Line (Start => (0, 4 + Box_Y_Offset),
-                        Stop  => (0, 10 + Box_Y_Offset));
+      Screen.Draw_Line (Start => (Box_Left, Box_Top + 2),
+                        Stop  => (Box_Left, Box_Bottom - 2));
       --  Side right
-      Screen.Draw_Line (Start => (Screen.Width - 1, 4 + Box_Y_Offset),
-                        Stop  => (Screen.Width - 1, 10 + Box_Y_Offset));
+      Screen.Draw_Line (Start => (Box_Right, Box_Top + 2),
+                        Stop  => (Box_Right, Box_Bottom - 2));
 
-      Screen.Set_Pixel ((1, 3 + Box_Y_Offset));
-      Screen.Set_Pixel ((1, 11 + Box_Y_Offset));
-      Screen.Set_Pixel ((Screen.Width - 2, 3 + Box_Y_Offset));
-      Screen.Set_Pixel ((Screen.Width - 2, 11 + Box_Y_Offset));
+      Screen.Set_Pixel ((Box_Left + 1, Box_Top + 1));
+      Screen.Set_Pixel ((Box_Left + 1, Box_Bottom - 1));
+      Screen.Set_Pixel ((Box_Right - 1, Box_Top + 1));
+      Screen.Set_Pixel ((Box_Right - 1, Box_Bottom - 1));
 
-      X := 3;
-      Print (X_Offset    => X,
-             Y_Offset    => 4 + Box_Y_Offset,
-             Str         => Text);
-
-      if Bottom then
-         Screen.Set_Pixel ((0, 15 + Box_Y_Offset));
-         Screen.Set_Pixel ((0, 14 + Box_Y_Offset));
-         Screen.Set_Pixel ((1, 13 + Box_Y_Offset));
-
-         Screen.Set_Pixel ((Screen.Width - 2, 13 + Box_Y_Offset));
-         Screen.Set_Pixel ((Screen.Width - 1, 14 + Box_Y_Offset));
-         Screen.Set_Pixel ((Screen.Width - 1, 15 + Box_Y_Offset));
+      if Index /= 0 then
+         X := 0;
+         Print (X_Offset => X,
+                Y_Offset => Arrow_Y_Offset,
+                C        => '<');
       end if;
    end Draw_Menu_Box;
+
+   ---------------------
+   -- Draw_Precentage --
+   ---------------------
+
+   procedure Draw_Precentage (Title : String;
+                              Val : Percentage)
+   is
+      X : Integer := Box_Center.X - 50;
+   begin
+      Print (X_Offset    => X,
+             Y_Offset    => 4 + Box_Top + 4,
+             Str         => Title);
+
+      Screen.Draw_Line ((Box_Center.X - 50, Box_Center.Y),
+                        (Box_Center.X + 50, Box_Center.Y));
+
+      Screen.Draw_Line ((Box_Center.X - 50 + Val, Box_Center.Y - 2),
+                        (Box_Center.X - 50 + Val, Box_Center.Y + 2));
+
+      X := Box_Center.X - 50;
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Val'Img & "%");
+
+   end Draw_Precentage;
+
+   --------------
+   -- Draw_Pan --
+   --------------
+
+   procedure Draw_Pan (Title : String;
+                       Val : Pan)
+   is
+      X : Integer := Box_Center.X - 50;
+   begin
+      Print (X_Offset    => X,
+             Y_Offset    => 4 + Box_Top + 4,
+             Str         => Title);
+
+      Screen.Draw_Line ((Box_Center.X - 50, Box_Center.Y),
+                        (Box_Center.X + 50, Box_Center.Y));
+
+      Screen.Draw_Line ((Box_Center.X + Val, Box_Center.Y - 2),
+                        (Box_Center.X + Val, Box_Center.Y + 2));
+
+      X := Box_Center.X - 50;
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Val'Img);
+   end Draw_Pan;
+
+   -------------------
+   -- Draw_MIDI_Val --
+   -------------------
+
+   procedure Draw_MIDI_Val (Title : String;
+                            Val   : MIDI.MIDI_Data)
+   is
+      X : Integer := Box_Center.X - 50;
+   begin
+      Print (X_Offset    => X,
+             Y_Offset    => 4 + Box_Top + 4,
+             Str         => Title);
+
+      X := Box_Center.X - 50;
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Val'Img);
+   end Draw_MIDI_Val;
+
+   ---------------
+   -- Draw_Text --
+   ---------------
+
+   procedure Draw_Text (Title : String;
+                        Val   : String)
+   is
+      X : Integer := Box_Center.X - 50;
+   begin
+      Print (X_Offset    => X,
+             Y_Offset    => 4 + Box_Top + 4,
+             Str         => Title);
+
+      X := Box_Center.X - 50;
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Val);
+   end Draw_Text;
+
+   ---------------
+   -- Draw_Knob --
+   ---------------
+
+   procedure Draw_Knob (Title : String;
+                        Value : Natural)
+   is
+      pragma Unreferenced (Title, Value);
+   begin
+      Screen.Draw_Line ((Box_Left, Box_Center.Y),
+                        (Box_Left + 100, Box_Center.Y));
+      Screen.Draw_Circle (Box_Center, 15);
+   end Draw_Knob;
 
 end WNM.GUI.Menu.Drawing;

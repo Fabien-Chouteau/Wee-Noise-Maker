@@ -35,6 +35,8 @@ private
                        Settings,
                        Shutdown);
 
+   function Menu_Items_Count is new Enum_Count (Menu_Items);
+
    type Root_Menu is new Menu_Window with record
       Item : Menu_Items;
    end record;

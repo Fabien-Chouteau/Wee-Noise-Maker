@@ -30,11 +30,11 @@ with WNM.Sequence_Copy;     use WNM.Sequence_Copy;
 with WNM.Pattern_Sequencer; use WNM.Pattern_Sequencer;
 with WNM.Master_Volume;
 with WNM.GUI.Menu;
+with WNM.GUI.Menu.Drawing;  use WNM.GUI.Menu.Drawing;
 with WNM.GUI.Logo;
 with WNM.GUI.Popup;
 --  with WNM.Sample_Library;    use WNM.Sample_Library;
 
---  with Quick_Synth;           use Quick_Synth;
 
 package body WNM.GUI.Update is
 
@@ -105,45 +105,45 @@ package body WNM.GUI.Update is
          when WNM.UI.Step_Select =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0 + 8,
+                   Y_Offset    => Box_Top,
                    Str         => "Select step");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9 + 8,
+                   Y_Offset    => Box_Top + 9,
                    Str         => "Current: " & Img (UI.Current_Editing_Trig));
          when WNM.UI.Track_Select =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0 + 8,
+                   Y_Offset    => Box_Top,
                    Str         => "Select track");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9 + 8,
+                   Y_Offset    => Box_Top + 9,
                    Str         => "Current: " & Img (Track));
          when WNM.UI.Pattern_Select =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0 + 8,
+                   Y_Offset    => Box_Top,
                    Str         => "Select pattern");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9 + 8,
+                   Y_Offset    => Box_Top + 9,
                    Str         => "Current: " & Img (Current_Pattern));
          when WNM.UI.Pattern_Chaining =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0 + 8,
+                   Y_Offset    => Box_Top,
                    Str         => "Chain patterns");
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 9 + 8,
+                   Y_Offset    => Box_Top + 9,
                    Str         => "Current: " & Img (Current_Pattern));
          when WNM.UI.Note =>
             Menu.Draw;
          when WNM.UI.FX_Alt =>
             B := 1;
             Print (X_Offset    => B,
-                   Y_Offset    => 0 + 8,
+                   Y_Offset    => Box_Top,
                    Str         => "FX/Copy",
                    Invert_From => 0);
          when WNM.UI.Copy =>
@@ -156,15 +156,15 @@ package body WNM.GUI.Update is
             begin
                B := 1;
                Print (X_Offset    => B,
-                      Y_Offset    => 0 + 8,
+                      Y_Offset    => Box_Top,
                       Str         => "Copy " & WNM.UI.Copy_T.From.Kind'Img);
                B := 1;
                Print (X_Offset    => B,
-                      Y_Offset    => 8 + 8,
+                      Y_Offset    => Box_Top + 9,
                       Str         => "From " & Image (WNM.UI.Copy_T.From, FB));
                B := 1;
                Print (X_Offset    => B,
-                      Y_Offset    => 16 + 8,
+                      Y_Offset    => Box_Top + 18,
                       Str         => "To   " & Image (WNM.UI.Copy_T.To, TB));
             end;
       end case;

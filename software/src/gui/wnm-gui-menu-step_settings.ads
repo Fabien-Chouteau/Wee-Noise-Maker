@@ -27,6 +27,7 @@ private
 
    type Settings is (Condition, Note, Repeat, Repeat_Rate, Velo,
                      CC_A, CC_B, CC_C, CC_D);
+   function Settings_Count is new Enum_Count (Settings);
 
    type Step_Settings_Menu is new Menu_Window with record
       Current_Setting : Settings := Settings'First;

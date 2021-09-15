@@ -88,6 +88,13 @@ package body WNM is
           when 15 => B15,
           when 16 => B16);
 
+   ----------------
+   -- Enum_Count --
+   ----------------
+
+   function Enum_Count return Natural
+   is (T'Pos (T'Last) - T'Pos (T'First) + 1);
+
    --  --------------
    --  -- To_Track --
    --  --------------

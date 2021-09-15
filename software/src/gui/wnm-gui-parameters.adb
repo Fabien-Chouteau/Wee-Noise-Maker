@@ -1,6 +1,7 @@
 
 with WNM.Screen;
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
+with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
 
 package body WNM.GUI.Parameters is
 
@@ -11,7 +12,7 @@ package body WNM.GUI.Parameters is
    --------------
 
    function Y_Offset (Slot : Parameter_Slot) return Integer
-   is (if Slot = Up then 0 + 8 else 8 + 8);
+   is (if Slot = Up then Box_Top else Box_Top + 8);
 
    ---------------
    -- Print_Int --

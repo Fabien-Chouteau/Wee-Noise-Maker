@@ -109,4 +109,8 @@ package WNM is
           when 16 => "16")
    with Inline_Always;
 
+   generic
+      type T is (<>);
+   function Enum_Count return Natural;
+
 end WNM;

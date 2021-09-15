@@ -204,27 +204,28 @@ package body WNM_Sim is
                Set_View (Letter_Box_View, Event.size.width, Event.size.height);
             end if;
 
-            if Event.eventType in sfEvtKeyPressed | sfEvtKeyReleased then
-
+            if Event.eventType in sfEvtKeyPressed then
                if Event.key.code = sfKeyEscape then
                   Close (Window);
                   Put_Line ("Attempting to close");
                   GNAT.OS_Lib.OS_Exit (0);
                elsif Event.key.code = sfKeyRight then
-                  Encoder_Right := Encoder_Right + 1;
+                  Encoder_Right := 1;
                elsif Event.key.code = sfKeyLeft then
-                  Encoder_Right := Encoder_Right - 1;
+                  Encoder_Right := -1;
                elsif Event.key.code = sfKeyDown then
-                  Encoder_Left := Encoder_Left + 1;
+                  Encoder_Left := 1;
                elsif Event.key.code = sfKeyUp then
-                  Encoder_Left := Encoder_Left - 1;
-               else
-                  for K in SFML_Keys loop
-                     if Event.key.code = To_SFML_Evt (K) then
-                        SFML_Pressed (K) := Event.eventType = sfEvtKeyPressed;
-                     end if;
-                  end loop;
+                  Encoder_Left := -1;
                end if;
+            end if;
+
+            if Event.eventType in sfEvtKeyPressed | sfEvtKeyReleased then
+               for K in SFML_Keys loop
+                  if Event.key.code = To_SFML_Evt (K) then
+                     SFML_Pressed (K) := Event.eventType = sfEvtKeyPressed;
+                  end if;
+               end loop;
             end if;
          end loop;
 

@@ -21,12 +21,10 @@
 
 with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
-with WNM.Synth;
-with WNM.Sequencer;        use WNM.Sequencer;
 
-package body WNM.GUI.Menu.Track_Settings is
+package body WNM.GUI.Menu.Pattern_Settings is
 
-   Track_Settings_Singleton : aliased Track_Settings_Menu;
+   Pattern_Menu_Singleton : aliased Pattern_Settings_Menu;
 
    -----------------
    -- Push_Window --
@@ -34,7 +32,7 @@ package body WNM.GUI.Menu.Track_Settings is
 
    procedure Push_Window is
    begin
-      Push (Track_Settings_Singleton'Access);
+      Push (Pattern_Menu_Singleton'Access);
    end Push_Window;
 
    ----------
@@ -42,18 +40,12 @@ package body WNM.GUI.Menu.Track_Settings is
    ----------
 
    overriding
-   procedure Draw
-     (This : in out Track_Settings_Menu)
+   procedure Draw (This : in out Pattern_Settings_Menu)
    is
    begin
-      Draw_Menu_Box ("Track settings",
+      Draw_Menu_Box ("Pattern settings",
                      Count => Settings_Count,
                      Index => Settings'Pos (This.Current_Setting));
-      case This.Current_Setting is
-         when Volume => Draw_Precentage ("Volume", WNM.Synth.Volume (Track));
-         when Pan    => Draw_Pan ("Pan", WNM.Synth.Pan (Track) / 2);
-      end case;
-
    end Draw;
 
    --------------
@@ -61,9 +53,8 @@ package body WNM.GUI.Menu.Track_Settings is
    --------------
 
    overriding
-   procedure On_Event
-     (This  : in out Track_Settings_Menu;
-      Event : Menu_Event)
+   procedure On_Event (This  : in out Pattern_Settings_Menu;
+                       Event : Menu_Event)
    is
    begin
       case Event.Kind is
@@ -73,13 +64,9 @@ package body WNM.GUI.Menu.Track_Settings is
             --  Never exit the step settings
             null;
          when Encoder_Right =>
-            case This.Current_Setting is
-               when Volume =>
-                  WNM.Synth.Change_Volume (Track, Event.Value);
-               when Pan =>
-                  Synth.Change_Pan (Track, Event.Value);
-            end case;
+            null;
          when Encoder_Left =>
+            pragma Warnings (Off, "condition can only be True");
             if Event.Value > 0 then
                if This.Current_Setting /= Settings'Last then
                   This.Current_Setting := Settings'Succ (This.Current_Setting);
@@ -93,15 +80,16 @@ package body WNM.GUI.Menu.Track_Settings is
                   This.Current_Setting := Settings'Last;
                end if;
             end if;
+            pragma Warnings (On, "condition can only be True");
       end case;
    end On_Event;
 
-      ---------------
+   ---------------
    -- On_Pushed --
    ---------------
 
-   overriding procedure On_Pushed
-     (This  : in out Track_Settings_Menu)
+   overriding
+   procedure On_Pushed (This  : in out Pattern_Settings_Menu)
    is
    begin
       null;
@@ -111,12 +99,12 @@ package body WNM.GUI.Menu.Track_Settings is
    -- On_Focus --
    --------------
 
-   overriding procedure On_Focus
-     (This       : in out Track_Settings_Menu;
-      Exit_Value : Window_Exit_Value)
+   overriding
+   procedure On_Focus (This       : in out Pattern_Settings_Menu;
+                       Exit_Value : Window_Exit_Value)
    is
    begin
       null;
    end On_Focus;
 
-end WNM.GUI.Menu.Track_Settings;
+end WNM.GUI.Menu.Pattern_Settings;

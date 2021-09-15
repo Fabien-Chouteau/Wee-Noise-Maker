@@ -40,7 +40,7 @@ package WNM.Screen is
    procedure Set_Pixel (Pt : Point; On : Boolean := True);
    procedure Fill_Rect (R : Rect; On : Boolean := True);
    procedure Draw_Line (Start, Stop : Point; On : Boolean := True);
-
+   procedure Draw_Circle (Center : Point; Radius : Natural);
    procedure Draw_H_Line (Y : Natural; On : Boolean := True);
    procedure Draw_Dot_H_Line (Y : Natural; On : Boolean := True);
 
@@ -61,6 +61,10 @@ package WNM.Screen is
    procedure Power_Down;
 
 private
+
+   pragma Inline_Always (Set_Pixel);
+   pragma Inline_Always (Draw_H_Line);
+   pragma Inline_Always (Draw_Dot_H_Line);
 
    type Screen_Mode is (Text, Parameter);
 

@@ -19,11 +19,42 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.MIDI;
+with WNM.Screen;
+with WNM.GUI.Bitmap_Fonts;
+
 package WNM.GUI.Menu.Drawing is
 
-   procedure Draw_Menu_Box
-     (Title       : String;
-      Text        : String;
-      Top, Bottom : Boolean);
+   Box_Top    : constant := 22;
+   Box_Bottom : constant := Screen.Height - 3;
+   Box_Left   : constant := Bitmap_Fonts.Width;
+   Box_Right  : constant := Screen.Width - Box_Left;
+
+   Box_Center : constant Screen.Point := ((Box_Right + Box_Left) / 2,
+                                          (Box_Top + Box_Bottom) / 2);
+
+
+   procedure Draw_Menu_Box (Title : String;
+                            Count : Positive;
+                            Index : Natural);
+
+   subtype Percentage is Natural range 0 .. 100;
+
+   procedure Draw_Precentage (Title : String;
+                              Val : Percentage);
+
+   subtype Pan is Integer range -50 .. 50;
+
+   procedure Draw_Pan (Title : String;
+                       Val : Pan);
+
+   procedure Draw_MIDI_Val (Title : String;
+                            Val   : MIDI.MIDI_Data);
+
+   procedure Draw_Text (Title : String;
+                        Val   : String);
+
+   procedure Draw_Knob (Title : String;
+                        Value : Natural);
 
 end WNM.GUI.Menu.Drawing;

@@ -62,9 +62,9 @@ package body WNM.GUI.Menu.Root is
    is
    begin
       Draw_Menu_Box ("Menu",
-                     Menu_Item_Text (This.Item),
-                     Top => This.Item /= Menu_Items'First,
-                     Bottom => This.Item /= Menu_Items'Last);
+                     Count => Menu_Items_Count,
+                     Index => Menu_Items'Pos (This.Item));
+      Draw_Text (Menu_Item_Text (This.Item), "");
    end Draw;
 
    --------------
@@ -103,10 +103,14 @@ package body WNM.GUI.Menu.Root is
             if Event.Value > 0 then
                if This.Item /= Menu_Items'Last then
                   This.Item := Menu_Items'Succ (This.Item);
+               else
+                  This.Item := Menu_Items'First;
                end if;
             elsif Event.Value < 0 then
                if This.Item /= Menu_Items'First then
                   This.Item := Menu_Items'Pred (This.Item);
+               else
+                  This.Item := Menu_Items'Last;
                end if;
             end if;
       end case;

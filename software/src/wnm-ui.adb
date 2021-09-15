@@ -19,11 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
---  Hold record to enter sequencer mode. Move between steps with an encoder
---  The current step number is shown on the screen. Press a note to add/remove
---  it to/from the current step. Active notes for this step are shown with the
---  LEDs. Press the current chan to erase the squence.
-
 with WNM.Sequencer;                use WNM.Sequencer;
 with WNM.Encoders;                 use WNM.Encoders;
 with WNM.Synth;                  use WNM.Synth;
@@ -98,10 +93,13 @@ package body WNM.UI is
 
                      Sequencer.On_Press (B);
                   when Step_Button =>
+                     GUI.Menu.Open (GUI.Menu.Step_Menu);
                      Current_Input_Mode := Step_Select;
                   when Track_Button =>
+                     GUI.Menu.Open (GUI.Menu.Track_Menu);
                      Current_Input_Mode := Track_Select;
                   when Pattern_Button =>
+                     GUI.Menu.Open (GUI.Menu.Pattern_Menu);
                      Current_Input_Mode := Pattern_Select;
                   when Menu =>
                      GUI.Menu.Root.Push_Root_Window;
@@ -187,7 +185,6 @@ package body WNM.UI is
          when Step_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Editing_Step := To_Value (B);
-               GUI.Menu.Open (GUI.Menu.Step_Menu);
             elsif B = Step_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -195,7 +192,6 @@ package body WNM.UI is
          when Track_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Sequencer.Select_Track (To_Value (B));
-               GUI.Menu.Open (GUI.Menu.Track_Menu);
             elsif B = Track_Button and then Evt = On_Release then
                Current_Input_Mode := Default_Input_Mode;
             end if;
@@ -203,7 +199,6 @@ package body WNM.UI is
          when Pattern_Select =>
             if B in B1 .. B16 and then Evt = On_Press then
                Editing_Pattern := To_Value (B);
-               GUI.Menu.Open (GUI.Menu.Pattern_Menu);
             elsif B = Rec and then Evt = On_Press then
                Current_Input_Mode := Pattern_Chaining;
             elsif B = Pattern_Button and then Evt = On_Release then

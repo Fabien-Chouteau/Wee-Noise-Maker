@@ -21,6 +21,7 @@
 
 with WNM.GUI.Menu.Step_Settings;
 with WNM.GUI.Menu.Track_Settings;
+with WNM.GUI.Menu.Pattern_Settings;
 
 package body WNM.GUI.Menu is
 
@@ -38,7 +39,7 @@ package body WNM.GUI.Menu is
          when Track_Menu =>
             GUI.Menu.Track_Settings.Push_Window;
          when Pattern_Menu =>
-            raise Program_Error with "not implemented";
+            GUI.Menu.Pattern_Settings.Push_Window;
       end case;
    end Open;
 
