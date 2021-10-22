@@ -1,0 +1,2 @@
+all:
+	pioasm -o ada -p WNM.RP2040.WS2812_PIO_ASM ws2812.pio wnm-rp2040-ws2812_pio_asm.ads
