@@ -8,6 +8,7 @@ with WNM.GUI.Update;
 --  with WNM.Synth;
 with WNM.Time; use WNM.Time;
 
+with WNM.RP2040.MIDI;
 with WNM.Screen;
 
 with WNM.GUI.Menu.Track_Settings;
@@ -28,6 +29,7 @@ begin
       Next_Start := Time_Microseconds'Min (WNM.Sequencer.Update, Next_Start);
       Next_Start := Time_Microseconds'Min (WNM.UI.Update, Next_Start);
       Next_Start := Time_Microseconds'Min (WNM.LED.Update, Next_Start);
+      WNM.RP2040.MIDI.Update;
       Next_Start := Time_Microseconds'Min (WNM.GUI.Update.Update, Next_Start);
 
       --  WNM.Audio.Set_Volume (50);
