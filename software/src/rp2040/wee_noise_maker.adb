@@ -13,7 +13,7 @@ with WNM.Screen;
 with WNM.GUI.Menu.Track_Settings;
 
 procedure Wee_Noise_Maker is
-   Next_Start : Time_Ms;
+   Next_Start : Time_Microseconds;
 begin
 
    --  WNM.Sample_Library.Load;
@@ -22,13 +22,13 @@ begin
    WNM.GUI.Menu.Track_Settings.Push_Window;
 
    loop
-      Next_Start := Time_Ms'Last;
+      Next_Start := Time_Microseconds'Last;
 
       --  Next_Start := Time_Ms'Min (WNM.Synth.Update, Next_Start);
-      Next_Start := Time_Ms'Min (WNM.Sequencer.Update, Next_Start);
-      Next_Start := Time_Ms'Min (WNM.UI.Update, Next_Start);
-      Next_Start := Time_Ms'Min (WNM.LED.Update, Next_Start);
-      Next_Start := Time_Ms'Min (WNM.GUI.Update.Update, Next_Start);
+      Next_Start := Time_Microseconds'Min (WNM.Sequencer.Update, Next_Start);
+      Next_Start := Time_Microseconds'Min (WNM.UI.Update, Next_Start);
+      Next_Start := Time_Microseconds'Min (WNM.LED.Update, Next_Start);
+      Next_Start := Time_Microseconds'Min (WNM.GUI.Update.Update, Next_Start);
 
       --  WNM.Audio.Set_Volume (50);
       --  WNM.Master_Volume.Update;

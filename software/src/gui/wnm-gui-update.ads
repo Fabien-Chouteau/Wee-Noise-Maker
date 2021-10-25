@@ -23,6 +23,6 @@ with WNM.Time;
 
 package WNM.GUI.Update is
 
-   function Update return WNM.Time.Time_Ms;
+   function Update return WNM.Time.Time_Microseconds;
 
 end WNM.GUI.Update;

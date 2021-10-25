@@ -26,7 +26,8 @@ with WNM.RP2040.WS2812;
 
 package body WNM.LED is
 
-   Next_Start : WNM.Time.Time_Ms := WNM.Time.Clock + LED_Task_Period_Ms;
+   Next_Start : WNM.Time.Time_Microseconds :=
+     WNM.Time.Clock + LED_Task_Period_Microseconds;
 
    Data : aliased RP2040.WS2812.LED_Data;
 
@@ -98,13 +99,13 @@ package body WNM.LED is
    -- Update --
    ------------
 
-   function Update return WNM.Time.Time_Ms is
+   function Update return WNM.Time.Time_Microseconds is
    begin
       if WNM.Time.Clock >= Next_Start then
 
          RP2040.WS2812.Push_Data_DMA (Data'Access);
 
-         Next_Start := Next_Start + LED_Task_Period_Ms;
+         Next_Start := Next_Start + LED_Task_Period_Microseconds;
       end if;
 
       return Next_Start;

@@ -42,7 +42,7 @@ package body WNM.GUI.Popup is
    -- Display --
    -------------
 
-   procedure Display (T : Popup_Text; Duration : Time.Time_Ms) is
+   procedure Display (T : Popup_Text; Duration : Time.Time_Microseconds) is
    begin
       Text := T;
       Expire := Time.Clock + Duration;

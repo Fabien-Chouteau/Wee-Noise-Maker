@@ -23,8 +23,7 @@ with HAL.GPIO;
 with HAL.I2C; use HAL.I2C;
 
 with WNM.RP2040.I2C;
----  with WNM.Samd51.Encoders;
---  with WNM.Time;
+with WNM.RP2040.Encoders;
 
 with HAL; use HAL;
 
@@ -165,8 +164,7 @@ package body WNM.Buttons is
 
    function Left_Diff return Integer is
    begin
-      return 0;
-      --  return WNM.Samd51.Encoders.Left;
+      return WNM.RP2040.Encoders.Left;
    end Left_Diff;
 
    -----------
@@ -175,8 +173,7 @@ package body WNM.Buttons is
 
    function Right_Diff return Integer is
    begin
-      return 0;
-      --  return WNM.Samd51.Encoders.Right;
+      return WNM.RP2040.Encoders.Right;
    end Right_Diff;
 
 begin

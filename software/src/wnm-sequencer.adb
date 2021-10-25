@@ -53,7 +53,8 @@ package body WNM.Sequencer is
    Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
 
-   Next_Start : Synth.Sample_Time := Synth.Sample_Time'First;
+   --  Next_Start : Synth.Sample_Time := Synth.Sample_Time'First;
+   Next_Start : Time.Time_Microseconds := Time.Time_Microseconds'First;
 
    Pattern_Counter : array (Patterns) of UInt32;
    --  Count how many times a pattern has played
@@ -128,7 +129,7 @@ package body WNM.Sequencer is
          WNM.MIDI.To_MIDI_Channel (Track),
          MIDI.C4,
          0),
-         Sample_Clock + Samples_Per_Beat);
+         Time.Clock + Microseconds_Per_Beat);
    end Do_Preview_Trigger;
 
 --      Octave : MIDI.Octaves := 4;
@@ -357,6 +358,15 @@ package body WNM.Sequencer is
       return Samples_Per_Minute / Sample_Time (Sequencer_BPM);
    end Samples_Per_Beat;
 
+   ---------------------------
+   -- Microseconds_Per_Beat --
+   ---------------------------
+
+   function Microseconds_Per_Beat return Time.Time_Microseconds is
+   begin
+      return (60 * 1_000 * 1_000) / Time.Time_Microseconds (Sequencer_BPM);
+   end Microseconds_Per_Beat;
+
    ------------
    -- Random --
    ------------
@@ -386,9 +396,13 @@ package body WNM.Sequencer is
       use Synth;
 
       Condition : Boolean := False;
-      Now : constant Sample_Time := Sample_Clock;
 
-      Note_Duration : constant Sample_Time := Samples_Per_Beat / 4;
+      Now : constant Time.Time_Microseconds := Time.Clock;
+      Note_Duration : constant Time.Time_Microseconds :=
+        Microseconds_Per_Beat / 4;
+
+      --  Now : constant Sample_Time := Sample_Clock;
+      --  Note_Duration : constant Sample_Time := Samples_Per_Beat / 4;
    begin
       if Step = Sequencer_Steps'First then
          Pattern_Counter (Pattern) := Pattern_Counter (Pattern) + 1;
@@ -424,30 +438,30 @@ package body WNM.Sequencer is
                   S.Note,
                   S.Velo));
                declare
-                  Repeat_Span : constant Sample_Time :=
-                    Samples_Per_Beat /  (case Sequences (Pattern)
-                                         (Track) (Step).Repeat_Rate
-                                         is
-                                            when Rate_1_1  => 1,
-                                            when Rate_1_2  => 2,
-                                            when Rate_1_3  => 3,
-                                            when Rate_1_4  => 4,
-                                            when Rate_1_5  => 5,
-                                            when Rate_1_6  => 6,
-                                            when Rate_1_8  => 8,
-                                            when Rate_1_10 => 10,
-                                            when Rate_1_12 => 12,
-                                            when Rate_1_16 => 16,
-                                            when Rate_1_20 => 20,
-                                            when Rate_1_24 => 24,
-                                            when Rate_1_32 => 32);
+                  Repeat_Span : constant Time.Time_Microseconds :=
+                    Microseconds_Per_Beat / (case Sequences (Pattern)
+                                             (Track) (Step).Repeat_Rate
+                                             is
+                                                when Rate_1_1  => 1,
+                                                when Rate_1_2  => 2,
+                                                when Rate_1_3  => 3,
+                                                when Rate_1_4  => 4,
+                                                when Rate_1_5  => 5,
+                                                when Rate_1_6  => 6,
+                                                when Rate_1_8  => 8,
+                                                when Rate_1_10 => 10,
+                                                when Rate_1_12 => 12,
+                                                when Rate_1_16 => 16,
+                                                when Rate_1_20 => 20,
+                                                when Rate_1_24 => 24,
+                                                when Rate_1_32 => 32);
 
-                  Repeat_Duration : constant Sample_Time :=
+                  Repeat_Duration : constant Time.Time_Microseconds :=
                     (if S.Repeat /= 0 and then Repeat_Span < Note_Duration
                      then Repeat_Span
                      else Note_Duration);
 
-                  Repeat_Time : Sample_Time := Now + Repeat_Span;
+                  Repeat_Time : Time.Time_Microseconds := Now + Repeat_Span;
                begin
                   --  Note-Off for the first Note-On, its duration depends if
                   --  there is a repeat and the repeat rate.
@@ -498,10 +512,9 @@ package body WNM.Sequencer is
       use Synth;
    begin
 
-      --  Next_Start := Next_Start +
-      --    (Time.Time_Ms ((60 * 1000) / Sequencer_BPM) / Steps_Per_Beat) / 2;
+      Next_Start := Next_Start + (Microseconds_Per_Beat / Steps_Per_Beat) / 2;
 
-      Next_Start := Next_Start + Samples_Per_Beat / Steps_Per_Beat / 2;
+      --  Next_Start := Next_Start + Samples_Per_Beat / Steps_Per_Beat / 2;
 
       if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
          case Microstep is
@@ -530,10 +543,11 @@ package body WNM.Sequencer is
    -- Update --
    ------------
 
-   function Update return Time.Time_Ms is
+   function Update return Time.Time_Microseconds is
       use Synth;
 
-      Now     : constant Sample_Time := Sample_Clock;
+      --  Now     : constant Sample_Time := Sample_Clock;
+      Now : constant Time.Time_Microseconds := Time.Clock;
       Success : Boolean;
       Msg     : WNM.MIDI.Message;
    begin
@@ -548,7 +562,7 @@ package body WNM.Sequencer is
          WNM.MIDI.Queues.Sequencer_Push (Msg);
       end loop;
 
-      return Time.Time_Ms'First;
+      return Time.Time_Microseconds'First;
    end Update;
 
    ---------

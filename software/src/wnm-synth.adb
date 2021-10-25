@@ -50,7 +50,7 @@ package body WNM.Synth is
 
    Passthrough : Input_Kind := Line_In;
 
-   Next_Start : WNM.Time.Time_Ms := WNM.Time.Time_Ms'First;
+   Next_Start : WNM.Time.Time_Microseconds := WNM.Time.Time_Microseconds'First;
    Glob_Sample_Clock : Sample_Time := 0 with Volatile;
 
    procedure Copy_Stereo_To_Mono (L, R : Mono_Buffer;
@@ -312,7 +312,7 @@ package body WNM.Synth is
    -- Update --
    ------------
 
-   function Update return WNM.Time.Time_Ms is
+   function Update return WNM.Time.Time_Microseconds is
 
       procedure Process (Out_L, Out_R : out Mono_Buffer;
                          In_L,  In_R  :     Mono_Buffer);
@@ -427,7 +427,7 @@ package body WNM.Synth is
 
       --  procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
 
-      Now : constant WNM.Time.Time_Ms := WNM.Time.Clock;
+      Now : constant WNM.Time.Time_Microseconds := WNM.Time.Clock;
    begin
       if Now >= Next_Start then
          Next_Start := Next_Start + 0;

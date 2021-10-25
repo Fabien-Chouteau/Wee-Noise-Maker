@@ -20,10 +20,11 @@
 -------------------------------------------------------------------------------
 
 with RP.Clock;
+with System;
 
 package WNM.RP2040 is
 
-   procedure Last_Chance_Handler;
+   procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
 
    XOSC_Frequency : RP.Clock.XOSC_Hertz := 12_000_000;

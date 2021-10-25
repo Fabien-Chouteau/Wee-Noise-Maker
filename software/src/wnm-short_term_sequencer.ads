@@ -21,13 +21,16 @@
 
 with WNM.Synth;
 with WNM.MIDI;
+with WNM.Time;
 
 package WNM.Short_Term_Sequencer is
 
    subtype Data is WNM.MIDI.Message;
 
-   procedure Push (D : Data; Expiration : Synth.Sample_Time);
-   procedure Pop (Now : Synth.Sample_Time; D : out Data; Success : out Boolean);
+   subtype Expiration_Time is Time.Time_Microseconds;
+
+   procedure Push (D : Data; Expiration : Expiration_Time);
+   procedure Pop (Now : Expiration_Time; D : out Data; Success : out Boolean);
 
 private
 
@@ -39,7 +42,7 @@ private
 
    type Event is record
       D : Data;
-      Expiration : Synth.Sample_Time;
+      Expiration : Expiration_Time;
       Next : Event_Access := null;
    end record;
 

@@ -99,11 +99,12 @@ package body WNM.Sample_Stream is
                             Filepath : String)
    is
    begin
-      Close_Stream (Track);
-
-      Open_Read (Streams (Track).FD, Filepath);
-
-      Streams (Track).State := Assigned;
+      null;
+      --  Close_Stream (Track);
+      --
+      --  Open_Read (Streams (Track).FD, Filepath);
+      --
+      --  Streams (Track).State := Assigned;
    end Assign_Sample;
 
    -----------

@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with HAL; use HAL;
+
 with WNM.Synth; use WNM.Synth;
 
 package body WNM.Short_Term_Sequencer is
@@ -90,7 +92,7 @@ package body WNM.Short_Term_Sequencer is
    ------------
 
    procedure Insert (Node : not null Event_Access) is
-      Exp : constant Synth.Sample_Time := Node.Expiration;
+      Exp : constant Expiration_Time := Node.Expiration;
 
       procedure Insert_After (First : Event_Access);
 
@@ -137,7 +139,7 @@ package body WNM.Short_Term_Sequencer is
    -- Push --
    ----------
 
-   procedure Push (D : Data; Expiration : Sample_Time) is
+   procedure Push (D : Data; Expiration : Expiration_Time) is
       Node : constant Event_Access := Alloc;
    begin
       if Node = null then
@@ -155,7 +157,7 @@ package body WNM.Short_Term_Sequencer is
    -- Pop --
    ---------
 
-   procedure Pop (Now : Sample_Time; D : out Data; Success : out Boolean) is
+   procedure Pop (Now : Expiration_Time; D : out Data; Success : out Boolean) is
       Node : Event_Access;
    begin
       if List_Head /= null and then List_Head.Expiration <= Now then

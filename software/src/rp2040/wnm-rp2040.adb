@@ -24,13 +24,15 @@ with WNM.GUI.Bitmap_Fonts;
 
 with RP.GPIO;
 
+with System.Machine_Code; use System.Machine_Code;
+
 package body WNM.RP2040 is
 
    -------------------------
    -- Last_Chance_Handler --
    -------------------------
 
-   procedure Last_Chance_Handler is
+   procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
       X : Integer := 0;
    begin
       Screen.Clear;
@@ -44,4 +46,7 @@ package body WNM.RP2040 is
 begin
    RP.Clock.Initialize (XOSC_Frequency);
    RP.GPIO.Enable;
+
+   Asm ("cpsie i",
+        Volatile => True);
 end WNM.RP2040;

@@ -18,8 +18,8 @@ procedure Wee_Noise_Maker_Sim is
 
 begin
 
-   WNM.Sample_Library.Load;
-   WNM.Synth.Load_Samples;
+   --  WNM.Sample_Library.Load;
+   --  WNM.Synth.Load_Samples;
 
    WNM.GUI.Menu.Track_Settings.Push_Window;
 

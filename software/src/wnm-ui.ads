@@ -25,7 +25,7 @@ with WNM.Sequence_Copy;
 
 package WNM.UI is
 
-   function Update return Time.Time_Ms;
+   function Update return Time.Time_Microseconds;
 
    type Input_Mode_Type is (Note,
                             Volume_BPM,

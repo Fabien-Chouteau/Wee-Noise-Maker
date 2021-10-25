@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2021 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,5 +19,18 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package body  WNM.Encoders is
-end WNM.Encoders;
+package body WNM.RP2040.PIO is
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize is
+   begin
+      Encoder_PIO.Enable;
+      WS2812_PIO.Enable;
+   end Initialize;
+
+begin
+   Initialize;
+end WNM.RP2040.PIO;

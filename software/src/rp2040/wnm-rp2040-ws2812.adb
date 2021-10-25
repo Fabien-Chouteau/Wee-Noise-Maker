@@ -23,13 +23,11 @@ with RP.Device;
 with RP.PIO; use RP.PIO;
 with RP.GPIO; use RP.GPIO;
 with WNM.RP2040.WS2812_PIO_ASM;
+with WNM.RP2040.PIO; use WNM.RP2040.PIO;
 
 package body WNM.RP2040.WS2812 is
 
-   PIO : PIO_Device renames RP.Device.PIO_0;
-
    Out_Pin : RP.GPIO.GPIO_Point := (Pin => 3);
-   SM      : constant PIO_SM := 0;
 
    ----------------
    -- Initialize --
@@ -43,14 +41,14 @@ package body WNM.RP2040.WS2812 is
         WS2812_PIO_ASM.T2 + WS2812_PIO_ASM.T3;
 
       Bit_Per_LED : constant := 24;
+
    begin
-      Out_Pin.Configure (Output, Pull_Up, Pio.GPIO_Function);
+      Out_Pin.Configure (Output, Pull_Up, WS2812_PIO.GPIO_Function);
 
-      PIO.Enable;
-      PIO.Load (WS2812_PIO_ASM.Ws2812_Program_Instructions,
-                Offset => 0);
+      WS2812_PIO.Load (WS2812_PIO_ASM.Ws2812_Program_Instructions,
+                       Offset => WS2812_Offset);
 
-      PIO.Set_Pin_Direction (SM, Out_Pin.Pin, Output);
+      WS2812_PIO.Set_Pin_Direction (WS2812_SM, Out_Pin.Pin, Output);
 
       Set_Sideset (Config,
                    Bit_Count => 1,
@@ -67,12 +65,14 @@ package body WNM.RP2040.WS2812 is
                      Join_RX => False);
 
       Set_Wrap (Config,
-                WS2812_PIO_ASM.Ws2812_Wrap_Target,
-                WS2812_PIO_ASM.Ws2812_Wrap);
+                WS2812_Offset + WS2812_PIO_ASM.Ws2812_Wrap_Target,
+                WS2812_Offset + WS2812_PIO_ASM.Ws2812_Wrap);
       Set_Clock_Frequency (Config, Freq * Cycles_Per_Bit);
 
-      PIO.SM_Initialize (SM, 0, Config);
-      PIO.Set_Enabled (SM, True);
+      WS2812_PIO.SM_Initialize (WS2812_SM,
+                                WS2812_Offset,
+                                Config);
+      WS2812_PIO.Set_Enabled (WS2812_SM, True);
    end Initialize;
 
    -------------------
@@ -82,7 +82,7 @@ package body WNM.RP2040.WS2812 is
    procedure Push_Data_DMA (Data : not null LED_Data_Access) is
    begin
       for Elt of Data.all loop
-         PIO.Put (SM, HAL.UInt32 (Elt));
+         WS2812_PIO.Put (WS2812_SM, HAL.UInt32 (Elt));
       end loop;
    end Push_Data_DMA;
 

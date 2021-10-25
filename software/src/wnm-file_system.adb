@@ -133,10 +133,10 @@ begin
       end if;
    end if;
 
-   Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
-   if Err /= 0 then
-      raise Program_Error with "Mount error:" & Err'Img;
-   end if;
+   --  Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
+   --  if Err /= 0 then
+   --     raise Program_Error with "Mount error:" & Err'Img;
+   --  end if;
 
    if Do_Reset then
       WNM.Factory_Reset.Reset (FS);

@@ -19,8 +19,7 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.Sequencer;                use WNM.Sequencer;
-with WNM.Encoders;                 use WNM.Encoders;
+with WNM.Sequencer;              use WNM.Sequencer;
 with WNM.Synth;                  use WNM.Synth;
 with WNM.Master_Volume;
 with WNM.Pattern_Sequencer;
@@ -286,27 +285,27 @@ package body WNM.UI is
 
 
    Last_State    : array (Button) of Buttons.Raw_Button_State := (others => WNM.Buttons.Up);
-   Pressed_Since : array (Button) of WNM.Time.Time_Ms := (others => 0);
+   Pressed_Since : array (Button) of WNM.Time.Time_Microseconds := (others => 0);
    Last_Event    : array (Button) of Buttton_Event := (others => On_Release);
-   Next_Start    : Time.Time_Ms := Time.Time_Ms'First;
+   Next_Start    : Time.Time_Microseconds := Time.Time_Microseconds'First;
 
    ------------
    -- Update --
    ------------
 
-   function Update return Time.Time_Ms is
+   function Update return Time.Time_Microseconds is
       use Buttons;
 
       L_Enco : Integer;
       R_Enco : Integer;
 
-      Now : constant Time.Time_Ms := Time.Clock;
+      Now : constant Time.Time_Microseconds := Time.Clock;
    begin
       if Now < Next_Start then
          return Next_Start;
       end if;
 
-      Next_Start := Next_Start + UI_Task_Period_Ms;
+      Next_Start := Next_Start + UI_Task_Period_Microseconds;
 
       Buttons.Scan;
 
@@ -321,7 +320,7 @@ package body WNM.UI is
               and then
                 Last_Event (B) = Waiting_For_Long_Press
               and then
-                Pressed_Since (B) + Long_Press_Time_Span_Ms < Now
+                Pressed_Since (B) + Long_Press_Time_Span_Microseconds < Now
             then
                Last_Event (B) := On_Long_Press;
                Signal_Event (B, Last_Event (B));

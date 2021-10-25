@@ -254,7 +254,7 @@ package body WNM.FM_Tuner is
 
       Write_Registers (Regs);
 
-      Time.Delay_Ms (500);
+      Time.Delay_Milliseconds (500);
 
       Read_Registers (Regs);
 

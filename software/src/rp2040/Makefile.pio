@@ -1,2 +1,3 @@
 all:
 	pioasm -o ada -p WNM.RP2040.WS2812_PIO_ASM ws2812.pio wnm-rp2040-ws2812_pio_asm.ads
+	pioasm -o ada -p WNM.RP2040.PIO_Rotary_Encoder_ASM pio_rotary_encoder.pio wnm-rp2040-pio_rotary_encoder_asm.ads

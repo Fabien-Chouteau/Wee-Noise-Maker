@@ -26,7 +26,7 @@ package WNM.GUI.Popup is
    Text_Length : constant := 10;
    subtype Popup_Text is String (1 .. Text_Length);
 
-   procedure Display (T : Popup_Text; Duration : Time.Time_Ms);
+   procedure Display (T : Popup_Text; Duration : Time.Time_Microseconds);
 
    procedure Update;
 
@@ -36,6 +36,6 @@ private
 
    State  : Popup_State := Disabled;
    Text   : Popup_Text := (others => ' ');
-   Expire : Time.Time_Ms := 0;
+   Expire : Time.Time_Microseconds := 0;
 
 end WNM.GUI.Popup;

@@ -136,11 +136,11 @@ package body WNM.Screen is
 
       --  Power on sequence
       N_Reset.Set;
-      WNM.Time.Delay_Ms (1);
+      WNM.Time.Delay_Microseconds (1);
       N_Reset.Clear;
-      WNM.Time.Delay_Ms (10);
+      WNM.Time.Delay_Microseconds (10);
       N_Reset.Set;
-      WNM.Time.Delay_Ms (10);
+      WNM.Time.Delay_Microseconds (10);
       Write_Cmd (SET_DISP or 16#01#);
 
       Write_Cmd (Init_Cmds);

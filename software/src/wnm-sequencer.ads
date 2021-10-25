@@ -69,10 +69,11 @@ package WNM.Sequencer is
    procedure Change_BPM (BPM_Delta : Integer);
    function BPM return Beat_Per_Minute;
    function Samples_Per_Beat return Synth.Sample_Time;
+   function Microseconds_Per_Beat return Time.Time_Microseconds;
 
    procedure Execute_Step;
 
-   function Update return Time.Time_Ms;
+   function Update return Time.Time_Microseconds;
 
    function Set (Step : Sequencer_Steps) return Boolean;
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean;

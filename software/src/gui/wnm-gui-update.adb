@@ -40,7 +40,7 @@ package body WNM.GUI.Update is
 
    Anim_Step : HAL.UInt32 := 0;
 
-   Next_Start : Time.Time_Ms := Time.Time_Ms'First;
+   Next_Start : Time.Time_Microseconds := Time.Time_Microseconds'First;
 
    function Header_Str return String is
       Pat : constant Keyboard_Value := UI.Current_Editing_Pattern;
@@ -59,23 +59,23 @@ package body WNM.GUI.Update is
    -- Update --
    ------------
 
-   function Update return Time.Time_Ms is
+   function Update return Time.Time_Microseconds is
       B : Integer;
 
       BPM : Natural;
       Volume : Natural;
-      Now : constant Time.Time_Ms := Time.Clock;
+      Now : constant Time.Time_Microseconds := Time.Clock;
    begin
       if Now < Next_Start then
          return Next_Start;
       end if;
 
-      Next_Start := Next_Start + GUI_Task_Period_Ms;
+      Next_Start := Next_Start + GUI_Task_Period_Microseconds;
 
       WNM.Screen.Clear;
 
       --  Splash screen
-      if WNM.Time.Clock < 1000 then
+      if WNM.Time.Clock < 1_000 then
          WNM.GUI.Logo.Draw_On_Screen (UInt2 (Anim_Step mod 4));
          WNM.Screen.Update;
          Anim_Step := Anim_Step + 1;

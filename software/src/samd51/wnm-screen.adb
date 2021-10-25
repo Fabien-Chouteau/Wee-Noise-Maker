@@ -91,7 +91,6 @@ package body WNM.Screen is
    begin
       for X in R.Position.X .. R.Position.X + R.Width - 1 loop
          for Y in R.Position.Y .. R.Position.Y + R.Height - 1 loop
-            null;
             Set_Pixel ((X, Y), On);
          end loop;
       end loop;

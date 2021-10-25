@@ -29,6 +29,6 @@ package WNM.LED is
    procedure Turn_Off_All with Inline_Always;
    function Brightness (B : LEDs) return UInt8;
 
-   function Update return WNM.Time.Time_Ms;
+   function Update return WNM.Time.Time_Microseconds;
 
 end WNM.LED;

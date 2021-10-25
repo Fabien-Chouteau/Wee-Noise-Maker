@@ -62,7 +62,7 @@ package WNM.Synth is
    function Sample_Of_Track (Track : WNM.Tracks)
                              return WNM.Sample_Library.Sample_Entry_Index;
 
-   function Update return WNM.Time.Time_Ms;
+   function Update return WNM.Time.Time_Microseconds;
 
    procedure Next_Samples (Output : out Audio.Stereo_Buffer;
                            Input  :     Audio.Stereo_Buffer);

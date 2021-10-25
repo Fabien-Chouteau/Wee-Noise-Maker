@@ -19,59 +19,28 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with RP.PIO; use RP.PIO;
 with RP.Device;
-with RP.Timer;
 
-with WNM.RP2040;
-pragma Elaborate (WNM.RP2040);
+with WNM.RP2040.WS2812_PIO_ASM; use WNM.RP2040.WS2812_PIO_ASM;
+with WNM.RP2040.PIO_Rotary_Encoder_ASM; use WNM.RP2040.PIO_Rotary_Encoder_ASM;
 
-package body WNM.Time is
+package WNM.RP2040.PIO is
+   pragma Elaborate_Body;
 
+   Encoder_PIO    : PIO_Device renames RP.Device.PIO_0;
+   Encoder_L_SM     : constant PIO_SM := 0;
+   Encoder_R_SM     : constant PIO_SM := 1;
+   Encoder_Offset : constant PIO_Address := 0;
+   Encoder_Last   : constant PIO_Address :=
+     Encoder_Offset + Pio_Rotary_Encoder_Program_Instructions'Length - 1;
 
-   ----------------
-   -- Initialize --
-   ----------------
+   WS2812_PIO    : PIO_Device renames RP.Device.PIO_0;
+   WS2812_SM     : constant PIO_SM := 2;
+   WS2812_Offset : constant PIO_Address :=
+     PIO_Address'Last - Ws2812_Program_Instructions'Length + 1;
 
-   procedure Initialize is
-   begin
-      RP.Device.Timer.Enable;
-   end Initialize;
+   pragma Compile_Time_Error (Encoder_Last >= WS2812_Offset,
+                              "PIO programs do not fit in memory");
 
-   -----------
-   -- Clock --
-   -----------
-
-   function Clock return Time_Microseconds
-   is (Time_Microseconds (RP.Timer.Clock));
-
-
-   ------------------------
-   -- Delay_Milliseconds --
-   ------------------------
-
-   procedure Delay_Milliseconds (Milliseconds : UInt64) is
-   begin
-      RP.Device.Timer.Delay_Milliseconds (Integer (Milliseconds));
-   end Delay_Milliseconds;
-
-   ------------------------
-   -- Delay_MicroSeconds --
-   ------------------------
-
-   procedure Delay_Microseconds (Microseconds : Time_Microseconds) is
-   begin
-      RP.Device.Timer.Delay_Microseconds (Integer (Microseconds));
-   end Delay_Microseconds;
-
-   -----------------
-   -- Delay_Until --
-   -----------------
-
-   procedure Delay_Until (Wakeup_Time : Time_Microseconds) is
-   begin
-      RP.Device.Timer.Delay_Until (RP.Timer.Time (Wakeup_Time));
-   end Delay_Until;
-
-begin
-   Initialize;
-end WNM.Time;
+end WNM.RP2040.PIO;

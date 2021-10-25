@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                     Copyright (C) 2021 Fabien Chouteau                    --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -19,8 +19,12 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-package WNM.Encoders
-  with Elaborate_Body
-is
+package WNM.RP2040.Encoders is
 
- end WNM.Encoders;
+   function Left return Integer;
+   --  Number of increments since last call
+
+   function Right return Integer;
+   --  Number of increments since last call
+
+end WNM.RP2040.Encoders;

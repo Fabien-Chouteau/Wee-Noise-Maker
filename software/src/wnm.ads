@@ -62,11 +62,11 @@ package WNM is
    Steps_Per_Beat      : constant := 4;
    Max_Events_Per_Step : constant := 6;
 
-   UI_Task_Period_Ms : constant := 50;
-   GUI_Task_Period_Ms : constant := 50;
-   LED_Task_Period_Ms : constant := 50;
+   UI_Task_Period_Microseconds  : constant := 50 * 1_000;
+   GUI_Task_Period_Microseconds : constant := 50 * 1_000;
+   LED_Task_Period_Microseconds : constant := 50 * 1_000;
 
-   Long_Press_Time_Span_Ms : constant := 300;
+   Long_Press_Time_Span_Microseconds : constant := 300 * 1_000;
    --  How much time (in miliseconds) users have to press a button to get the
    --  alternative function.
 
