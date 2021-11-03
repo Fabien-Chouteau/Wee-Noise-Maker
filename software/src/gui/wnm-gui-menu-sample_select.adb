@@ -96,7 +96,7 @@ package body WNM.GUI.Menu.Sample_Select is
                   end if;
                end if;
                WNM.Synth.Assign_Sample
-                 (WNM.Sequencer.Track,
+                 (WNM.Sequencer.Editing_Track,
                   Sample_Library.Entry_Path (This.Index));
             end if;
       end case;
@@ -114,7 +114,7 @@ package body WNM.GUI.Menu.Sample_Select is
       This.To := Sample_Library.Last_Valid_Entry;
       This.Index := This.From;
       if This.Index /= Invalid_Sample_Entry then
-         WNM.Synth.Assign_Sample (WNM.Sequencer.Track,
+         WNM.Synth.Assign_Sample (WNM.Sequencer.Editing_Track,
                                     Sample_Library.Entry_Path (This.Index));
       end if;
    end On_Pushed;

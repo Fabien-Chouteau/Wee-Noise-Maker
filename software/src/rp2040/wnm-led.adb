@@ -31,9 +31,9 @@ package body WNM.LED is
 
    Data : aliased RP2040.WS2812.LED_Data;
 
-   LED_Red   : constant HAL.UInt24 := 16#00_FF_00#;
-   LED_Green : constant HAL.UInt24 := 16#00_00_FF#;
-   LED_Blue  : constant HAL.UInt24 := 16#FF_00_00#;
+   LED_Red   : constant HAL.UInt32 := 16#00_FF_00#;
+   LED_Green : constant HAL.UInt32 := 16#00_00_FF#;
+   LED_Blue  : constant HAL.UInt32 := 16#FF_00_00#;
 
    function To_LED_Index (B : LEDs) return Natural
    is (case B is

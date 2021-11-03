@@ -48,8 +48,14 @@ package WNM.GUI.Menu.Drawing is
    procedure Draw_Pan (Title : String;
                        Val : Pan);
 
-   procedure Draw_MIDI_Val (Title : String;
-                            Val   : MIDI.MIDI_Data);
+   procedure Draw_MIDI_Val (Val      : MIDI.MIDI_Data;
+                            Selected : Boolean);
+
+   procedure Draw_MIDI_Note (Key     : MIDI.MIDI_Key;
+                            Selected : Boolean);
+
+   procedure Draw_Duration (D        : Note_Duration;
+                            Selected : Boolean);
 
    procedure Draw_Text (Title : String;
                         Val   : String);

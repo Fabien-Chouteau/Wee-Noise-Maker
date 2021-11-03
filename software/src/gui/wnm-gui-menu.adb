@@ -19,9 +19,10 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.GUI.Menu.Step_Settings;
+with WNM.GUI.Menu.Root;
 with WNM.GUI.Menu.Track_Settings;
 with WNM.GUI.Menu.Pattern_Settings;
+with WNM.GUI.Menu.Step_Settings;
 
 package body WNM.GUI.Menu is
 
@@ -34,6 +35,8 @@ package body WNM.GUI.Menu is
    begin
       Exit_Menu;
       case Kind is
+         when Main_Menu =>
+            GUI.Menu.Root.Push_Root_Window;
          when Step_Menu =>
             GUI.Menu.Step_Settings.Push_Window;
          when Track_Menu =>

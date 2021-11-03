@@ -26,7 +26,7 @@ with HAL;
 package WNM.RP2040.WS2812 is
 
 
-   type LED_Data is array (1 .. 18) of HAL.UInt24;
+   type LED_Data is array (1 .. 18) of HAL.UInt32;
    type LED_Data_Access is access all LED_Data;
 
    procedure Push_Data_DMA (Data : not null LED_Data_Access);

@@ -20,9 +20,16 @@
 -------------------------------------------------------------------------------
 
 with RP.Clock;
+with RP.DMA;
 with System;
 
 package WNM.RP2040 is
+
+   I2S_OUT_DMA      : constant RP.DMA.DMA_Channel_Id := 0;
+   I2S_IN_DMA       : constant RP.DMA.DMA_Channel_Id := 1;
+   Screen_SPI_DMA   : constant RP.DMA.DMA_Channel_Id := 2;
+   LED_PIO_DMA      : constant RP.DMA.DMA_Channel_Id := 3;
+   MIDI_UART_TX_DMA : constant RP.DMA.DMA_Channel_Id := 4;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");

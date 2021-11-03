@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with HAL; use HAL;
+
 with WNM.MIDI.Queues;
 
 with RP.Device;
@@ -31,9 +33,12 @@ with HAL.UART; use HAL.UART;
 
 package body WNM.RP2040.MIDI is
 
-   UART    : RP.UART.UART_Port renames RP.Device.UART_0;
-   UART_TX : RP.GPIO.GPIO_Point := (Pin => 16);
-   UART_RX : RP.GPIO.GPIO_Point := (Pin => 17);
+   UART           : RP.UART.UART_Port renames RP.Device.UART_0;
+   DMA_TX_Trigger : RP.DMA.DMA_Request_Trigger := RP.DMA.UART0_TX;
+   UART_TX        : RP.GPIO.GPIO_Point := (Pin => 16);
+   UART_RX        : RP.GPIO.GPIO_Point := (Pin => 17);
+
+   Out_Grant : BBqueue.Buffers.Read_Grant;
 
    ----------------
    -- Initialize --
@@ -51,6 +56,20 @@ package body WNM.RP2040.MIDI is
             Stop_Bits => 1,
             others    => <>));
 
+      -- DMA --
+      declare
+         use RP.DMA;
+         Config : DMA_Configuration;
+      begin
+         Config.Trigger := DMA_TX_Trigger;
+         Config.High_Priority := True;
+         Config.Data_Size := Transfer_8;
+         Config.Increment_Read := True;
+         Config.Increment_Write := False;
+
+         RP.DMA.Configure (RP2040.MIDI_UART_TX_DMA, Config);
+      end;
+
    end Initialize;
 
    ------------
@@ -58,21 +77,29 @@ package body WNM.RP2040.MIDI is
    ------------
 
    procedure Update is
-      G : BBqueue.Buffers.Read_Grant;
-      Status  : UART_Status;
+      use BBqueue.Buffers;
    begin
-      WNM.MIDI.Queues.MIDI_Out_Read (G);
-      if State (G) = Valid then
-         declare
-            Buffer : UART_Data_8b (1 .. Integer (Slice (G).Length))
-              with Address => Slice (G).Addr;
-         begin
-            UART.Transmit (Buffer, Status);
-            if Status /= Ok then
-               raise Program_Error with "MIDI out failed";
-            end if;
-         end;
-         WNM.MIDI.Queues.MIDI_Out_Release (G);
+      if RP.DMA.Busy (RP2040.MIDI_UART_TX_DMA) then
+         --  Previous DMA transfer still in progress
+         return;
+      end if;
+
+      if State (Out_Grant) = Valid then
+         --  Release the previous grant
+         WNM.MIDI.Queues.MIDI_Out_Release (Out_Grant);
+      end if;
+
+      --  Try to get a new grant
+      WNM.MIDI.Queues.MIDI_Out_Read (Out_Grant);
+
+      if State (Out_Grant) = Valid then
+
+         --  If we have a new grant, start DMA transfer
+
+         RP.DMA.Start (Channel => RP2040.MIDI_UART_TX_DMA,
+                       From    => Slice (Out_Grant).Addr,
+                       To      => UART.FIFO_Address,
+                       Count   => UInt32 (Slice (Out_Grant).Length));
       end if;
 
    end Update;

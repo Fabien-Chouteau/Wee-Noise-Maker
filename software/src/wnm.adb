@@ -40,9 +40,22 @@ package body WNM is
    -- Img --
    ---------
 
+   function Img (D : Note_Duration) return String
+   is (case D is
+          when Double  => "Double",
+          when Whole   => "Whole",
+          when Half    => "Half",
+          when Quarter => "Quarter",
+          when N_8th   => "8th",
+          when N_16th  => "16th",
+          when N_32nd  => "32nd");
+
+   ---------
+   -- Img --
+   ---------
+
    function Img (R : Repeat_Rate) return String
    is (case R is
-       when Rate_1_1  => "1/1",
        when Rate_1_2  => "1/2",
        when Rate_1_3  => "1/3",
        when Rate_1_4  => "1/4",

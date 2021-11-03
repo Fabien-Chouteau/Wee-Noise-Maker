@@ -46,6 +46,7 @@ package body WNM.RP2040 is
 begin
    RP.Clock.Initialize (XOSC_Frequency);
    RP.GPIO.Enable;
+   RP.DMA.Enable;
 
    Asm ("cpsie i",
         Volatile => True);

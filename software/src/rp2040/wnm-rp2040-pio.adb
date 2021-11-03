@@ -29,6 +29,7 @@ package body WNM.RP2040.PIO is
    begin
       Encoder_PIO.Enable;
       WS2812_PIO.Enable;
+      I2S_PIO.Enable;
    end Initialize;
 
 begin

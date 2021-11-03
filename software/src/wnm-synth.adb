@@ -155,7 +155,7 @@ package body WNM.Synth is
       --  Assign_Sample (ST_15, "/samples/G5");
       --  Assign_Sample (ST_16, "/samples/A5");
       for ST in ST_6 .. ST_16 loop
-         Assign_Sample (ST, "samples/clap.raw");
+         Assign_Sample (ST, "samples/clap");
       end loop;
    end Load_Samples;
 

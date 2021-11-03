@@ -22,6 +22,8 @@
 with RP.Device;
 with RP.PIO; use RP.PIO;
 with RP.GPIO; use RP.GPIO;
+with RP.DMA;
+
 with WNM.RP2040.WS2812_PIO_ASM;
 with WNM.RP2040.PIO; use WNM.RP2040.PIO;
 
@@ -73,6 +75,20 @@ package body WNM.RP2040.WS2812 is
                                 WS2812_Offset,
                                 Config);
       WS2812_PIO.Set_Enabled (WS2812_SM, True);
+
+      -- DMA --
+      declare
+         use RP.DMA;
+         Config : DMA_Configuration;
+      begin
+         Config.Trigger := WS2812_DMA_Trigger;
+         Config.Data_Size := Transfer_32;
+         Config.Increment_Read := True;
+         Config.Increment_Write := False;
+
+         RP.DMA.Configure (RP2040.LED_PIO_DMA, Config);
+      end;
+
    end Initialize;
 
    -------------------
@@ -81,9 +97,15 @@ package body WNM.RP2040.WS2812 is
 
    procedure Push_Data_DMA (Data : not null LED_Data_Access) is
    begin
-      for Elt of Data.all loop
-         WS2812_PIO.Put (WS2812_SM, HAL.UInt32 (Elt));
-      end loop;
+      if RP.DMA.Busy (RP2040.LED_PIO_DMA) then
+         --  Previous DMA transfer still in progress
+         return;
+      end if;
+
+      RP.DMA.Start (Channel => RP2040.LED_PIO_DMA,
+                    From    => Data.all'Address,
+                    To      => WS2812_PIO.TX_FIFO_Address (WS2812_SM),
+                    Count   => Data.all'Length);
    end Push_Data_DMA;
 
 begin

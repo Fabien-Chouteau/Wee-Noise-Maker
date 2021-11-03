@@ -19,8 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-
 with Interfaces; use Interfaces;
 with System.Storage_Elements; use System.Storage_Elements;
 
@@ -100,6 +98,7 @@ package body WNM.Sample_Stream is
    is
    begin
       null;
+
       --  Close_Stream (Track);
       --
       --  Open_Read (Streams (Track).FD, Filepath);
@@ -196,8 +195,6 @@ package body WNM.Sample_Stream is
          exit when Len /= Buf'Length or else Count >= File_Signed_Size (To);
       end loop;
 
-      Ada.Text_IO.Put_Line (Count'Img & " copied from '" &
-                              Srcpath & "' to '" & Dstpath & "'");
       Close (Src_FD);
       Close (Dst_FD);
    end Copy_File;

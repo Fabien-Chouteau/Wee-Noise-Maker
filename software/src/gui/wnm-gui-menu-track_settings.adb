@@ -50,8 +50,9 @@ package body WNM.GUI.Menu.Track_Settings is
                      Count => Settings_Count,
                      Index => Settings'Pos (This.Current_Setting));
       case This.Current_Setting is
-         when Volume => Draw_Precentage ("Volume", WNM.Synth.Volume (Track));
-         when Pan    => Draw_Pan ("Pan", WNM.Synth.Pan (Track) / 2);
+         when Volume => Draw_Precentage ("Volume",
+                                         WNM.Synth.Volume (Editing_Track));
+         when Pan    => Draw_Pan ("Pan", WNM.Synth.Pan (Editing_Track) / 2);
       end case;
 
    end Draw;
@@ -75,9 +76,9 @@ package body WNM.GUI.Menu.Track_Settings is
          when Encoder_Right =>
             case This.Current_Setting is
                when Volume =>
-                  WNM.Synth.Change_Volume (Track, Event.Value);
+                  WNM.Synth.Change_Volume (Editing_Track, Event.Value);
                when Pan =>
-                  Synth.Change_Pan (Track, Event.Value);
+                  Synth.Change_Pan (Editing_Track, Event.Value);
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then

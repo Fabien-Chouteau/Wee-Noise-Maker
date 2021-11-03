@@ -45,9 +45,13 @@ package WNM is
                     One_Of_Two, One_Of_Three);
    function Img (T : Trigger) return String;
 
+   type Note_Duration is (Double, Whole, Half, Quarter, N_8th,
+                          N_16th, N_32nd);
+   function Img (D : Note_Duration) return String;
+
    type Repeat is mod 9;
 
-   type Repeat_Rate is (Rate_1_1, Rate_1_2, Rate_1_3, Rate_1_4, Rate_1_5,
+   type Repeat_Rate is (Rate_1_2, Rate_1_3, Rate_1_4, Rate_1_5,
                         Rate_1_6, Rate_1_8, Rate_1_10, Rate_1_12, Rate_1_16,
                         Rate_1_20, Rate_1_24, Rate_1_32);
    function Img (R : Repeat_Rate) return String;
@@ -87,6 +91,8 @@ package WNM is
    use Repeat_Next;
    package Repeat_Rate_Next is new Enum_Next (Repeat_Rate);
    use Repeat_Rate_Next;
+   package Note_Duration_Next is new Enum_Next (Note_Duration);
+   use Note_Duration_Next;
    pragma Warnings (On, "use clause for package");
 
    function Img (V : Keyboard_Value) return String

@@ -43,15 +43,14 @@ package body WNM.GUI.Update is
    Next_Start : Time.Time_Microseconds := Time.Time_Microseconds'First;
 
    function Header_Str return String is
-      Pat : constant Keyboard_Value := UI.Current_Editing_Pattern;
-      Trk : constant Keyboard_Value := Track;
-      Stp : constant Keyboard_Value := UI.Current_Editing_Trig;
-
-      Result : String (1 .. 11) := "P00:T00:S00";
+      Result : String (1 .. 21) := "P00:T00:S00  P:00:S00";
    begin
-      Result (2 .. 3) := Img (Pat);
-      Result (6 .. 7) := Img (Trk);
-      Result (10 .. 11) := Img (Stp);
+      Result (2 .. 3) := Img (Sequencer.Editing_Pattern);
+      Result (6 .. 7) := Img (Sequencer.Editing_Track);
+      Result (10 .. 11) := Img (Sequencer.Editing_Step);
+
+      Result (16 .. 17) := Img (Sequencer.Playing_Pattern);
+      Result (20 .. 21) := Img (Sequencer.Playing_Step);
       return Result;
    end Header_Str;
 
@@ -75,7 +74,7 @@ package body WNM.GUI.Update is
       WNM.Screen.Clear;
 
       --  Splash screen
-      if WNM.Time.Clock < 1_000 then
+      if WNM.Time.Clock < 1_000_000 then
          WNM.GUI.Logo.Draw_On_Screen (UInt2 (Anim_Step mod 4));
          WNM.Screen.Update;
          Anim_Step := Anim_Step + 1;
@@ -89,7 +88,7 @@ package body WNM.GUI.Update is
              Str         => Header_Str);
       Screen.Draw_H_Line (8);
 
-      case WNM.UI.Input_Mode is
+      case WNM.UI.Input_GUI_Mode is
          when WNM.UI.Volume_BPM =>
             BPM := Integer (WNM.Sequencer.BPM);
             Volume := Integer (WNM.Master_Volume.Value);
@@ -102,33 +101,23 @@ package body WNM.GUI.Update is
                                           Value => BPM,
                                           Min   => 50,
                                           Max   => 200);
-         when WNM.UI.Step_Select =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top,
-                   Str         => "Select step");
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top + 9,
-                   Str         => "Current: " & Img (UI.Current_Editing_Trig));
-         when WNM.UI.Track_Select =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top,
-                   Str         => "Select track");
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top + 9,
-                   Str         => "Current: " & Img (Track));
-         when WNM.UI.Pattern_Select =>
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top,
-                   Str         => "Select pattern");
-            B := 1;
-            Print (X_Offset    => B,
-                   Y_Offset    => Box_Top + 9,
-                   Str         => "Current: " & Img (Current_Pattern));
+
+         --  when WNM.UI.Pattern_Mode =>
+         --     B := 1;
+         --     Print (X_Offset    => B,
+         --            Y_Offset    => Box_Top,
+         --            Str         => "Pattern Mode");
+         --  when WNM.UI.Track_Mode =>
+         --     B := 1;
+         --     Print (X_Offset    => B,
+         --            Y_Offset    => Box_Top,
+         --            Str         => "Track Mode");
+         --  when WNM.UI.Step_Mode =>
+         --     B := 1;
+         --     Print (X_Offset    => B,
+         --            Y_Offset    => Box_Top,
+         --            Str         => "Step Mode");
+
          when WNM.UI.Pattern_Chaining =>
             B := 1;
             Print (X_Offset    => B,
@@ -137,8 +126,8 @@ package body WNM.GUI.Update is
             B := 1;
             Print (X_Offset    => B,
                    Y_Offset    => Box_Top + 9,
-                   Str         => "Current: " & Img (Current_Pattern));
-         when WNM.UI.Note =>
+                   Str         => "Current: " & Img (Sequencer.Playing_Pattern));
+         when WNM.UI.Pattern_Mode | WNM.UI.Track_Mode | WNM.UI.Step_Mode =>
             Menu.Draw;
          when WNM.UI.FX_Alt =>
             B := 1;
@@ -167,6 +156,10 @@ package body WNM.GUI.Update is
                       Y_Offset    => Box_Top + 18,
                       Str         => "To   " & Image (WNM.UI.Copy_T.To, TB));
             end;
+
+         when WNM.UI.Step_Select | WNM.UI.Track_Select | WNM.UI.Pattern_Select  =>
+            --  These mode are not expected for the GUI
+            raise Program_Error;
       end case;
 
       WNM.GUI.Popup.Update;

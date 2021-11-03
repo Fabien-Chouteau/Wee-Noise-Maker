@@ -50,7 +50,8 @@ package body WNM.GUI.Menu.Assign_To_Track is
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This   : in out Assign_To_Track_Window)
    is
       X : Integer;
@@ -70,7 +71,8 @@ package body WNM.GUI.Menu.Assign_To_Track is
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
+   overriding
+   procedure On_Event
      (This  : in out Assign_To_Track_Window;
       Event : Menu_Event)
    is
@@ -95,10 +97,11 @@ package body WNM.GUI.Menu.Assign_To_Track is
    -- On_Pushed --
    ---------------
 
-   overriding procedure On_Pushed (This  : in out Assign_To_Track_Window)
+   overriding
+   procedure On_Pushed (This  : in out Assign_To_Track_Window)
    is
    begin
-      This.Track := Sequencer.Track;
+      This.Track := Sequencer.Editing_Track;
    end On_Pushed;
 
 

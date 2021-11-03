@@ -35,9 +35,11 @@ package body WNM.File_System is
    ---------------
 
    procedure Open_Read (FD : aliased in out File_Descriptor; Name : String) is
+      Result : constant int := Littlefs.Open (FS, FD, Name, LFS_O_RDONLY);
    begin
-      if Littlefs.Open (FS, FD, Name, LFS_O_RDONLY) /= 0 then
-         raise Program_Error with "Open_Read ('" & Name & "') file error...";
+      if Result /= 0 then
+         raise Program_Error with "Open_Read ('" & Name & "') file error (" &
+           Result'Img & ")...";
       end if;
    end Open_Read;
 

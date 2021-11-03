@@ -1,6 +1,7 @@
 with "config/wee_noise_maker_config.gpr";
 
 with "rp2040_hal.gpr";
+with "embedded_components.gpr";
 
 project Wee_Noise_Maker is
 

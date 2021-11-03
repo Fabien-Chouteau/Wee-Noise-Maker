@@ -37,20 +37,38 @@ package body WNM.UI is
 
    procedure Toggle_FX (B : Keyboard_Button);
 
-   Default_Input_Mode : constant Input_Mode_Type := Note;
-
    FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
-   Current_Input_Mode : Input_Mode_Type := Note;
+   Last_Main_Mode : Main_Modes := Track_Mode;
+   Current_Input_Mode : Input_Mode_Type := Last_Main_Mode;
 
-   Editing_Step : Sequencer_Steps := 1;
-   Editing_Pattern : Patterns := 1;
+   Select_Done : Boolean := False;
+
+   Recording_On : Boolean := False;
 
    ----------------
    -- Input_Mode --
    ----------------
 
-   function Input_Mode return Input_Mode_Type
-   is (Current_Input_Mode);
+   function Input_Mode return Input_Mode_Type is
+   begin
+      return Current_Input_Mode;
+   end Input_Mode;
+
+   --------------------
+   -- Input_GUI_Mode --
+   --------------------
+
+   function Input_GUI_Mode return Input_Mode_Type is
+   begin
+      if Current_Input_Mode in Pattern_Select | Track_Select | Step_Select then
+         return Last_Main_Mode;
+      else
+         return Current_Input_Mode;
+      end if;
+   end Input_GUI_Mode;
+
+   function Recording return Boolean
+   is (Recording_On);
 
    ------------------
    -- Signal_Event --
@@ -72,73 +90,153 @@ package body WNM.UI is
 
       case Current_Input_Mode is
 
-      when Note =>
-         case Evt is
-            when On_Press =>
-               case B is
+         when Main_Modes =>
+            case Evt is
+               when On_Press=>
+                  case B is
+                  when Pattern_Button =>
+                     Current_Input_Mode := Pattern_Select;
+                     Select_Done := False;
+                  when Track_Button =>
+                     Current_Input_Mode := Track_Select;
+                     Select_Done := False;
+                  when Step_Button =>
+                     Current_Input_Mode := Step_Select;
+                     Select_Done := False;
+
                   when Func =>
                      --  Switch to Func mode
-                        Current_Input_Mode := FX_Alt;
+                     Current_Input_Mode := FX_Alt;
+
+                  when Menu =>
+                     GUI.Menu.Open (GUI.Menu.Main_Menu);
+
                   when Play =>
                      Sequencer.Play_Pause;
+
                   when Rec =>
-                     Sequencer.Rec_Pressed;
-                  when Keyboard_Button =>
-                     if Sequencer.State
-                       in Sequencer.Edit | Sequencer.Play_And_Edit
-                     then
-                        Editing_Step := To_Value (B);
+                     if Current_Input_Mode = Pattern_Mode then
+                        if Recording then
+                           Pattern_Sequencer.End_Recording;
+                        else
+                           Pattern_Sequencer.Start_Recording;
+                        end if;
                      end if;
 
-                     Sequencer.On_Press (B);
-                  when Step_Button =>
-                     GUI.Menu.Open (GUI.Menu.Step_Menu);
-                     Current_Input_Mode := Step_Select;
-                  when Track_Button =>
-                     GUI.Menu.Open (GUI.Menu.Track_Menu);
-                     Current_Input_Mode := Track_Select;
-                  when Pattern_Button =>
-                     GUI.Menu.Open (GUI.Menu.Pattern_Menu);
-                     Current_Input_Mode := Pattern_Select;
-                  when Menu =>
-                     GUI.Menu.Root.Push_Root_Window;
-                  when others => null;
-               end case;
-            when On_Long_Press =>
-               case B is
+                     Recording_On := not Recording_On;
+
+                  when Keyboard_Button =>
+
+                     Sequencer.On_Press (B, Current_Input_Mode);
+
+                  when others =>
+                     null;
+                  end case;
+               when On_Long_Press =>
+                  case B is
                   when Play =>
                      --  Switch to volume/BPM config mode
                      Current_Input_Mode := Volume_BPM;
-                  when Rec =>
-                     --  Switch to squence edition mode
-                     Sequencer.Rec_Long;
-                  when B1 .. B16 =>
-
-                     GUI.Menu.Open (GUI.Menu.Step_Menu);
-                     Editing_Step := To_Value (B);
+                  --  when Rec =>
+                  --     --  Switch to squence edition mode
+                  --     Sequencer.Rec_Long;
+                  --  when B1 .. B16 =>
+                  --
+                  --     GUI.Menu.Open (GUI.Menu.Step_Menu);
+                  --     Editing_Step := To_Value (B);
+                  --
+                  --  when Pattern_Button =>
+                  --     GUI.Menu.Open (GUI.Menu.Pattern_Menu);
+                  --     Current_Input_Mode := Pattern_Select;
                   when others => null;
-               end case;
-            when On_Release =>
-               case B is
+                  end case;
+               when On_Release =>
+                  case B is
                   when Keyboard_Button =>
-                     --  Release note or octave Up/Down
-                     Sequencer.On_Release (B);
-                  when Rec =>
-                     Sequencer.Rec_Release;
+                     Sequencer.On_Release (B, Current_Input_Mode);
                   when others => null;
-               end case;
-            when others => null;
-         end case;
+                  end case;
+               when others => null;
+            end case;
 
-         when Volume_BPM =>
-            if B = Play and Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
-               WNM.Pattern_Sequencer.End_Sequence_Edit;
-            end if;
+         when Pattern_Select =>
+            case B is
+               when Keyboard_Button =>
+                  Sequencer.Set_Editing_Pattern (To_Value (B));
+                  Select_Done := True;
 
-            if B in B1 .. B16 and Evt = On_Press then
-               WNM.Synth.Toggle_Mute (To_Value (B));
-            end if;
+               when Pattern_Button =>
+                  if Evt = On_Release then
+                     if Select_Done then
+                        --  Go back a main mode
+                        Current_Input_Mode := Last_Main_Mode;
+
+                     else
+                        --  Switch to pattern mode
+                        Current_Input_Mode := Pattern_Mode;
+                        GUI.Menu.Open (GUI.Menu.Pattern_Menu);
+                        Last_Main_Mode := Current_Input_Mode;
+
+                        --  Switching mode disables recording.
+                        --  TODO: Is that a good thing?
+                        Recording_On := False;
+                     end if;
+                  end if;
+               when others => null;
+            end case;
+
+         when Track_Select =>
+            case B is
+               when Keyboard_Button =>
+                  Sequencer.Set_Editing_Track (To_Value (B));
+                  Select_Done := True;
+
+
+               when Track_Button =>
+                  if Evt = On_Release then
+                     if Select_Done then
+                        --  Go back a main mode
+                        Current_Input_Mode := Last_Main_Mode;
+
+                     else
+                        --  Switch to track mode
+                        Current_Input_Mode := Track_Mode;
+                        GUI.Menu.Open (GUI.Menu.Track_Menu);
+                        Last_Main_Mode := Current_Input_Mode;
+
+                        --  Switching mode disables recording.
+                        --  TODO: Is that a good thing?
+                        Recording_On := False;
+                     end if;
+                  end if;
+               when others => null;
+            end case;
+
+         when Step_Select =>
+            case B is
+               when Keyboard_Button =>
+                  Sequencer.Set_Editing_Step (To_Value (B));
+                  Select_Done := True;
+
+               when Step_Button =>
+                  if Evt = On_Release then
+                     if Select_Done then
+                        --  Go back a main mode
+                        Current_Input_Mode := Last_Main_Mode;
+
+                     else
+                        --  Switch to step mode
+                        Current_Input_Mode := Step_Mode;
+                        GUI.Menu.Open (GUI.Menu.Step_Menu);
+                        Last_Main_Mode := Current_Input_Mode;
+
+                        --  Switching mode disables recording.
+                        --  TODO: Is that a good thing?
+                        Recording_On := False;
+                     end if;
+                  end if;
+               when others => null;
+            end case;
 
          when FX_Alt =>
             case Evt is
@@ -151,12 +249,13 @@ package body WNM.UI is
                         Current_Input_Mode := Copy;
                      when Track_Button =>
                         Copy_T := WNM.Sequence_Copy.Start_Copy_Track
-                          (WNM.Pattern_Sequencer.Current_Pattern);
+                          (Sequencer.Editing_Pattern);
 
                         Current_Input_Mode := Copy;
                      when Step_Button =>
                         Copy_T := WNM.Sequence_Copy.Start_Copy_Step
-                          (WNM.Pattern_Sequencer.Current_Pattern, Track);
+                          (Sequencer.Editing_Pattern,
+                           Sequencer.Editing_Track);
 
                         Current_Input_Mode := Copy;
                      when others =>
@@ -164,7 +263,7 @@ package body WNM.UI is
                   end case;
                when On_Release =>
                   if B = Func then
-                     Current_Input_Mode := Default_Input_Mode;
+                     Current_Input_Mode := Last_Main_Mode;
                   end if;
                when others =>
                   null;
@@ -172,46 +271,190 @@ package body WNM.UI is
 
          when Copy =>
             if Evt = On_Release and then B = Func then
-               Current_Input_Mode := Default_Input_Mode;
+               Current_Input_Mode := Last_Main_Mode;
             elsif Evt = On_Press then
                WNM.Sequence_Copy.Apply (Copy_T, B);
                if WNM.Sequence_Copy.Is_Complete (Copy_T) then
-                  WNM.GUI.Popup.Display ("  copied  ", 500);
                   WNM.Sequencer.Do_Copy (Copy_T);
+                  WNM.GUI.Popup.Display ("  copied  ", 500);
                end if;
             end if;
 
-         when Step_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Editing_Step := To_Value (B);
-            elsif B = Step_Button and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
+         when Volume_BPM =>
+            if B = Play and Evt = On_Release then
+               Current_Input_Mode := Last_Main_Mode;
             end if;
 
-         when Track_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Sequencer.Select_Track (To_Value (B));
-            elsif B = Track_Button and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
+            if B in Keyboard_Button and Evt = On_Press then
+               WNM.Synth.Toggle_Mute (To_Value (B));
             end if;
 
-         when Pattern_Select =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Editing_Pattern := To_Value (B);
-            elsif B = Rec and then Evt = On_Press then
-               Current_Input_Mode := Pattern_Chaining;
-            elsif B = Pattern_Button and then Evt = On_Release then
-               Current_Input_Mode := Default_Input_Mode;
-            end if;
 
-         when Pattern_Chaining =>
-            if B in B1 .. B16 and then Evt = On_Press then
-               Pattern_Sequencer.Add_To_Sequence (To_Value (B));
-            elsif B = Pattern_Button and then Evt = On_Release then
-               Pattern_Sequencer.End_Sequence_Edit;
-               Current_Input_Mode := Default_Input_Mode;
-            end if;
+         when others =>
+            null;
       end case;
+
+      --  case Current_Input_Mode is
+      --
+      --     when Pattern_Mode =>
+      --        if B in B1 .. B16 and then Evt = On_Press then
+      --           --  Play the pattern coresponding to the button
+      --           Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+      --           Pattern_Sequencer.End_Sequence_Edit;
+      --        elsif B = Rec and then Evt = On_Press then
+      --           Current_Input_Mode := Pattern_Chaining;
+      --        end if;
+      --
+      --     when Track_Mode =>
+      --        null;
+      --
+      --     when Step_Mode =>
+      --        null;
+      --
+      --  when Note =>
+      --     case Evt is
+      --        when On_Press =>
+      --           case B is
+      --              when Func =>
+      --                 --  Switch to Func mode
+      --                    Current_Input_Mode := FX_Alt;
+      --              when Play =>
+      --                 Sequencer.Play_Pause;
+      --              when Rec =>
+      --                 Sequencer.Rec_Pressed;
+      --              when Keyboard_Button =>
+      --                 if Sequencer.State
+      --                   in Sequencer.Edit | Sequencer.Play_And_Edit
+      --                 then
+      --                    Editing_Step := To_Value (B);
+      --                 end if;
+      --
+      --                 Sequencer.On_Press (B);
+      --              when Step_Button =>
+      --                 GUI.Menu.Open (GUI.Menu.Step_Menu);
+      --                 Current_Input_Mode := Step_Select;
+      --              when Track_Button =>
+      --                 GUI.Menu.Open (GUI.Menu.Track_Menu);
+      --                 Current_Input_Mode := Track_Select;
+      --              when Pattern_Button =>
+      --                 GUI.Menu.Open (GUI.Menu.Pattern_Menu);
+      --                 Current_Input_Mode := Pattern_Mode;
+      --              when Menu =>
+      --                 GUI.Menu.Root.Push_Root_Window;
+      --              when others => null;
+      --           end case;
+      --        when On_Long_Press =>
+      --           case B is
+      --              when Play =>
+      --                 --  Switch to volume/BPM config mode
+      --                 Current_Input_Mode := Volume_BPM;
+      --              when Rec =>
+      --                 --  Switch to squence edition mode
+      --                 Sequencer.Rec_Long;
+      --              when B1 .. B16 =>
+      --
+      --                 GUI.Menu.Open (GUI.Menu.Step_Menu);
+      --                 Editing_Step := To_Value (B);
+      --
+      --              when Pattern_Button =>
+      --                 GUI.Menu.Open (GUI.Menu.Pattern_Menu);
+      --                 Current_Input_Mode := Pattern_Select;
+      --              when others => null;
+      --           end case;
+      --        when On_Release =>
+      --           case B is
+      --              when Keyboard_Button =>
+      --                 --  Release note or octave Up/Down
+      --                 Sequencer.On_Release (B);
+      --              when Rec =>
+      --                 Sequencer.Rec_Release;
+      --              when others => null;
+      --           end case;
+      --        when others => null;
+      --     end case;
+      --
+      --     when Volume_BPM =>
+      --        if B = Play and Evt = On_Release then
+      --           Current_Input_Mode := Last_Main_Mode;
+      --           WNM.Pattern_Sequencer.End_Sequence_Edit;
+      --        end if;
+      --
+      --        if B in B1 .. B16 and Evt = On_Press then
+      --           WNM.Synth.Toggle_Mute (To_Value (B));
+      --        end if;
+      --
+      --     when FX_Alt =>
+      --        case Evt is
+      --           when On_Press =>
+      --              case B is
+      --                 when Keyboard_Button =>
+      --                    Toggle_FX (B);
+      --                 when Pattern_Button =>
+      --                    Copy_T := WNM.Sequence_Copy.Start_Copy_Pattern;
+      --                    Current_Input_Mode := Copy;
+      --                 when Track_Button =>
+      --                    Copy_T := WNM.Sequence_Copy.Start_Copy_Track
+      --                      (WNM.Pattern_Sequencer.Current_Pattern);
+      --
+      --                    Current_Input_Mode := Copy;
+      --                 when Step_Button =>
+      --                    Copy_T := WNM.Sequence_Copy.Start_Copy_Step
+      --                      (WNM.Pattern_Sequencer.Current_Pattern, Track);
+      --
+      --                    Current_Input_Mode := Copy;
+      --                 when others =>
+      --                    null;
+      --              end case;
+      --           when On_Release =>
+      --              if B = Func then
+      --                 Current_Input_Mode := Last_Main_Mode;
+      --              end if;
+      --           when others =>
+      --              null;
+      --        end case;
+      --
+      --     when Copy =>
+      --        if Evt = On_Release and then B = Func then
+      --           Current_Input_Mode := Last_Main_Mode;
+      --        elsif Evt = On_Press then
+      --           WNM.Sequence_Copy.Apply (Copy_T, B);
+      --           if WNM.Sequence_Copy.Is_Complete (Copy_T) then
+      --              WNM.GUI.Popup.Display ("  copied  ", 500);
+      --              WNM.Sequencer.Do_Copy (Copy_T);
+      --           end if;
+      --        end if;
+      --
+      --     when Step_Select =>
+      --        if B in B1 .. B16 and then Evt = On_Press then
+      --           Editing_Step := To_Value (B);
+      --        elsif B = Step_Button and then Evt = On_Release then
+      --           Current_Input_Mode := Last_Main_Mode;
+      --        end if;
+      --
+      --     when Track_Select =>
+      --        if B in B1 .. B16 and then Evt = On_Press then
+      --           Sequencer.Select_Track (To_Value (B));
+      --        elsif B = Track_Button and then Evt = On_Release then
+      --           Current_Input_Mode := Last_Main_Mode;
+      --        end if;
+      --
+      --     when Pattern_Select =>
+      --        if B in B1 .. B16 and then Evt = On_Press then
+      --           Editing_Pattern := To_Value (B);
+      --        elsif B = Rec and then Evt = On_Press then
+      --           Current_Input_Mode := Pattern_Chaining;
+      --        elsif B = Pattern_Button and then Evt = On_Release then
+      --           Current_Input_Mode := Last_Main_Mode;
+      --        end if;
+      --
+      --     when Pattern_Chaining =>
+      --        if B in B1 .. B16 and then Evt = On_Press then
+      --           Pattern_Sequencer.Add_To_Sequence (To_Value (B));
+      --        elsif B = Pattern_Button and then Evt = On_Release then
+      --           Pattern_Sequencer.End_Sequence_Edit;
+      --           Current_Input_Mode := Last_Main_Mode;
+      --        end if;
+      --  end case;
    end Signal_Event;
 
    ---------------
@@ -249,38 +492,33 @@ package body WNM.UI is
    --------------------
 
    function Has_Long_Press (B : Button) return Boolean is
-
-      In_Edit : constant Boolean := Sequencer.State in Play_And_Edit | Edit;
-
-      In_Pattern_Select : constant Boolean :=
-        Current_Input_Mode in Pattern_Select;
    begin
       return (case B is
-              when B1           => In_Edit,
-              when B2           => In_Edit,
-              when B3           => In_Edit,
-              when B4           => In_Edit,
-              when B5           => In_Edit,
-              when B6           => In_Edit,
-              when B7           => In_Edit,
-              when B8           => In_Edit,
-              when B9           => In_Edit,
-              when B10          => In_Edit,
-              when B11          => In_Edit,
-              when B12          => In_Edit,
-              when B13          => In_Edit,
-              when B14          => In_Edit,
-              when B15          => In_Edit,
-              when B16          => In_Edit,
-              when Rec          => not In_Pattern_Select,
-              when Play         => True,
-              when Func         => False,
-              when Step_Button  => False,
-              when Track_Button => False,
-              when Pattern_Button      => False,
-              when Menu         => False,
-              when Encoder_L    => True,
-              when Encoder_R    => True);
+              when B1             => False,
+              when B2             => False,
+              when B3             => False,
+              when B4             => False,
+              when B5             => False,
+              when B6             => False,
+              when B7             => False,
+              when B8             => False,
+              when B9             => False,
+              when B10            => False,
+              when B11            => False,
+              when B12            => False,
+              when B13            => False,
+              when B14            => False,
+              when B15            => False,
+              when B16            => False,
+              when Rec            => False,
+              when Play           => True,
+              when Func           => False,
+              when Step_Button    => False,
+              when Track_Button   => False,
+              when Pattern_Button => False,
+              when Menu           => False,
+              when Encoder_L      => True,
+              when Encoder_R      => True);
    end Has_Long_Press;
 
 
@@ -385,20 +623,17 @@ package body WNM.UI is
 
       LED.Turn_Off_All;
 
-      -- Play LED --
-      if Sequencer.State not in Pause | Edit then
-         LED.Turn_On (Play);
-         if Sequencer.Step in 1 | 5 | 9 | 13 then
-            LED.Turn_On (Play);
-         end if;
+      -- Rec LED --
+      if Recording then
+         LED.Turn_On (Rec);
       end if;
 
-      -- Rec LED --
-      if Sequencer.State = Edit
-        or else
-          Sequencer.State in Play_And_Rec | Play_And_Edit
-      then
-         LED.Turn_On (Rec);
+      -- Play LED --
+      if Pattern_Sequencer.Playing then
+         LED.Turn_On (Play);
+         if Sequencer.Playing_Step in 1 | 5 | 9 | 13 then
+            LED.Turn_On (Play);
+         end if;
       end if;
 
       --  B1 .. B16 LEDs --
@@ -425,7 +660,7 @@ package body WNM.UI is
             -- Track assign mode --
          when Track_Select =>
             for B in B1 .. B16 loop
-               if Sequencer.Track = To_Value (B) then
+               if Editing_Track = To_Value (B) then
                   LED.Turn_On (B);
                end if;
             end loop;
@@ -438,16 +673,6 @@ package body WNM.UI is
                end if;
             end loop;
 
-         when Pattern_Chaining =>
-            for B in B1 .. B16 loop
-               if Pattern_Sequencer.Current_Pattern = To_Value (B) then
-                  LED.Turn_On (B);
-               end if;
-               if Pattern_Sequencer.Is_In_Pattern_Sequence (To_Value (B)) then
-                  LED.Turn_On (B);
-               end if;
-            end loop;
-
          --  Volume and BPM mode --
          when Volume_BPM =>
             for B in B1 .. B16 loop
@@ -456,29 +681,57 @@ package body WNM.UI is
                end if;
             end loop;
 
-            --  Any other mode --
+         when Pattern_Chaining =>
+            for B in B1 .. B16 loop
+               if Pattern_Sequencer.Playing_Pattern = To_Value (B) then
+                  LED.Turn_On (B);
+               end if;
+               if Pattern_Sequencer.Is_In_Pattern_Sequence (To_Value (B)) then
+                  LED.Turn_On (B);
+               end if;
+            end loop;
+
          when others =>
-            case Sequencer.State is
-               when Edit | Play_And_Edit =>
-                  for B in B1 .. B16 loop
+            case Last_Main_Mode is
+            when Pattern_Mode =>
+               for B in B1 .. B16 loop
+                  if Pattern_Sequencer.Is_In_Pattern_Sequence (To_Value (B)) then
+                     LED.Turn_On (B);
+                  end if;
+               end loop;
+
+               --  Blinking playing pattern
+               if Pattern_Sequencer.Playing then
+                  if Sequencer.Playing_Step in 1 | 5 | 9 | 13 then
+                     LED.Turn_On
+                       (To_Button (Pattern_Sequencer.Playing_Pattern));
+                  else
+                     LED.Turn_Off
+                       (To_Button (Pattern_Sequencer.Playing_Pattern));
+                  end if;
+               end if;
+
+            when Track_Mode | Step_Mode =>
+               if Pattern_Sequencer.Playing  then
+                  LED.Turn_On (To_Button (Sequencer.Playing_Step));
+               end if;
+
+               if Last_Main_Mode = Step_Mode or else Recording then
+                  for B in Keyboard_Button loop
                      if Sequencer.Set (To_Value (B)) then
                         LED.Turn_On (B);
                      end if;
                   end loop;
-               when Play | Play_And_Rec =>
-                  for B in B1 .. B16 loop
-                     if Sequencer.Set (To_Value (B), Sequencer.Step) then
+               else
+                  for B in Keyboard_Button loop
+                     if Sequencer.Set (To_Value (B), Sequencer.Playing_Step) then
                         LED.Turn_On (B);
                      end if;
                   end loop;
-               when others =>
-                  null;
+               end if;
+
             end case;
       end case;
-
-      if Sequencer.State in Play_And_Edit | Play_And_Rec | Play then
-         LED.Turn_On (To_Button (Sequencer.Step));
-      end if;
 
       return Next_Start;
    end Update;

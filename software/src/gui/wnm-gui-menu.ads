@@ -21,7 +21,7 @@
 
 package WNM.GUI.Menu is
 
-   type Base_Menu_Kind is (Step_Menu, Track_Menu, Pattern_Menu);
+   type Base_Menu_Kind is (Main_Menu, Step_Menu, Track_Menu, Pattern_Menu);
 
    procedure Open (Kind : Base_Menu_Kind);
 

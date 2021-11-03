@@ -19,12 +19,28 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Time;
+with WNM.UI;
+
 package WNM.Pattern_Sequencer is
 
-   procedure Add_To_Sequence (Pattern : Patterns);
-   procedure End_Sequence_Edit;
+   procedure Start_Recording;
+   procedure End_Recording;
 
-   function Current_Pattern return Patterns;
+   procedure Play_Pause;
+   function Playing return Boolean;
+
+   procedure On_Press (Button : Keyboard_Button;
+                       Mode : WNM.UI.Main_Modes);
+
+   procedure On_Release (Button : Keyboard_Button;
+                         Mode : WNM.UI.Main_Modes);
+
+   procedure Single_Play (P : Patterns);
+
+   procedure Add_To_Sequence (Pattern : Patterns);
+
+   function Playing_Pattern return Patterns;
    function Is_In_Pattern_Sequence (Pattern : Patterns) return Boolean;
 
    procedure Signal_End_Of_Pattern;

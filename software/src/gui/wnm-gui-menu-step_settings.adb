@@ -38,6 +38,18 @@ package body WNM.GUI.Menu.Step_Settings is
       Push (Step_Settings_Singleton'Access);
    end Push_Window;
 
+   function To_Top (S : Sub_Settings) return Top_Settings
+   is (case S is
+          when Condition => Condition,
+          when Note => Note,
+          when Duration => Note,
+          when Velo => Note,
+          when Repeat => Repeat,
+          when Repeat_Rate => Repeat,
+          when CC_A => CC_A,
+          when CC_B => CC_B,
+          when CC_C => CC_C,
+          when CC_D => CC_D);
    ----------
    -- Draw --
    ----------
@@ -47,7 +59,7 @@ package body WNM.GUI.Menu.Step_Settings is
      (This : in out Step_Settings_Menu)
    is
 
-      Trig : constant Sequencer_Steps := UI.Current_Editing_Trig;
+      Trig : constant Sequencer_Steps := Sequencer.Editing_Step;
 
       function CC_Letter (ID : Sequencer.CC_Id) return String
       is (case ID is
@@ -56,31 +68,48 @@ package body WNM.GUI.Menu.Step_Settings is
              when C => "C",
              when D => "D");
 
-      function CC_String (Id : Sequencer.CC_Id) return String
-      is (if Sequencer.CC_Enabled (Trig, Id)
-          then CC_Letter (Id) & Sequencer.CC_Value (Trig, Id)'Img
-          else CC_Letter (Id) & "- disabled -");
-      pragma Unreferenced (CC_String);
+      Top_Setting : constant Top_Settings := To_Top (This.Current_Setting);
    begin
       Draw_Menu_Box ("Step settings",
-                     Count => Settings_Count,
-                     Index => Settings'Pos (This.Current_Setting));
+                     Count => Top_Settings_Count,
+                     Index => Top_Settings'Pos (To_Top (This.Current_Setting)));
 
-      case This.Current_Setting is
+      case Top_Setting is
          when Condition =>
             Draw_Text ("Condition", Img (Sequencer.Trig (Trig)));
 
          when Note      =>
-            Draw_MIDI_Val ("Note", Sequencer.Note (Trig));
+            case This.Current_Setting is
+               when Note =>
+                  Draw_Text ("Note", "");
+               when Duration =>
+                  Draw_Text ("Duration", "");
+               when Velo =>
+                  Draw_Text ("Velocity", "");
+               when others =>
+                  raise Program_Error;
+            end case;
+
+            Draw_MIDI_Note (Sequencer.Note (Trig),
+                            This.Current_Setting = Note);
+
+            Draw_Duration (Sequencer.Duration (Trig),
+                           This.Current_Setting = Duration);
+
+            Draw_MIDI_Val (Sequencer.Velo (Trig),
+                           This.Current_Setting = Velo);
 
          when Repeat =>
-            Draw_Text ("Repeat Count", Sequencer.Repeat (Trig)'Img);
-
-         when Repeat_Rate =>
-            Draw_Text ("Repeat Rate", Img (Sequencer.Repeat_Rate (Trig)));
-
-         when Velo =>
-            Draw_MIDI_Val ("Velocity", Sequencer.Velo (Trig));
+            case This.Current_Setting is
+               when Repeat =>
+                  Draw_Text ("Repeat Count", "");
+                  Draw_Text ("", Sequencer.Repeat (Trig)'Img);
+               when Repeat_Rate =>
+                  Draw_Text ("Repeat Rate", "");
+                  Draw_Text ("", Img (Sequencer.Repeat_Rate (Trig)));
+               when others =>
+                  raise Program_Error;
+            end case;
 
          when CC_A .. CC_D =>
             declare
@@ -92,8 +121,9 @@ package body WNM.GUI.Menu.Step_Settings is
                   when others => Sequencer.D);
             begin
                if Sequencer.CC_Enabled (Trig, Id) then
-                  Draw_MIDI_Val ("CC " & CC_Letter (Id),
-                                 Sequencer.CC_Value (Trig, Id));
+                  Draw_Text ("CC " & CC_Letter (Id), "");
+                  Draw_MIDI_Val (Sequencer.CC_Value (Trig, Id),
+                                Selected => False);
                else
                   Draw_Text ("CC " & CC_Letter (Id), "- Disabled -");
                end if;
@@ -110,7 +140,7 @@ package body WNM.GUI.Menu.Step_Settings is
      (This  : in out Step_Settings_Menu;
       Event : Menu_Event)
    is
-      Trig : constant Sequencer_Steps := UI.Current_Editing_Trig;
+      Trig : constant Sequencer_Steps := Sequencer.Editing_Step;
    begin
       case Event.Kind is
          when Left_Press =>
@@ -137,6 +167,12 @@ package body WNM.GUI.Menu.Step_Settings is
                      WNM.Sequencer.Note_Next (Trig);
                   else
                      WNM.Sequencer.Note_Prev (Trig);
+                  end if;
+               when Duration =>
+                  if Event.Value > 0 then
+                     WNM.Sequencer.Duration_Next (Trig);
+                  else
+                     WNM.Sequencer.Duration_Prev (Trig);
                   end if;
                when Repeat =>
                   if Event.Value > 0 then
@@ -175,16 +211,16 @@ package body WNM.GUI.Menu.Step_Settings is
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
-               if This.Current_Setting /= Settings'Last then
-                  This.Current_Setting := Settings'Succ (This.Current_Setting);
+               if This.Current_Setting /= Sub_Settings'Last then
+                  This.Current_Setting := Sub_Settings'Succ (This.Current_Setting);
                else
-                  This.Current_Setting := Settings'First;
+                  This.Current_Setting := Sub_Settings'First;
                end if;
             elsif Event.Value < 0 then
-               if This.Current_Setting /= Settings'First then
-                  This.Current_Setting := Settings'Pred (This.Current_Setting);
+               if This.Current_Setting /= Sub_Settings'First then
+                  This.Current_Setting := Sub_Settings'Pred (This.Current_Setting);
                else
-                  This.Current_Setting := Settings'Last;
+                  This.Current_Setting := Sub_Settings'Last;
                end if;
             end if;
       end case;

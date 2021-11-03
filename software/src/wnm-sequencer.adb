@@ -21,7 +21,7 @@
 
 with WNM.Short_Term_Sequencer;
 with WNM.Pattern_Sequencer;
-with WNM.UI;
+with WNM.UI; use WNM.UI;
 with WNM.MIDI.Queues;
 with HAL;                   use HAL;
 
@@ -35,10 +35,11 @@ package body WNM.Sequencer is
       Repeat      : WNM.Repeat;
       Repeat_Rate : WNM.Repeat_Rate;
 
-      Note : MIDI.MIDI_Key := MIDI.C4;
-      Velo : MIDI.MIDI_Data := 40;
-      CC_Ena : CC_Ena_Array := (others => False);
-      CC_Val : CC_Val_Array := (others => 0);
+      Note     : MIDI.MIDI_Key := MIDI.C4;
+      Duration : Note_Duration := Quarter;
+      Velo     : MIDI.MIDI_Data := MIDI.MIDI_Data'Last;
+      CC_Ena   : CC_Ena_Array := (others => False);
+      CC_Val   : CC_Val_Array := (others => 0);
    end record;
 
    type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
@@ -47,9 +48,15 @@ package body WNM.Sequencer is
 
    Sequencer_BPM : Beat_Per_Minute := 120;
 
-   Current_Step      : Sequencer_Steps := Sequencer_Steps'First with Atomic;
-   Current_Seq_State : Sequencer_State := Pause with Atomic;
+   Current_Playing_Step : Sequencer_Steps := Sequencer_Steps'First with Atomic;
+
+   --  Current_Seq_State : Sequencer_State := Pause with Atomic;
    Current_Track     : Tracks := Tracks'First with Atomic;
+
+   Current_Editing_Pattern : Patterns := Patterns'First;
+   Current_Editing_Track : Tracks := Tracks'First;
+   Current_Editing_Step : Sequencer_Steps := Sequencer_Steps'First;
+
    Track_Instrument  : array (Tracks) of Keyboard_Value :=
      (others => Keyboard_Value'First);
 
@@ -76,41 +83,101 @@ package body WNM.Sequencer is
                                   Rec_Long_Event,
                                   Rec_Release_Event);
    procedure Do_Preview_Trigger (T : Tracks);
+   procedure Play_Step (P : Patterns; T : Tracks; S : Sequencer_Steps;
+                        Now : Time.Time_Microseconds := Time.Clock);
 
-   ----------------
-   -- Transition --
-   ----------------
+   --  ----------------
+   --  -- Transition --
+   --  ----------------
+   --
+   --  function Transition (State : Sequencer_State;
+   --                       Evt   : Sequencer_State_Event)
+   --                       return Sequencer_State
+   --  is
+   --    (case State is
+   --        when Pause =>        (case Evt is
+   --                                 when Play_Event        => Play,
+   --                                 when Rec_Event         => Edit,
+   --                                 when Rec_Long_Event    => Pause,
+   --                                 when Rec_Release_Event => Pause),
+   --        when Play =>         (case Evt is
+   --                                 when Play_Event        => Pause,
+   --                                 when Rec_Event         => Play_And_Edit,
+   --                                 when Rec_Long_Event    => Play_And_Rec,
+   --                                 when Rec_Release_Event => Play),
+   --        when Edit =>         (case Evt is
+   --                                 when Play_Event        => Play_And_Edit,
+   --                                 when Rec_Event         => Pause,
+   --                                 when Rec_Long_Event    => Edit,
+   --                                 when Rec_Release_Event => Edit),
+   --        when Play_And_Edit =>         (case Evt is
+   --                                 when Play_Event        => Edit,
+   --                                 when Rec_Event         => Play,
+   --                                 when Rec_Long_Event    => Play_And_Rec,
+   --                                 when Rec_Release_Event => Play_And_Edit),
+   --        when Play_And_Rec => (case Evt is
+   --                                 when Play_Event        => Pause,
+   --                                 when Rec_Event         => Play_And_Rec,
+   --                                 when Rec_Long_Event    => Play_And_Rec,
+   --                                 when Rec_Release_Event => Play));
 
-   function Transition (State : Sequencer_State;
-                        Evt   : Sequencer_State_Event)
-                        return Sequencer_State
-   is
-     (case State is
-         when Pause =>        (case Evt is
-                                  when Play_Event        => Play,
-                                  when Rec_Event         => Edit,
-                                  when Rec_Long_Event    => Pause,
-                                  when Rec_Release_Event => Pause),
-         when Play =>         (case Evt is
-                                  when Play_Event        => Pause,
-                                  when Rec_Event         => Play_And_Edit,
-                                  when Rec_Long_Event    => Play_And_Rec,
-                                  when Rec_Release_Event => Play),
-         when Edit =>         (case Evt is
-                                  when Play_Event        => Play_And_Edit,
-                                  when Rec_Event         => Pause,
-                                  when Rec_Long_Event    => Edit,
-                                  when Rec_Release_Event => Edit),
-         when Play_And_Edit =>         (case Evt is
-                                  when Play_Event        => Edit,
-                                  when Rec_Event         => Play,
-                                  when Rec_Long_Event    => Play_And_Rec,
-                                  when Rec_Release_Event => Play_And_Edit),
-         when Play_And_Rec => (case Evt is
-                                  when Play_Event        => Pause,
-                                  when Rec_Event         => Play_And_Rec,
-                                  when Rec_Long_Event    => Play_And_Rec,
-                                  when Rec_Release_Event => Play));
+   ------------------
+   -- Playing_Step --
+   ------------------
+
+   function Playing_Step return Sequencer_Steps
+   is (Current_Playing_Step);
+
+   ---------------------
+   -- Playing_Pattern --
+   ---------------------
+
+   function Playing_Pattern return Patterns
+   is (Pattern_Sequencer.Playing_Pattern);
+
+   -------------------
+   -- Editing_Step --
+   -------------------
+
+   function Editing_Step return Sequencer_Steps
+   is (Current_Editing_Step);
+
+   --------------------
+   -- Editing_Track --
+   --------------------
+
+   function Editing_Track return Tracks
+   is (Current_Editing_Track);
+
+   ----------------------
+   -- Editing_Pattern --
+   ----------------------
+
+   function Editing_Pattern return Patterns
+   is (Current_Editing_Pattern);
+
+   procedure Set_Editing_Step    (S : Sequencer_Steps) is
+   begin
+      Current_Editing_Step := S;
+   end Set_Editing_Step;
+
+   -----------------------
+   -- Set_Editing_Track --
+   -----------------------
+
+   procedure Set_Editing_Track   (T : Tracks) is
+   begin
+      Current_Editing_Track := T;
+   end Set_Editing_Track;
+
+   -------------------------
+   -- Set_Editing_Pattern --
+   -------------------------
+
+   procedure Set_Editing_Pattern (P : Patterns) is
+   begin
+      Current_Editing_Pattern := P;
+   end Set_Editing_Pattern;
 
    ------------------------
    -- Do_Preview_Trigger --
@@ -126,7 +193,7 @@ package body WNM.Sequencer is
          40));
       WNM.Short_Term_Sequencer.Push
         ((MIDI.Note_Off,
-         WNM.MIDI.To_MIDI_Channel (Track),
+         WNM.MIDI.To_MIDI_Channel (T),
          MIDI.C4,
          0),
          Time.Clock + Microseconds_Per_Beat);
@@ -152,95 +219,81 @@ package body WNM.Sequencer is
 --           when B16 => MIDI.Key (Oct + 1, MIDI.C),
 --           when others => MIDI.A0);
 
-   -----------
-   -- State --
-   -----------
-
-   function State return Sequencer_State is
-     (Current_Seq_State);
-
-   ----------
-   -- Step --
-   ----------
-
-   function Step return Sequencer_Steps is
-      (Current_Step);
-
    ----------------
    -- Play_Pause --
    ----------------
 
    procedure Play_Pause is
    begin
-      Current_Seq_State := Transition (Current_Seq_State, Play_Event);
-      if Current_Seq_State in Play | Play_And_Rec | Edit | Play_And_Edit then
-         Current_Step := Sequencer_Steps'First;
+      if not Pattern_Sequencer.Playing then
+         Current_Playing_Step := Sequencer_Steps'First;
          Microstep := 1;
          Execute_Step;
       end if;
+
+      Pattern_Sequencer.Play_Pause;
+
    end Play_Pause;
-
-   -----------------
-   -- Rec_Pressed --
-   -----------------
-
-   procedure Rec_Pressed is
-   begin
-      Current_Seq_State := Transition (Current_Seq_State, Rec_Event);
-   end Rec_Pressed;
-
-   --------------
-   -- Rec_Long --
-   --------------
-
-   procedure Rec_Long is
-   begin
-      Current_Seq_State := Transition (Current_Seq_State, Rec_Long_Event);
-   end Rec_Long;
-
-   -----------------
-   -- Rec_Release --
-   -----------------
-
-   procedure Rec_Release is
-   begin
-      Current_Seq_State := Transition (Current_Seq_State, Rec_Release_Event);
-   end Rec_Release;
 
    --------------
    -- On_Press --
    --------------
 
-   procedure On_Press (Button : Keyboard_Button) is
+   procedure On_Press (Button : Keyboard_Button;
+                       Mode   : WNM.UI.Main_Modes)
+   is
       V : constant Keyboard_Value := To_Value (Button);
    begin
-      case Current_Seq_State is
-         when Pause | Play =>
-            Do_Preview_Trigger (V);
+      case Mode is
+         when UI.Pattern_Mode =>
+            Current_Editing_Pattern := V;
+            Pattern_Sequencer.On_Press (Button, Mode);
 
-            Current_Track := V;
+         when UI.Track_Mode | UI.Step_Mode =>
 
-         when Play_And_Rec =>
-            Sequences (Pattern_Sequencer.Current_Pattern) (V) (Step).Trig
-              := Always;
-            Current_Track := V;
-            if Microstep /= 1 then
-               Do_Preview_Trigger (V);
+            if Mode = UI.Track_Mode and then not UI.Recording then
+               Current_Editing_Track := V;
+            else
+               Current_Editing_Step := V;
             end if;
 
-         when Play_And_Edit | Edit =>
-            declare
-               S : Step_Rec renames Sequences
-                 (Pattern_Sequencer.Current_Pattern)
-                 (Current_Track)
-                 (To_Value (Button));
-            begin
-               if S.Trig /= None then
-                  S.Trig := None;
+            --  if UI.Recording and then Pattern_Sequencer.Playing then
+            --
+            --     --  Live record the trigger
+            --     Sequences (Current_Editing_Pattern) (V) (Current_Playing_Step).Trig
+            --       := Always;
+            --
+            --     if Microstep /= 1 then
+            --        --  If user play later than the step time, play a preview
+            --        Do_Preview_Trigger (V);
+            --     end if;
+            --  else
+            --     Do_Preview_Trigger (V);
+            --  end if;
+
+            if UI.Recording then
+               declare
+                  S : Step_Rec renames Sequences
+                    (Editing_Pattern)
+                    (Editing_Track)
+                    (To_Value (Button));
+               begin
+                  if S.Trig /= None then
+                     S.Trig := None;
+                  else
+                     S.Trig := Always;
+                  end if;
+               end;
+            else
+               if Mode = UI.Step_Mode then
+                  Play_Step (Editing_Pattern,
+                             Editing_Track,
+                             To_Value (Button));
                else
-                  S.Trig := Always;
+                  Do_Preview_Trigger (V);
+
                end if;
-            end;
+            end if;
       end case;
    end On_Press;
 
@@ -248,9 +301,11 @@ package body WNM.Sequencer is
    -- On_Release --
    ----------------
 
-   procedure On_Release (Button : Keyboard_Button) is
+   procedure On_Release (Button : Keyboard_Button;
+                         Mode   : WNM.UI.Main_Modes)
+   is
    begin
-      null;
+      Pattern_Sequencer.On_Release (Button, Mode);
    end On_Release;
 
    --------------------
@@ -293,13 +348,6 @@ package body WNM.Sequencer is
       end case;
 
    end Do_Copy;
-
-   -----------
-   -- Track --
-   -----------
-
-   function Track return Tracks
-   is (Current_Track);
 
    --------------------
    -- Set_Instrument --
@@ -386,6 +434,83 @@ package body WNM.Sequencer is
       return Rand_Percent (Rand_Z mod 100);
    end Random;
 
+   ---------------
+   -- Play_Step --
+   ---------------
+
+   procedure Play_Step (P : Patterns; T : Tracks; S : Sequencer_Steps;
+                        Now : Time.Time_Microseconds := Time.Clock)
+   is
+      Step : Step_Rec renames Sequences (P) (T) (S);
+
+      Note_Duration : constant Time.Time_Microseconds :=
+        (case Step.Duration
+         is
+            when Double  => Microseconds_Per_Beat * 2,
+            when Whole   => Microseconds_Per_Beat,
+            when Half    => Microseconds_Per_Beat / 2,
+            when Quarter => Microseconds_Per_Beat / 4,
+            when N_8th   => Microseconds_Per_Beat / 8,
+            when N_16th  => Microseconds_Per_Beat / 16,
+            when N_32nd  => Microseconds_Per_Beat / 32);
+   begin
+      WNM.MIDI.Queues.Sequencer_Push
+        ((MIDI.Note_On,
+         WNM.MIDI.To_MIDI_Channel (T),
+         Step.Note,
+         Step.Velo));
+      declare
+         Repeat_Span : constant Time.Time_Microseconds :=
+           Microseconds_Per_Beat / (case Step.Repeat_Rate
+                                    is
+                                       when Rate_1_2  => 2,
+                                       when Rate_1_3  => 3,
+                                       when Rate_1_4  => 4,
+                                       when Rate_1_5  => 5,
+                                       when Rate_1_6  => 6,
+                                       when Rate_1_8  => 8,
+                                       when Rate_1_10 => 10,
+                                       when Rate_1_12 => 12,
+                                       when Rate_1_16 => 16,
+                                       when Rate_1_20 => 20,
+                                       when Rate_1_24 => 24,
+                                       when Rate_1_32 => 32);
+
+         Repeat_Duration : constant Time.Time_Microseconds :=
+           (if Step.Repeat /= 0 and then Repeat_Span < Note_Duration
+            then Repeat_Span
+            else Note_Duration);
+
+         Repeat_Time : Time.Time_Microseconds := Now + Repeat_Span;
+      begin
+         --  Note-Off for the first Note-On, its duration depends if
+         --  there is a repeat and the repeat rate.
+         WNM.Short_Term_Sequencer.Push
+           ((MIDI.Note_Off,
+            WNM.MIDI.To_MIDI_Channel (T),
+            Step.Note,
+            0),
+            Now + Repeat_Duration);
+
+         for Rep in 1 .. Step.Repeat loop
+            WNM.Short_Term_Sequencer.Push
+              ((MIDI.Note_On,
+               WNM.MIDI.To_MIDI_Channel (T),
+               Step.Note,
+               Step.Velo),
+               Repeat_Time);
+            WNM.Short_Term_Sequencer.Push
+              ((MIDI.Note_Off,
+               WNM.MIDI.To_MIDI_Channel (T),
+               Step.Note,
+               0),
+               Repeat_Time + Repeat_Duration);
+
+            Repeat_Time := Repeat_Time + Repeat_Span;
+         end loop;
+      end;
+   end Play_Step;
+
    ------------------
    -- Process_Step --
    ------------------
@@ -432,63 +557,7 @@ package body WNM.Sequencer is
             end case;
 
             if Condition then
-               WNM.MIDI.Queues.Sequencer_Push
-                 ((MIDI.Note_On,
-                  WNM.MIDI.To_MIDI_Channel (Track),
-                  S.Note,
-                  S.Velo));
-               declare
-                  Repeat_Span : constant Time.Time_Microseconds :=
-                    Microseconds_Per_Beat / (case Sequences (Pattern)
-                                             (Track) (Step).Repeat_Rate
-                                             is
-                                                when Rate_1_1  => 1,
-                                                when Rate_1_2  => 2,
-                                                when Rate_1_3  => 3,
-                                                when Rate_1_4  => 4,
-                                                when Rate_1_5  => 5,
-                                                when Rate_1_6  => 6,
-                                                when Rate_1_8  => 8,
-                                                when Rate_1_10 => 10,
-                                                when Rate_1_12 => 12,
-                                                when Rate_1_16 => 16,
-                                                when Rate_1_20 => 20,
-                                                when Rate_1_24 => 24,
-                                                when Rate_1_32 => 32);
-
-                  Repeat_Duration : constant Time.Time_Microseconds :=
-                    (if S.Repeat /= 0 and then Repeat_Span < Note_Duration
-                     then Repeat_Span
-                     else Note_Duration);
-
-                  Repeat_Time : Time.Time_Microseconds := Now + Repeat_Span;
-               begin
-                  --  Note-Off for the first Note-On, its duration depends if
-                  --  there is a repeat and the repeat rate.
-                  WNM.Short_Term_Sequencer.Push
-                    ((MIDI.Note_Off,
-                     WNM.MIDI.To_MIDI_Channel (Track),
-                     S.Note,
-                     0),
-                     Now + Repeat_Duration);
-
-                  for Rep in 1 .. S.Repeat loop
-                     WNM.Short_Term_Sequencer.Push
-                       ((MIDI.Note_On,
-                        WNM.MIDI.To_MIDI_Channel (Track),
-                        S.Note,
-                        S.Velo),
-                        Repeat_Time);
-                     WNM.Short_Term_Sequencer.Push
-                       ((MIDI.Note_Off,
-                        WNM.MIDI.To_MIDI_Channel (Track),
-                        S.Note,
-                        0),
-                        Repeat_Time + Repeat_Duration);
-
-                     Repeat_Time := Repeat_Time + Repeat_Span;
-                  end loop;
-               end;
+               Play_Step (Pattern, Track, Step, Now);
             end if;
 
             for Id in CC_Id loop
@@ -514,27 +583,24 @@ package body WNM.Sequencer is
 
       Next_Start := Next_Start + (Microseconds_Per_Beat / Steps_Per_Beat) / 2;
 
-      --  Next_Start := Next_Start + Samples_Per_Beat / Steps_Per_Beat / 2;
-
-      if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
+      if Pattern_Sequencer.Playing then
          case Microstep is
 
             --  Begining of a new step
             when 0 =>
-               if Current_Step /= Sequencer_Steps'Last then
-                  Current_Step := Current_Step + 1;
+               if Current_Playing_Step /= Sequencer_Steps'Last then
+                  Current_Playing_Step := Current_Playing_Step + 1;
                else
-                  Current_Step := Sequencer_Steps'First;
+                  Current_Playing_Step := Sequencer_Steps'First;
                   Pattern_Sequencer.Signal_End_Of_Pattern;
                end if;
 
                --  At the middle of the step we play the recorded notes
             when 1 =>
-               if Current_Seq_State in Play | Play_And_Rec | Play_And_Edit then
-                  Process_Step
-                    (Pattern_Sequencer.Current_Pattern, Current_Step);
-               end if;
+               Process_Step (Pattern_Sequencer.Playing_Pattern,
+                             Playing_Step);
          end case;
+
          Microstep := Microstep + 1;
       end if;
    end Execute_Step;
@@ -546,7 +612,6 @@ package body WNM.Sequencer is
    function Update return Time.Time_Microseconds is
       use Synth;
 
-      --  Now     : constant Sample_Time := Sample_Clock;
       Now : constant Time.Time_Microseconds := Time.Clock;
       Success : Boolean;
       Msg     : WNM.MIDI.Message;
@@ -571,8 +636,7 @@ package body WNM.Sequencer is
 
    function Set (Step : Sequencer_Steps) return Boolean is
    begin
-      return Sequences
-        (Pattern_Sequencer.Current_Pattern)(Current_Track)(Step).Trig /= None;
+      return Sequences (Editing_Pattern) (Editing_Track) (Step).Trig /= None;
    end Set;
 
    ---------
@@ -581,8 +645,7 @@ package body WNM.Sequencer is
 
    function Set (Track : Tracks; Step : Sequencer_Steps) return Boolean is
    begin
-      return Sequences
-        (Pattern_Sequencer.Current_Pattern)(Track)(Step).Trig /= None;
+      return Sequences (Editing_Pattern) (Track) (Step).Trig /= None;
    end Set;
 
    ----------
@@ -591,8 +654,7 @@ package body WNM.Sequencer is
 
    function Trig (Step : Sequencer_Steps) return Trigger is
    begin
-      return Sequences
-        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig;
+      return Sequences (Editing_Pattern) (Editing_Track) (Step).Trig;
    end Trig;
 
    ---------------
@@ -601,8 +663,7 @@ package body WNM.Sequencer is
 
    procedure Trig_Next (Step : Sequencer_Steps) is
    begin
-      Next (Sequences
-            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig);
+      Next (Sequences (Editing_Pattern)(Editing_Track) (Step).Trig);
    end Trig_Next;
 
    ---------------
@@ -611,8 +672,7 @@ package body WNM.Sequencer is
 
    procedure Trig_Prev (Step : Sequencer_Steps) is
    begin
-      Prev (Sequences
-            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Trig);
+      Prev (Sequences (Editing_Pattern)(Editing_Track) (Step).Trig);
    end Trig_Prev;
 
    ------------
@@ -622,7 +682,7 @@ package body WNM.Sequencer is
    function Repeat (Step : Sequencer_Steps) return WNM.Repeat is
    begin
       return Sequences
-        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat;
+        (Editing_Pattern) (Editing_Track) (Step).Repeat;
    end Repeat;
 
    -----------------
@@ -632,7 +692,7 @@ package body WNM.Sequencer is
    procedure Repeat_Next (Step : Sequencer_Steps) is
    begin
       Next (Sequences
-            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat);
+            (Editing_Pattern) (Editing_Track) (Step).Repeat);
    end Repeat_Next;
 
    -----------------
@@ -642,7 +702,7 @@ package body WNM.Sequencer is
    procedure Repeat_Prev (Step : Sequencer_Steps) is
    begin
       Prev (Sequences
-            (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat);
+            (Editing_Pattern) (Editing_Track) (Step).Repeat);
    end Repeat_Prev;
 
    -----------------
@@ -652,7 +712,7 @@ package body WNM.Sequencer is
    function Repeat_Rate (Step : Sequencer_Steps) return WNM.Repeat_Rate is
    begin
       return Sequences
-        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Repeat_Rate;
+        (Editing_Pattern) (Editing_Track) (Step).Repeat_Rate;
    end Repeat_Rate;
 
    ----------------------
@@ -662,8 +722,8 @@ package body WNM.Sequencer is
    procedure Repeat_Rate_Next (Step : Sequencer_Steps) is
    begin
       Next (Sequences
-            (Pattern_Sequencer.Current_Pattern)
-            (Current_Track)
+            (Editing_Pattern)
+            (Editing_Track)
             (Step).Repeat_Rate);
    end Repeat_Rate_Next;
 
@@ -674,8 +734,8 @@ package body WNM.Sequencer is
    procedure Repeat_Rate_Prev (Step : Sequencer_Steps) is
    begin
       Prev (Sequences
-            (Pattern_Sequencer.Current_Pattern)
-            (Current_Track)
+            (Editing_Pattern)
+            (Editing_Track)
             (Step).Repeat_Rate);
    end Repeat_Rate_Prev;
 
@@ -686,7 +746,7 @@ package body WNM.Sequencer is
    function Note (Step : Sequencer_Steps) return MIDI.MIDI_Key is
    begin
       return Sequences
-        (Pattern_Sequencer.Current_Pattern) (Current_Track) (Step).Note;
+        (Editing_Pattern) (Editing_Track) (Step).Note;
    end Note;
 
    ---------------
@@ -695,8 +755,8 @@ package body WNM.Sequencer is
 
    procedure Note_Next (Step : Sequencer_Steps) is
       CC : MIDI.MIDI_Key renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).Note;
    begin
       if CC /= MIDI.MIDI_Key'Last then
@@ -710,8 +770,8 @@ package body WNM.Sequencer is
 
    procedure Note_Prev (Step : Sequencer_Steps) is
       CC : MIDI.MIDI_Key renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).Note;
    begin
       if CC /= MIDI.MIDI_Key'First then
@@ -719,14 +779,47 @@ package body WNM.Sequencer is
       end if;
    end Note_Prev;
 
+   -------------------
+   -- Note_Duration --
+   -------------------
+
+   function Duration (Step : Sequencer_Steps) return Note_Duration is
+   begin
+      return Sequences (Editing_Pattern) (Editing_Track) (Step).Duration;
+   end Duration;
+
+   -------------------
+   -- Duration_Next --
+   -------------------
+
+   procedure Duration_Next (Step : Sequencer_Steps) is
+   begin
+      Next (Sequences
+            (Editing_Pattern)
+            (Editing_Track)
+            (Step).Duration);
+   end Duration_Next;
+
+   -------------------
+   -- Duration_Prev --
+   -------------------
+
+   procedure Duration_Prev (Step : Sequencer_Steps) is
+   begin
+      Prev (Sequences
+            (Editing_Pattern)
+            (Editing_Track)
+            (Step).Duration);
+   end Duration_Prev;
+
    ----------
    -- Velo --
    ----------
 
    function Velo (Step : Sequencer_Steps) return MIDI.MIDI_Data is
       V : MIDI.MIDI_Data renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).Velo;
    begin
       return V;
@@ -738,8 +831,8 @@ package body WNM.Sequencer is
 
    procedure Velo_Next (Step : Sequencer_Steps) is
       V : MIDI.MIDI_Data renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).Velo;
    begin
       if V /= MIDI.MIDI_Data'Last then
@@ -753,8 +846,8 @@ package body WNM.Sequencer is
 
    procedure Velo_Prev (Step : Sequencer_Steps) is
       V : MIDI.MIDI_Data renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).Velo;
    begin
       if V /= MIDI.MIDI_Data'First then
@@ -769,8 +862,8 @@ package body WNM.Sequencer is
    function CC_Enabled (Step : Sequencer_Steps; Id : CC_Id) return Boolean is
    begin
       return Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Ena (Id);
    end CC_Enabled;
 
@@ -780,8 +873,8 @@ package body WNM.Sequencer is
 
    procedure CC_Toggle (Step : Sequencer_Steps; Id : CC_Id) is
       CC : Boolean renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Ena (Id);
    begin
       CC := not CC;
@@ -795,8 +888,8 @@ package body WNM.Sequencer is
    is
    begin
       return Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Val (Id);
    end CC_Value;
 
@@ -806,8 +899,8 @@ package body WNM.Sequencer is
 
    procedure CC_Value_Inc (Step : Sequencer_Steps; Id : CC_Id) is
       CC : MIDI.MIDI_Data renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Val (Id);
    begin
       if CC /= MIDI.MIDI_Data'Last then
@@ -816,8 +909,8 @@ package body WNM.Sequencer is
 
       --  Enable when the value is changed
       Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Ena (Id) := True;
    end CC_Value_Inc;
 
@@ -827,8 +920,8 @@ package body WNM.Sequencer is
 
    procedure CC_Value_Dec (Step : Sequencer_Steps; Id : CC_Id) is
       CC : MIDI.MIDI_Data renames Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Val (Id);
    begin
       if CC /= MIDI.MIDI_Data'First then
@@ -837,8 +930,8 @@ package body WNM.Sequencer is
 
       --  Enable when the value is changed
       Sequences
-        (Pattern_Sequencer.Current_Pattern)
-        (Current_Track)
+        (Editing_Pattern)
+        (Editing_Track)
         (Step).CC_Ena (Id) := True;
    end CC_Value_Dec;
 
@@ -846,7 +939,7 @@ begin
    for Pattern in Patterns loop
       for Track in Tracks loop
          for Step in Sequencer_Steps loop
-            Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_1,
+            Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_2,
                                                    others => <>);
          end loop;
       end loop;

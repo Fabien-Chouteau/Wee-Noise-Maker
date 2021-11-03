@@ -18,3 +18,5 @@ rp2040_hal = { path='../../../JeremyGrosser/rp2040_hal' }
 rp2040_hal.Flash_Chip = "generic_qspi"
 [[depends-on]]  # Added by alr
 littlefs = "~0.1.0"  # Added by alr
+[[depends-on]]  # Added by alr
+embedded_components = "~0.1.0"  # Added by alr

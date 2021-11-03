@@ -27,19 +27,25 @@ package WNM.UI is
 
    function Update return Time.Time_Microseconds;
 
-   type Input_Mode_Type is (Note,
+   type Input_Mode_Type is (Pattern_Mode,
+                            Track_Mode,
+                            Step_Mode,
+
+                            Pattern_Select,
+                            Track_Select,
+                            Step_Select,
+
                             Volume_BPM,
                             FX_Alt,
                             Copy,
-                            Step_Select,
-                            Track_Select,
-                            Pattern_Select,
-                            Pattern_Chaining);
+                            Pattern_Chaining
+                           );
 
+   subtype Main_Modes is Input_Mode_Type range Pattern_Mode .. Step_Mode;
    function Input_Mode return Input_Mode_Type;
+   function Input_GUI_Mode return Input_Mode_Type;
 
-   function Current_Editing_Pattern return Patterns;
-   function Current_Editing_Trig return Sequencer_Steps;
+   function Recording return Boolean;
 
    function FX_On (B : Keyboard_Button) return Boolean;
 

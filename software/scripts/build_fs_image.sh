@@ -14,7 +14,7 @@
 
 IMG=wnm_fs.img
 FSMAKER="fsmaker -f littlefs -i ${IMG}"
-#$FSMAKER init $((8 * 1024 * 1024))
+$FSMAKER init $((1 * 1024 * 1024))
 $FSMAKER mkdir /samples
 $FSMAKER import /samples/clap samples_dl/HANDCLP1.WAV.raw 
 $FSMAKER import /samples/kick samples_dl/BT0A0DA.WAV.raw 

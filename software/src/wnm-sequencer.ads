@@ -23,42 +23,41 @@ with WNM.Time;
 with WNM.Synth;
 with WNM.MIDI;
 with WNM.Sequence_Copy;
+with WNM.UI;
 
 package WNM.Sequencer is
 
-   type Sequencer_State is (Pause,
-                            Play,
-                            Edit,
-                            Play_And_Rec,
-                            Play_And_Edit);
+   --  type Sequencer_State is (Pause,
+   --                           Play,
+   --                           Edit,
+   --                           Play_And_Rec,
+   --                           Play_And_Edit);
+   --
+   --  function State return Sequencer_State;
+   --  --  Current state of the sequencer
 
-   function State return Sequencer_State;
-   --  Current state of the sequencer
+   function Playing_Step return Sequencer_Steps;
+   function Playing_Pattern return Patterns;
 
-   function Step return Sequencer_Steps;
-   --  Current step
+   function Editing_Step return Sequencer_Steps;
+   function Editing_Track return Tracks;
+   function Editing_Pattern return Patterns;
+
+   procedure Set_Editing_Step    (S : Sequencer_Steps);
+   procedure Set_Editing_Track   (T : Tracks);
+   procedure Set_Editing_Pattern (P : Patterns);
 
    procedure Play_Pause;
    --  Use it to signal a play/pause event
 
-   procedure Rec_Pressed;
-   --  Use it to signal a rec/stop record event
+   procedure On_Press (Button : Keyboard_Button;
+                       Mode : WNM.UI.Main_Modes);
 
-   procedure Rec_Long;
-
-   procedure Rec_Release;
-
-   procedure On_Press (Button : Keyboard_Button);
-
-   procedure On_Release (Button : Keyboard_Button);
-
-   procedure Select_Track (Track : Tracks);
-   --  Select the current track
+   procedure On_Release (Button : Keyboard_Button;
+                         Mode : WNM.UI.Main_Modes);
 
    procedure Do_Copy (T : in out WNM.Sequence_Copy.Copy_Transaction)
      with Pre => WNM.Sequence_Copy.Is_Complete (T);
-
-   function Track return Tracks;
 
    procedure Set_Instrument (Val : Keyboard_Value);
    --  Set the instrument of the current track
@@ -93,6 +92,10 @@ package WNM.Sequencer is
    function Note (Step : Sequencer_Steps) return MIDI.MIDI_Key;
    procedure Note_Next (Step : Sequencer_Steps);
    procedure Note_Prev (Step : Sequencer_Steps);
+
+   function Duration (Step : Sequencer_Steps) return Note_Duration;
+   procedure Duration_Next (Step : Sequencer_Steps);
+   procedure Duration_Prev (Step : Sequencer_Steps);
 
    function Velo (Step : Sequencer_Steps) return MIDI.MIDI_Data;
    procedure Velo_Next (Step : Sequencer_Steps);

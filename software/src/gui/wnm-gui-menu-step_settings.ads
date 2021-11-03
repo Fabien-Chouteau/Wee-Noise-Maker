@@ -25,12 +25,16 @@ package WNM.GUI.Menu.Step_Settings is
 
 private
 
-   type Settings is (Condition, Note, Repeat, Repeat_Rate, Velo,
-                     CC_A, CC_B, CC_C, CC_D);
-   function Settings_Count is new Enum_Count (Settings);
+
+   type Top_Settings is (Condition, Note, Repeat, CC_A, CC_B, CC_C, CC_D);
+   function Top_Settings_Count is new Enum_Count (Top_Settings);
+
+   type Sub_Settings is (Condition, Note, Duration, Velo, Repeat, Repeat_Rate,
+                         CC_A, CC_B, CC_C, CC_D);
+   function Sub_Settings_Count is new Enum_Count (Sub_Settings);
 
    type Step_Settings_Menu is new Menu_Window with record
-      Current_Setting : Settings := Settings'First;
+      Current_Setting : Sub_Settings := Sub_Settings'First;
    end record;
 
    overriding

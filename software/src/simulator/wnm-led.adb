@@ -26,7 +26,8 @@ with Sf.Graphics.Color;
 package body WNM.LED is
 
    LED_Brightness : array (LEDs) of UInt8 := (others => 0);
-   Next_Start : WNM.Time.Time_Ms := WNM.Time.Clock + LED_Task_Period_Ms;
+   Next_Start : WNM.Time.Time_Microseconds :=
+     WNM.Time.Clock + LED_Task_Period_Microseconds;
 
    -------------
    -- Turn_On --
@@ -66,10 +67,10 @@ package body WNM.LED is
    -- Update --
    ------------
 
-   function Update return WNM.Time.Time_Ms is
+   function Update return WNM.Time.Time_Microseconds is
    begin
       if WNM.Time.Clock >= Next_Start then
-         Next_Start := Next_Start + LED_Task_Period_Ms;
+         Next_Start := Next_Start + LED_Task_Period_Microseconds;
       end if;
 
       for L in LEDs loop

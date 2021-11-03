@@ -27,9 +27,12 @@ package body WNM.GUI.Menu.Drawing is
    Scroll_Bar_Y_Offset : constant := 19;
 
    Value_Text_Y : constant := Box_Bottom - 15;
+   Title_Text_Y : constant := Box_Top + 4;
 
    Arrow_Y_Offset : constant :=
      Box_Top + ((Box_Bottom - Box_Top + 1) - Bitmap_Fonts.Height) / 2;
+
+   Select_Line_X : constant := Box_Bottom - 3;
 
    -------------------
    -- Draw_Menu_Box --
@@ -104,7 +107,7 @@ package body WNM.GUI.Menu.Drawing is
       X : Integer := Box_Center.X - 50;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 4 + Box_Top + 4,
+             Y_Offset    => Title_Text_Y,
              Str         => Title);
 
       Screen.Draw_Line ((Box_Center.X - 50, Box_Center.Y),
@@ -130,7 +133,7 @@ package body WNM.GUI.Menu.Drawing is
       X : Integer := Box_Center.X - 50;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 4 + Box_Top + 4,
+             Y_Offset    => Title_Text_Y,
              Str         => Title);
 
       Screen.Draw_Line ((Box_Center.X - 50, Box_Center.Y),
@@ -149,20 +152,178 @@ package body WNM.GUI.Menu.Drawing is
    -- Draw_MIDI_Val --
    -------------------
 
-   procedure Draw_MIDI_Val (Title : String;
-                            Val   : MIDI.MIDI_Data)
+   procedure Draw_MIDI_Val (Val      : MIDI.MIDI_Data;
+                            Selected : Boolean)
    is
-      X : Integer := Box_Center.X - 50;
+      X : Integer := Box_Center.X + 20;
    begin
-      Print (X_Offset    => X,
-             Y_Offset    => 4 + Box_Top + 4,
-             Str         => Title);
+      if Selected then
+         Screen.Draw_Line ((X + 5, Select_Line_X),
+                           (X + 4 * 6, Select_Line_X));
+      end if;
 
-      X := Box_Center.X - 50;
       Print (X_Offset    => X,
              Y_Offset    => Value_Text_Y,
              Str         => Val'Img);
    end Draw_MIDI_Val;
+
+   --------------------
+   -- Draw_MIDI_Note --
+   --------------------
+
+   procedure Draw_MIDI_Note (Key      : MIDI.MIDI_Key;
+                             Selected : Boolean)
+   is
+      X : Integer := Box_Center.X - 40;
+   begin
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_X),
+                           (X + 3 * 6, Select_Line_X));
+      end if;
+
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => WNM.MIDI.Key_Img (Key));
+
+   end Draw_MIDI_Note;
+
+   -------------------
+   -- Draw_Duration --
+   -------------------
+
+   procedure Draw_Duration (D        : Note_Duration;
+                            Selected : Boolean)
+   is
+      X : Integer := Box_Center.X - 50;
+
+      DX : constant Integer := Box_Center.X - 3;
+      DY : constant := Box_Top + 22;
+   begin
+      if Selected then
+         Screen.Draw_Line ((DX - 1, Select_Line_X),
+                           (DX + 5, Select_Line_X));
+      end if;
+
+      if D = Double then
+         for Cnt in 0 .. 4 loop
+            --  X     X
+            --  XXXXXXX
+            --  X     X
+            --  XXXXXXX
+            --  X     X
+            Screen.Set_Pixel ((DX, DY + 5 + Cnt));
+            Screen.Set_Pixel ((DX + 5, DY + 5 + Cnt));
+
+            Screen.Set_Pixel ((DX + Cnt, DY + 5 +  1));
+            Screen.Set_Pixel ((DX + Cnt, DY + 5 + 3));
+         end loop;
+      else
+         --   XXX
+         --  X   X
+         --  X   X
+         --   XXX
+         Screen.Set_Pixel ((DX + 0, DY + 7));
+         Screen.Set_Pixel ((DX + 0, DY + 8));
+         Screen.Set_Pixel ((DX + 4, DY + 7));
+         Screen.Set_Pixel ((DX + 4, DY + 8));
+         Screen.Set_Pixel ((DX + 1, DY + 6));
+         Screen.Set_Pixel ((DX + 2, DY + 6));
+         Screen.Set_Pixel ((DX + 3, DY + 6));
+         Screen.Set_Pixel ((DX + 1, DY + 9));
+         Screen.Set_Pixel ((DX + 2, DY + 9));
+         Screen.Set_Pixel ((DX + 3, DY + 9));
+         if D = Whole then
+            return;
+         end if;
+
+         --      X
+         --      X
+         --      X
+         --      X
+         --      X
+         --      X
+         --   XXXX
+         --  X   X
+         --  X   X
+         --   XXX
+         for Cnt in 0 .. 6 loop
+            Screen.Set_Pixel ((DX + 4, DY + Cnt));
+         end loop;
+
+         if D = Half then
+            return;
+         end if;
+
+         --      X
+         --      X
+         --      X
+         --      X
+         --      X
+         --      X
+         --   XXXX
+         --  XXXXX
+         --  XXXXX
+         --   XXX
+         Screen.Set_Pixel ((DX + 1, DY + 7));
+         Screen.Set_Pixel ((DX + 2, DY + 7));
+         Screen.Set_Pixel ((DX + 3, DY + 7));
+         Screen.Set_Pixel ((DX + 1, DY + 8));
+         Screen.Set_Pixel ((DX + 2, DY + 8));
+         Screen.Set_Pixel ((DX + 3, DY + 8));
+
+         if D = Quarter then
+            return;
+         end if;
+
+         --      XX
+         --      X X
+         --      X  X
+         --      X
+         --      X
+         --      X
+         --   XXXX
+         --  XXXXX
+         --  XXXXX
+         --   XXX
+         Screen.Set_Pixel ((DX + 5, DY + 0));
+         Screen.Set_Pixel ((DX + 6, DY + 1));
+         Screen.Set_Pixel ((DX + 7, DY + 2));
+         if D = N_8th then
+            return;
+         end if;
+
+         --      XX
+         --      X X
+         --      XX X
+         --      X X X
+         --      X
+         --      X
+         --   XXXX
+         --  XXXXX
+         --  XXXXX
+         --   XXX
+         Screen.Set_Pixel ((DX + 8, DY + 3));
+         Screen.Set_Pixel ((DX + 5, DY + 2));
+         Screen.Set_Pixel ((DX + 6, DY + 3));
+         if D = N_16th then
+            return;
+         end if;
+
+         --      XX
+         --      X X
+         --      XX X
+         --      X X X
+         --      XX X
+         --      X X
+         --   XXXX
+         --  XXXXX
+         --  XXXXX
+         --   XXX
+         Screen.Set_Pixel ((DX + 7, DY + 4));
+         Screen.Set_Pixel ((DX + 5, DY + 4));
+         Screen.Set_Pixel ((DX + 6, DY + 5));
+      end if;
+   end Draw_Duration;
 
    ---------------
    -- Draw_Text --
@@ -174,7 +335,7 @@ package body WNM.GUI.Menu.Drawing is
       X : Integer := Box_Center.X - 50;
    begin
       Print (X_Offset    => X,
-             Y_Offset    => 4 + Box_Top + 4,
+             Y_Offset    => Title_Text_Y,
              Str         => Title);
 
       X := Box_Center.X - 50;

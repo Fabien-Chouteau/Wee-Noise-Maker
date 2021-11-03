@@ -29,12 +29,14 @@ with WNM.Time;
 with RP.SPI;  use RP.SPI;
 with RP.Device;
 with RP.GPIO; use RP.GPIO;
+with RP.DMA;
 
 with WNM.RP2040;
 
 package body WNM.Screen is
 
-   SPI     : RP.SPI.SPI_Port renames RP.Device.SPI_1;
+   SPI         : RP.SPI.SPI_Port renames RP.Device.SPI_1;
+   DMA_Trigger : RP.DMA.DMA_Request_Trigger := RP.DMA.SPI1_TX;
 
    N_Reset : RP.GPIO.GPIO_Point := (Pin => 11);
    DC      : RP.GPIO.GPIO_Point := (Pin => 12);
@@ -46,8 +48,10 @@ package body WNM.Screen is
    --    (0 .. WNM.Screen.Width - 1, 0 .. WNM.Screen.Height - 1)
    --    of Boolean := (others => (others => False));
 
-   Screen_Pixels : SPI_Data_8b (0 .. (Width * (Height / 8)) - 1);
+   subtype Framebuffer is SPI_Data_8b (0 .. (Width * (Height / 8)) - 1);
+   Screen_Pixels : array (Boolean) of Framebuffer;
 
+   Write : Boolean := True;
 
    procedure Initialize;
    procedure Write_Cmd (Cmd : UInt8);
@@ -128,7 +132,7 @@ package body WNM.Screen is
       DC.Clear;
 
       SPI.Configure ((Role     => Master,
-                      Baud      => 1_000_000,
+                      Baud      => 5_000_000,
                       Data_Size => HAL.SPI.Data_Size_8b,
                       Polarity  => Active_Low,
                       Phase     => Rising_Edge,
@@ -147,6 +151,19 @@ package body WNM.Screen is
 
       Write_Cmd ((SET_COL_ADDR, 0, Width - 1));
       Write_Cmd ((SET_PAGE_ADDR, 0, (Height / 8) - 1));
+
+      -- DMA --
+      declare
+         use RP.DMA;
+         Config : DMA_Configuration;
+      begin
+         Config.Trigger := DMA_Trigger;
+         Config.Data_Size := Transfer_8;
+         Config.Increment_Read := True;
+         Config.Increment_Write := False;
+
+         RP.DMA.Configure (RP2040.Screen_SPI_DMA, Config);
+      end;
 
    end Initialize;
 
@@ -180,8 +197,19 @@ package body WNM.Screen is
    procedure Update is
       Status : SPI_Status;
    begin
+      --  if RP.DMA.Busy (RP2040.Screen_SPI_DMA) then
+      --     --  Previous DMA transfer still in progress
+      --     return;
+      --  end if;
+
       DC.Set;
-      SPI.Transmit (Screen_Pixels, Status);
+      SPI.Transmit (Screen_Pixels (Write), Status);
+      --  RP.DMA.Start (Channel => RP2040.Screen_SPI_DMA,
+      --                From    => Screen_Pixels (Write)'Address,
+      --                To      => SPI.FIFO_Address,
+      --                Count   => Screen_Pixels (Write)'Length);
+
+      Write := not Write;
    end Update;
 
    -----------
@@ -190,7 +218,7 @@ package body WNM.Screen is
 
    procedure Clear is
    begin
-      Screen_Pixels := (others => 0);
+      Screen_Pixels (Write) := (others => 0);
    end Clear;
 
    ---------------
@@ -201,7 +229,7 @@ package body WNM.Screen is
       X     : constant Natural := Pt.X;
       Y     : constant Natural := Pt.Y;
       Index : constant Natural := X + (Y / 8) * Screen.Width;
-      Byte  : UInt8 renames Screen_Pixels (Screen_Pixels'First + Index);
+      Byte  : UInt8 renames Screen_Pixels (Write) (Framebuffer'First + Index);
    begin
       if On then
          Byte := Byte or Shift_Left (1, Y mod 8);
