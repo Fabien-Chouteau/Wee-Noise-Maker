@@ -46,6 +46,27 @@ package body WNM.Sequencer is
    type Pattern is array (Tracks) of Sequence;
    Sequences : array (Patterns) of Pattern;
 
+   type CC_Setting is record
+      Controller : MIDI.MIDI_Data := 0;
+      Label      : Controller_Label := "Noname Controller";
+   end record;
+   type CC_Setting_Array is array (CC_Id) of CC_Setting;
+
+   type Track_Setting is record
+      Chan : MIDI.MIDI_Channel := 0;
+      CC : CC_Setting_Array;
+   end record;
+
+   Track_Settings : array (Tracks) of Track_Setting
+     := (others => (Chan => 0,
+                    CC => ((0, "Control 0        "),
+                           (1, "Control 1        "),
+                           (2, "Control 2        "),
+                           (3, "Control 3        ")
+                           )
+                   )
+        );
+
    Sequencer_BPM : Beat_Per_Minute := 120;
 
    Current_Playing_Step : Sequencer_Steps := Sequencer_Steps'First with Atomic;
@@ -453,10 +474,12 @@ package body WNM.Sequencer is
             when N_8th   => Microseconds_Per_Beat / 8,
             when N_16th  => Microseconds_Per_Beat / 16,
             when N_32nd  => Microseconds_Per_Beat / 32);
+
+      Channel : constant MIDI.MIDI_Channel :=  Track_Settings (T).Chan;
    begin
       WNM.MIDI.Queues.Sequencer_Push
         ((MIDI.Note_On,
-         WNM.MIDI.To_MIDI_Channel (T),
+         Channel,
          Step.Note,
          Step.Velo));
       declare
@@ -487,7 +510,7 @@ package body WNM.Sequencer is
          --  there is a repeat and the repeat rate.
          WNM.Short_Term_Sequencer.Push
            ((MIDI.Note_Off,
-            WNM.MIDI.To_MIDI_Channel (T),
+            Channel,
             Step.Note,
             0),
             Now + Repeat_Duration);
@@ -495,13 +518,13 @@ package body WNM.Sequencer is
          for Rep in 1 .. Step.Repeat loop
             WNM.Short_Term_Sequencer.Push
               ((MIDI.Note_On,
-               WNM.MIDI.To_MIDI_Channel (T),
+               Channel,
                Step.Note,
                Step.Velo),
                Repeat_Time);
             WNM.Short_Term_Sequencer.Push
               ((MIDI.Note_Off,
-               WNM.MIDI.To_MIDI_Channel (T),
+               Channel,
                Step.Note,
                0),
                Repeat_Time + Repeat_Duration);
@@ -556,19 +579,27 @@ package body WNM.Sequencer is
                Condition := Pattern_Counter (Pattern) mod 3 = 0;
             end case;
 
+            --  Send CC first
+            declare
+               Channel : constant MIDI.MIDI_Channel :=
+                 Track_Settings (Track).Chan;
+            begin
+               for Id in CC_Id loop
+                  if S.CC_Ena (Id) then
+                     WNM.MIDI.Queues.Sequencer_Push
+                       ((MIDI.Continous_Controller,
+                        Channel,
+                        Track_Settings (Track).CC (Id).Controller,
+                        S.CC_Val (Id)));
+                  end if;
+               end loop;
+            end;
+
+            --  Play note
             if Condition then
                Play_Step (Pattern, Track, Step, Now);
             end if;
 
-            for Id in CC_Id loop
-               if S.CC_Ena (Id) then
-                  WNM.MIDI.Queues.Sequencer_Push
-                    ((MIDI.Continous_Controller,
-                      WNM.MIDI.To_MIDI_Channel (Track),
-                      0,
-                      S.CC_Val (Id)));
-               end if;
-            end loop;
          end;
       end loop;
    end Process_Step;
@@ -855,6 +886,104 @@ package body WNM.Sequencer is
       end if;
    end Velo_Prev;
 
+   ---------------
+   -- MIDI_Chan --
+   ---------------
+
+   function MIDI_Chan (T : Tracks) return MIDI.MIDI_Channel is
+   begin
+      return Track_Settings (T).Chan;
+   end MIDI_Chan;
+
+   --------------------
+   -- MIDI_Chan_Next --
+   --------------------
+
+   procedure MIDI_Chan_Next (T : Tracks) is
+      use MIDI;
+   begin
+      if Track_Settings (T).Chan /= MIDI.MIDI_Channel'Last then
+         Track_Settings (T).Chan :=  Track_Settings (T).Chan + 1;
+      end if;
+   end MIDI_Chan_Next;
+
+   --------------------
+   -- MIDI_Chan_Prev --
+   --------------------
+
+   procedure MIDI_Chan_Prev (T : Tracks) is
+      use MIDI;
+   begin
+      if Track_Settings (T).Chan /= MIDI.MIDI_Channel'First then
+         Track_Settings (T).Chan :=  Track_Settings (T).Chan - 1;
+      end if;
+   end MIDI_Chan_Prev;
+
+   -------------------
+   -- CC_Controller --
+   -------------------
+
+   function CC_Controller (T : Tracks; Id : CC_Id) return MIDI.MIDI_Data
+   is (Track_Settings (T).CC (Id).Controller);
+
+   -----------------------
+   -- Set_CC_Controller --
+   -----------------------
+
+   procedure Set_CC_Controller (T : Tracks; Id : CC_Id; C : MIDI.MIDI_Data) is
+   begin
+      Track_Settings (T).CC (Id).Controller := C;
+   end Set_CC_Controller;
+
+   ------------------------
+   -- CC_Controller_Next --
+   ------------------------
+
+   procedure CC_Controller_Next (T : Tracks; Id : CC_Id) is
+      use MIDI;
+
+      Controller : MIDI_Data renames Track_Settings (T).CC (Id).Controller;
+   begin
+      if Controller /= MIDI_Data'Last then
+         Controller := Controller + 1;
+      end if;
+   end CC_Controller_Next;
+
+   ------------------------
+   -- CC_Controller_Prev --
+   ------------------------
+
+   procedure CC_Controller_Prev (T : Tracks; Id : CC_Id) is
+      use MIDI;
+
+      Controller : MIDI_Data renames Track_Settings (T).CC (Id).Controller;
+   begin
+      if Controller /= MIDI_Data'First then
+         Controller := Controller - 1;
+      end if;
+   end CC_Controller_Prev;
+
+   ----------------------------
+   -- Set_CC_Controller_Name --
+   ----------------------------
+
+   procedure Set_CC_Controller_Label (T     : Tracks;
+                                      Id    : CC_Id;
+                                      Label : Controller_Label)
+   is
+   begin
+      Track_Settings (T).CC (Id).Label := Label;
+   end Set_CC_Controller_Label;
+
+   -------------------------
+   -- CC_Controller_Label --
+   -------------------------
+
+   function CC_Controller_Label (T    : Tracks;
+                                 Id   : CC_Id)
+                                 return Controller_Label
+   is (Track_Settings (T).CC (Id).Label);
+
    ----------------
    -- CC_Enabled --
    ----------------
@@ -938,6 +1067,7 @@ package body WNM.Sequencer is
 begin
    for Pattern in Patterns loop
       for Track in Tracks loop
+         Track_Settings (Track).Chan := MIDI.MIDI_Channel (Integer (Track) - 1);
          for Step in Sequencer_Steps loop
             Sequences (Pattern) (Track) (Step) := (None, 0, Rate_1_2,
                                                    others => <>);

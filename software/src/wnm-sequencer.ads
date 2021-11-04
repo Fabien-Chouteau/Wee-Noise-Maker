@@ -101,7 +101,33 @@ package WNM.Sequencer is
    procedure Velo_Next (Step : Sequencer_Steps);
    procedure Velo_Prev (Step : Sequencer_Steps);
 
+   function MIDI_Chan (T : Tracks) return MIDI.MIDI_Channel;
+   procedure MIDI_Chan_Next (T : Tracks);
+   procedure MIDI_Chan_Prev (T : Tracks);
+
    type CC_Id is (A, B, C, D);
+
+   function CC_Letter (ID : Sequencer.CC_Id) return String
+   is (case ID is
+          when A => "A",
+          when B => "B",
+          when C => "C",
+          when D => "D");
+
+   function CC_Controller (T : Tracks; Id : CC_Id) return MIDI.MIDI_Data;
+   procedure Set_CC_Controller (T : Tracks; Id : CC_Id; C : MIDI.MIDI_Data);
+   procedure CC_Controller_Next (T : Tracks; Id : CC_Id);
+   procedure CC_Controller_Prev (T : Tracks; Id : CC_Id);
+
+   subtype Controller_Label is String (1 .. 17);
+   Empty_Controller_Label : constant Controller_Label := (others => ' ');
+
+   procedure Set_CC_Controller_Label (T    : Tracks;
+                                      Id   : CC_Id;
+                                      Label : Controller_Label);
+   function CC_Controller_Label (T    : Tracks;
+                                 Id   : CC_Id)
+                                 return Controller_Label;
 
    function CC_Enabled (Step : Sequencer_Steps; Id : CC_Id) return Boolean;
    procedure CC_Toggle (Step : Sequencer_Steps; Id : CC_Id);

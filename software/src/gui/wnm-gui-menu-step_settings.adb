@@ -50,6 +50,7 @@ package body WNM.GUI.Menu.Step_Settings is
           when CC_B => CC_B,
           when CC_C => CC_C,
           when CC_D => CC_D);
+
    ----------
    -- Draw --
    ----------
@@ -60,13 +61,6 @@ package body WNM.GUI.Menu.Step_Settings is
    is
 
       Trig : constant Sequencer_Steps := Sequencer.Editing_Step;
-
-      function CC_Letter (ID : Sequencer.CC_Id) return String
-      is (case ID is
-             when A => "A",
-             when B => "B",
-             when C => "C",
-             when D => "D");
 
       Top_Setting : constant Top_Settings := To_Top (This.Current_Setting);
    begin
@@ -120,12 +114,14 @@ package body WNM.GUI.Menu.Step_Settings is
                   when CC_C => Sequencer.C,
                   when others => Sequencer.D);
             begin
+               Draw_Text (Sequencer.CC_Controller_Label (Editing_Track, Id),
+                          "");
+
                if Sequencer.CC_Enabled (Trig, Id) then
-                  Draw_Text ("CC " & CC_Letter (Id), "");
                   Draw_MIDI_Val (Sequencer.CC_Value (Trig, Id),
                                 Selected => False);
                else
-                  Draw_Text ("CC " & CC_Letter (Id), "- Disabled -");
+                  Draw_Text ("", "- Disabled -");
                end if;
             end;
       end case;

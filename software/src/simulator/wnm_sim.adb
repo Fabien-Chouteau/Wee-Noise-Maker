@@ -210,13 +210,13 @@ package body WNM_Sim is
                   Put_Line ("Attempting to close");
                   GNAT.OS_Lib.OS_Exit (0);
                elsif Event.key.code = sfKeyRight then
-                  Encoder_Right := 1;
-               elsif Event.key.code = sfKeyLeft then
-                  Encoder_Right := -1;
-               elsif Event.key.code = sfKeyDown then
                   Encoder_Left := 1;
-               elsif Event.key.code = sfKeyUp then
+               elsif Event.key.code = sfKeyLeft then
                   Encoder_Left := -1;
+               elsif Event.key.code = sfKeyDown then
+                  Encoder_Right := 1;
+               elsif Event.key.code = sfKeyUp then
+                  Encoder_Right := -1;
                end if;
             end if;
 

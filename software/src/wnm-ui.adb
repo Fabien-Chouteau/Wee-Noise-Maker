@@ -276,7 +276,7 @@ package body WNM.UI is
                WNM.Sequence_Copy.Apply (Copy_T, B);
                if WNM.Sequence_Copy.Is_Complete (Copy_T) then
                   WNM.Sequencer.Do_Copy (Copy_T);
-                  WNM.GUI.Popup.Display ("  copied  ", 500);
+                  WNM.GUI.Popup.Display ("     copied     ", 500_000);
                end if;
             end if;
 

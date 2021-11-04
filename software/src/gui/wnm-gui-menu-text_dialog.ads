@@ -23,6 +23,9 @@ package WNM.GUI.Menu.Text_Dialog is
 
    procedure Push_Window;
 
+   procedure Push_Window (Str : String);
+   --  Push with a preset text
+
    Title_Max_Len : constant := 15;
 
    procedure Set_Title (Title : String)
@@ -35,9 +38,10 @@ private
    subtype Text_Range is Natural range 1 .. 15;
 
    type Text_Dialog_Window is new Menu_Window with record
-      Text    : String (Text_Range);
-      Len     : Natural;
-      Index   : Natural;
+      Text          : String (Text_Range);
+      Len           : Natural;
+      Index         : Natural;
+      Reset_On_Push : Boolean;
    end record;
 
    overriding

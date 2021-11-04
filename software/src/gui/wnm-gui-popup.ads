@@ -23,7 +23,7 @@ with WNM.Time;
 
 package WNM.GUI.Popup is
 
-   Text_Length : constant := 10;
+   Text_Length : constant := 16;
    subtype Popup_Text is String (1 .. Text_Length);
 
    procedure Display (T : Popup_Text; Duration : Time.Time_Microseconds);

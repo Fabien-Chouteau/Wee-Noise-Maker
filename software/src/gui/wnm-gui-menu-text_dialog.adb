@@ -27,12 +27,26 @@ package body WNM.GUI.Menu.Text_Dialog is
    Text_Dialog  : aliased Text_Dialog_Window;
    Dialog_Title : String (1 .. Title_Max_Len) := (others => ' ');
 
+   procedure Set_Value (Str : String);
+
    -----------------
    -- Push_Window --
    -----------------
 
    procedure Push_Window is
    begin
+      Text_Dialog.Reset_On_Push := True;
+      Push (Text_Dialog'Access);
+   end Push_Window;
+
+   -----------------
+   -- Push_Window --
+   -----------------
+
+   procedure Push_Window (Str : String) is
+   begin
+      Set_Value (Str);
+      Text_Dialog.Reset_On_Push := False;
       Push (Text_Dialog'Access);
    end Push_Window;
 
@@ -56,11 +70,24 @@ package body WNM.GUI.Menu.Text_Dialog is
    function Value return String
    is (Text_Dialog.Text (Text_Dialog.Text'First .. Text_Dialog.Text'First + Text_Dialog.Len - 1));
 
+   ---------------
+   -- Set_Value --
+   ---------------
+
+   procedure Set_Value (Str : String) is
+      Len : Natural := Natural'Min (Str'Length, Text_Dialog.Text'Length);
+   begin
+      Text_Dialog.Len := Len;
+      Text_Dialog.Text (1 .. Len - 1) := Str (Str'First .. Str'First + Len - 1);
+      Text_Dialog.Index := Len;
+   end Set_Value;
+
    ----------
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This : in out Text_Dialog_Window)
    is
       X        : Integer := 1;
@@ -82,7 +109,8 @@ package body WNM.GUI.Menu.Text_Dialog is
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
+   overriding
+   procedure On_Event
      (This  : in out Text_Dialog_Window;
       Event : Menu_Event)
    is
@@ -133,13 +161,16 @@ package body WNM.GUI.Menu.Text_Dialog is
    -- On_Pushed --
    ---------------
 
-   overriding procedure On_Pushed
+   overriding
+   procedure On_Pushed
      (This  : in out Text_Dialog_Window)
    is
    begin
-      This.Len   := 1;
-      This.Index := This.Text'First;
-      This.Text (This.Text'First) := 'A';
+      if This.Reset_On_Push then
+         This.Len   := 1;
+         This.Index := This.Text'First;
+         This.Text (This.Text'First) := 'A';
+      end if;
    end On_Pushed;
 
 end WNM.GUI.Menu.Text_Dialog;
