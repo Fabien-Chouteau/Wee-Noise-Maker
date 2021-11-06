@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                  Copyright (C) 2016-2021 Fabien Chouteau                  --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -22,6 +22,7 @@
 with WNM.MIDI;
 with WNM.Screen;
 with WNM.GUI.Bitmap_Fonts;
+with WNM.Chord_Sequencer;
 
 package WNM.GUI.Menu.Drawing is
 
@@ -56,6 +57,9 @@ package WNM.GUI.Menu.Drawing is
 
    procedure Draw_Duration (D        : Note_Duration;
                             Selected : Boolean);
+
+   procedure Draw_Scale_Mode (M        : Chord_Sequencer.Scale_Name;
+                              Selected : Boolean);
 
    procedure Draw_Text (Title : String;
                         Val   : String);

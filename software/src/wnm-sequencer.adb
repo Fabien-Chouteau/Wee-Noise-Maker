@@ -21,6 +21,7 @@
 
 with WNM.Short_Term_Sequencer;
 with WNM.Pattern_Sequencer;
+with WNM.Chord_Sequencer;
 with WNM.UI; use WNM.UI;
 with WNM.MIDI.Queues;
 with HAL;                   use HAL;
@@ -35,11 +36,12 @@ package body WNM.Sequencer is
       Repeat      : WNM.Repeat;
       Repeat_Rate : WNM.Repeat_Rate;
 
-      Note     : MIDI.MIDI_Key := MIDI.C4;
-      Duration : Note_Duration := Quarter;
-      Velo     : MIDI.MIDI_Data := MIDI.MIDI_Data'Last;
-      CC_Ena   : CC_Ena_Array := (others => False);
-      CC_Val   : CC_Val_Array := (others => 0);
+      Note_Mode : Note_Mode_Kind := Note;
+      Note      : MIDI.MIDI_Key := MIDI.C4;
+      Duration  : Note_Duration := Quarter;
+      Velo      : MIDI.MIDI_Data := MIDI.MIDI_Data'Last;
+      CC_Ena    : CC_Ena_Array := (others => False);
+      CC_Val    : CC_Val_Array := (others => 0);
    end record;
 
    type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
@@ -462,6 +464,8 @@ package body WNM.Sequencer is
    procedure Play_Step (P : Patterns; T : Tracks; S : Sequencer_Steps;
                         Now : Time.Time_Microseconds := Time.Clock)
    is
+      use Chord_Sequencer;
+
       Step : Step_Rec renames Sequences (P) (T) (S);
 
       Note_Duration : constant Time.Time_Microseconds :=
@@ -476,12 +480,31 @@ package body WNM.Sequencer is
             when N_32nd  => Microseconds_Per_Beat / 32);
 
       Channel : constant MIDI.MIDI_Channel :=  Track_Settings (T).Chan;
+
+      Notes : constant Chord_Sequencer.Chord_Notes :=
+        (case Step.Note_Mode is
+            when Note =>
+              (Step.Note, 0, 0, 0),
+
+            when Chord =>
+              Chord_Sequencer.Current_Chord,
+
+            when Note_In_Chord =>
+              (Current_Chord (Chord_Index_Range (Step.Note)), 0, 0, 0));
+
+      Play_Chord : constant Boolean := Step.Note_Mode = Chord;
+
+      Last_Note : constant Chord_Index_Range :=
+        (if Step.Note_Mode = Chord then Notes'Last else Notes'First);
    begin
-      WNM.MIDI.Queues.Sequencer_Push
-        ((MIDI.Note_On,
-         Channel,
-         Step.Note,
-         Step.Velo));
+      for X in Notes'First .. Last_Note loop
+         WNM.MIDI.Queues.Sequencer_Push
+           ((MIDI.Note_On,
+            Channel,
+            Notes (X),
+            Step.Velo));
+      end loop;
+
       declare
          Repeat_Span : constant Time.Time_Microseconds :=
            Microseconds_Per_Beat / (case Step.Repeat_Rate
@@ -508,27 +531,30 @@ package body WNM.Sequencer is
       begin
          --  Note-Off for the first Note-On, its duration depends if
          --  there is a repeat and the repeat rate.
-         WNM.Short_Term_Sequencer.Push
-           ((MIDI.Note_Off,
-            Channel,
-            Step.Note,
-            0),
-            Now + Repeat_Duration);
-
-         for Rep in 1 .. Step.Repeat loop
-            WNM.Short_Term_Sequencer.Push
-              ((MIDI.Note_On,
-               Channel,
-               Step.Note,
-               Step.Velo),
-               Repeat_Time);
+         for X in Notes'First .. Last_Note loop
             WNM.Short_Term_Sequencer.Push
               ((MIDI.Note_Off,
                Channel,
-               Step.Note,
+               Notes (X),
                0),
-               Repeat_Time + Repeat_Duration);
+               Now + Repeat_Duration);
+         end loop;
 
+         for Rep in 1 .. Step.Repeat loop
+            for X in Notes'First .. Last_Note loop
+               WNM.Short_Term_Sequencer.Push
+                 ((MIDI.Note_On,
+                  Channel,
+                  Notes (X),
+                  Step.Velo),
+                  Repeat_Time);
+               WNM.Short_Term_Sequencer.Push
+                 ((MIDI.Note_Off,
+                  Channel,
+                  Notes (X),
+                  0),
+                  Repeat_Time + Repeat_Duration);
+            end loop;
             Repeat_Time := Repeat_Time + Repeat_Span;
          end loop;
       end;
@@ -770,14 +796,59 @@ package body WNM.Sequencer is
             (Step).Repeat_Rate);
    end Repeat_Rate_Prev;
 
+   ---------------
+   -- Note_Mode --
+   ---------------
+
+   function Note_Mode (Step : Sequencer_Steps) return Note_Mode_Kind is
+   begin
+      return Sequences
+        (Editing_Pattern) (Editing_Track) (Step).Note_Mode;
+   end Note_Mode;
+
+   --------------------
+   -- Note_Mode_Next --
+   --------------------
+
+   procedure Note_Mode_Next (Step : Sequencer_Steps) is
+      S : Step_Rec renames Sequences
+        (Editing_Pattern)
+        (Editing_Track)
+        (Step);
+   begin
+      S.Note_Mode := Next (S.Note_Mode);
+
+      case S.Note_Mode is
+         when Note =>
+            S.Note := MIDI.C4;
+         when others =>
+            S.Note := 0;
+      end case;
+   end Note_Mode_Next;
+
    ----------
    -- Note --
    ----------
 
    function Note (Step : Sequencer_Steps) return MIDI.MIDI_Key is
+      S : Step_Rec renames Sequences
+        (Editing_Pattern)
+        (Editing_Track)
+        (Step);
    begin
-      return Sequences
-        (Editing_Pattern) (Editing_Track) (Step).Note;
+      case S.Note_Mode is
+         when Note =>
+            return S.Note;
+         when Chord =>
+            return 0;
+         when Note_In_Chord =>
+            declare
+               use Chord_Sequencer;
+               Chord : constant Chord_Notes := Current_Chord;
+            begin
+               return Chord (Chord_Index_Range (S.Note mod 4));
+            end;
+      end case;
    end Note;
 
    ---------------
@@ -785,14 +856,27 @@ package body WNM.Sequencer is
    ---------------
 
    procedure Note_Next (Step : Sequencer_Steps) is
-      CC : MIDI.MIDI_Key renames Sequences
+      S : Step_Rec renames Sequences
         (Editing_Pattern)
         (Editing_Track)
-        (Step).Note;
+        (Step);
    begin
-      if CC /= MIDI.MIDI_Key'Last then
-         CC := CC + 1;
-      end if;
+      case S.Note_Mode is
+         when Note =>
+            if S.Note /= MIDI.MIDI_Key'Last then
+               S.Note := S.Note + 1;
+            end if;
+
+         when Chord =>
+            null;
+
+         when Note_In_Chord =>
+            if S.Note /= MIDI.MIDI_Key (Chord_Sequencer.Chord_Index_Range'Last)
+            then
+               S.Note := S.Note + 1;
+            end if;
+      end case;
+
    end Note_Next;
 
    ---------------

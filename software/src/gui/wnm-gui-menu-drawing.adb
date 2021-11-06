@@ -2,7 +2,7 @@
 --                                                                           --
 --                              Wee Noise Maker                              --
 --                                                                           --
---                  Copyright (C) 2016-2017 Fabien Chouteau                  --
+--                  Copyright (C) 2016-2021 Fabien Chouteau                  --
 --                                                                           --
 --    Wee Noise Maker is free software: you can redistribute it and/or       --
 --    modify it under the terms of the GNU General Public License as         --
@@ -32,7 +32,7 @@ package body WNM.GUI.Menu.Drawing is
    Arrow_Y_Offset : constant :=
      Box_Top + ((Box_Bottom - Box_Top + 1) - Bitmap_Fonts.Height) / 2;
 
-   Select_Line_X : constant := Box_Bottom - 3;
+   Select_Line_Y : constant := Box_Bottom - 3;
 
    -------------------
    -- Draw_Menu_Box --
@@ -158,8 +158,8 @@ package body WNM.GUI.Menu.Drawing is
       X : Integer := Box_Center.X + 20;
    begin
       if Selected then
-         Screen.Draw_Line ((X + 5, Select_Line_X),
-                           (X + 4 * 6, Select_Line_X));
+         Screen.Draw_Line ((X + 5, Select_Line_Y),
+                           (X + 4 * 6, Select_Line_Y));
       end if;
 
       Print (X_Offset    => X,
@@ -177,8 +177,8 @@ package body WNM.GUI.Menu.Drawing is
       X : Integer := Box_Center.X - 40;
    begin
       if Selected then
-         Screen.Draw_Line ((X - 1, Select_Line_X),
-                           (X + 3 * 6, Select_Line_X));
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + 3 * 6, Select_Line_Y));
       end if;
 
       Print (X_Offset    => X,
@@ -200,8 +200,8 @@ package body WNM.GUI.Menu.Drawing is
       DY : constant := Box_Top + 22;
    begin
       if Selected then
-         Screen.Draw_Line ((DX - 1, Select_Line_X),
-                           (DX + 5, Select_Line_X));
+         Screen.Draw_Line ((DX - 1, Select_Line_Y),
+                           (DX + 5, Select_Line_Y));
       end if;
 
       if D = Double then
@@ -324,6 +324,26 @@ package body WNM.GUI.Menu.Drawing is
          Screen.Set_Pixel ((DX + 6, DY + 5));
       end if;
    end Draw_Duration;
+
+   ---------------------
+   -- Draw_Scale_Mode --
+   ---------------------
+
+   procedure Draw_Scale_Mode (M        : Chord_Sequencer.Scale_Name;
+                              Selected : Boolean)
+   is
+      X : Integer := Box_Center.X + 10;
+   begin
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + 6 * 6, Select_Line_Y));
+      end if;
+
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Chord_Sequencer.Img (M));
+
+   end Draw_Scale_Mode;
 
    ---------------
    -- Draw_Text --

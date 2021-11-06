@@ -25,11 +25,14 @@ package WNM.GUI.Menu.Pattern_Settings is
 
 private
 
-   type Settings is (Nothing);
-   function Settings_Count is new Enum_Count (Settings);
+   type Top_Settings is (Scale, Chord_Index);
+   function Top_Settings_Count is new Enum_Count (Top_Settings);
+
+   type Sub_Settings is (Scale_Key, Scale_Mode, Chord_Index);
+   function Sub_Settings_Count is new Enum_Count (Sub_Settings);
 
    type Pattern_Settings_Menu is new Menu_Window with record
-      Current_Setting : Settings := Settings'First;
+      Current_Setting : Sub_Settings := Sub_Settings'First;
    end record;
 
    overriding

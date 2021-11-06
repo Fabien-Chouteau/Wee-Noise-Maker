@@ -22,7 +22,14 @@
 with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
 
+with WNM.Chord_Sequencer;
+
 package body WNM.GUI.Menu.Pattern_Settings is
+
+   package Top_Settings_Next is new Enum_Next (Top_Settings);
+   use Top_Settings_Next;
+   package Sub_Settings_Next is new Enum_Next (Sub_Settings);
+   use Sub_Settings_Next;
 
    Pattern_Menu_Singleton : aliased Pattern_Settings_Menu;
 
@@ -35,6 +42,16 @@ package body WNM.GUI.Menu.Pattern_Settings is
       Push (Pattern_Menu_Singleton'Access);
    end Push_Window;
 
+   ------------
+   -- To_Top --
+   ------------
+
+   function To_Top (S : Sub_Settings) return Top_Settings
+   is (case S is
+          when Scale_Key => Scale,
+          when Scale_Mode => Scale,
+          when Chord_Index => Chord_Index);
+
    ----------
    -- Draw --
    ----------
@@ -42,10 +59,25 @@ package body WNM.GUI.Menu.Pattern_Settings is
    overriding
    procedure Draw (This : in out Pattern_Settings_Menu)
    is
+      use Chord_Sequencer;
+      Top_Setting : constant Top_Settings := To_Top (This.Current_Setting);
    begin
       Draw_Menu_Box ("Pattern settings",
-                     Count => Settings_Count,
-                     Index => Settings'Pos (This.Current_Setting));
+                     Count => Top_Settings_Count,
+                     Index => Top_Settings'Pos (To_Top (This.Current_Setting)));
+
+      case Top_Setting is
+         when Scale =>
+            Draw_Text ("Key", "");
+            Draw_MIDI_Note (Current_Scale_Key,
+                            This.Current_Setting = Scale_Key);
+            Draw_Scale_Mode (Chord_Sequencer.Current_Scale,
+                             This.Current_Setting = Scale_Mode);
+         when Chord_Index =>
+            Draw_Text ("Chord Index",
+                       Current_Chord_Index'Img);
+      end case;
+
    end Draw;
 
    --------------
@@ -64,23 +96,34 @@ package body WNM.GUI.Menu.Pattern_Settings is
             --  Never exit the step settings
             null;
          when Encoder_Right =>
-            null;
+            case This.Current_Setting is
+               when Scale_Key =>
+                  if Event.Value > 0 then
+                     Chord_Sequencer.Scale_Key_Next;
+                  else
+                     Chord_Sequencer.Scale_Key_Prev;
+                  end if;
+               when Scale_Mode =>
+                  if Event.Value > 0 then
+                     Chord_Sequencer.Scale_Next;
+                  else
+                     Chord_Sequencer.Scale_Prev;
+                  end if;
+
+               when Chord_Index =>
+                  if Event.Value > 0 then
+                     Chord_Sequencer.Chord_Index_Next;
+                  else
+                     Chord_Sequencer.Chord_Index_Prev;
+                  end if;
+            end case;
+
          when Encoder_Left =>
-            pragma Warnings (Off, "condition can only be True");
             if Event.Value > 0 then
-               if This.Current_Setting /= Settings'Last then
-                  This.Current_Setting := Settings'Succ (This.Current_Setting);
-               else
-                  This.Current_Setting := Settings'First;
-               end if;
+               This.Current_Setting := Next (This.Current_Setting);
             elsif Event.Value < 0 then
-               if This.Current_Setting /= Settings'First then
-                  This.Current_Setting := Settings'Pred (This.Current_Setting);
-               else
-                  This.Current_Setting := Settings'Last;
-               end if;
+               This.Current_Setting := Prev (This.Current_Setting);
             end if;
-            pragma Warnings (On, "condition can only be True");
       end case;
    end On_Event;
 

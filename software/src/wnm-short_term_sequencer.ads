@@ -34,7 +34,12 @@ package WNM.Short_Term_Sequencer is
 
 private
 
-   MAX_EVENT_NUMBER : constant := 256;
+   Max_Number_Of_Tracks  : constant := 16;
+   Max_Number_Of_Repeats : constant := 8;
+   Max_Number_Of_Notes   : constant := 4;
+
+   MAX_EVENT_NUMBER : constant :=
+     Max_Number_Of_Tracks * Max_Number_Of_Repeats * Max_Number_Of_Notes * 2;
 
    type Event;
 

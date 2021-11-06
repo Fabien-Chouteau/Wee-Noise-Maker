@@ -28,6 +28,9 @@ with WNM.GUI.Menu.Text_Dialog;
 
 package body WNM.GUI.Menu.Track_Settings is
 
+   package Settings_Next is new Enum_Next (Settings);
+   use Settings_Next;
+
    Track_Settings_Singleton : aliased Track_Settings_Menu;
 
    --------------
@@ -197,17 +200,9 @@ package body WNM.GUI.Menu.Track_Settings is
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
-               if This.Current_Setting /= Settings'Last then
-                  This.Current_Setting := Settings'Succ (This.Current_Setting);
-               else
-                  This.Current_Setting := Settings'First;
-               end if;
+               This.Current_Setting := Next (This.Current_Setting);
             elsif Event.Value < 0 then
-               if This.Current_Setting /= Settings'First then
-                  This.Current_Setting := Settings'Pred (This.Current_Setting);
-               else
-                  This.Current_Setting := Settings'Last;
-               end if;
+               This.Current_Setting := Prev (This.Current_Setting);
             end if;
       end case;
    end On_Event;

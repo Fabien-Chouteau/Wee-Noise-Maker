@@ -27,6 +27,11 @@ with WNM.UI;
 
 package body WNM.GUI.Menu.Step_Settings is
 
+   package Top_Settings_Next is new Enum_Next (Top_Settings);
+   use Top_Settings_Next;
+   package Sub_Settings_Next is new Enum_Next (Sub_Settings);
+   use Sub_Settings_Next;
+
    Step_Settings_Singleton : aliased Step_Settings_Menu;
 
    -----------------
@@ -37,6 +42,10 @@ package body WNM.GUI.Menu.Step_Settings is
    begin
       Push (Step_Settings_Singleton'Access);
    end Push_Window;
+
+   ------------
+   -- To_Top --
+   ------------
 
    function To_Top (S : Sub_Settings) return Top_Settings
    is (case S is
@@ -75,7 +84,7 @@ package body WNM.GUI.Menu.Step_Settings is
          when Note      =>
             case This.Current_Setting is
                when Note =>
-                  Draw_Text ("Note", "");
+                  Draw_Text (Img (Sequencer.Note_Mode (Trig)), "");
                when Duration =>
                   Draw_Text ("Duration", "");
                when Velo =>
@@ -145,6 +154,9 @@ package body WNM.GUI.Menu.Step_Settings is
                when CC_B => Sequencer.CC_Toggle (Trig, B);
                when CC_C => Sequencer.CC_Toggle (Trig, C);
                when CC_D => Sequencer.CC_Toggle (Trig, D);
+
+               when Note => Sequencer.Note_Mode_Next (Trig);
+
                when others => null;
             end case;
          when Right_Press =>
@@ -207,17 +219,9 @@ package body WNM.GUI.Menu.Step_Settings is
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
-               if This.Current_Setting /= Sub_Settings'Last then
-                  This.Current_Setting := Sub_Settings'Succ (This.Current_Setting);
-               else
-                  This.Current_Setting := Sub_Settings'First;
-               end if;
+               This.Current_Setting := Next (This.Current_Setting);
             elsif Event.Value < 0 then
-               if This.Current_Setting /= Sub_Settings'First then
-                  This.Current_Setting := Sub_Settings'Pred (This.Current_Setting);
-               else
-                  This.Current_Setting := Sub_Settings'Last;
-               end if;
+               This.Current_Setting := Prev (This.Current_Setting);
             end if;
       end case;
    end On_Event;
