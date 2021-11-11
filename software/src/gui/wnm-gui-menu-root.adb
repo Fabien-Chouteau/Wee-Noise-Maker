@@ -64,7 +64,7 @@ package body WNM.GUI.Menu.Root is
       Draw_Menu_Box ("Menu",
                      Count => Menu_Items_Count,
                      Index => Menu_Items'Pos (This.Item));
-      Draw_Text (Menu_Item_Text (This.Item), "");
+      Draw_Title (Menu_Item_Text (This.Item), "");
    end Draw;
 
    --------------

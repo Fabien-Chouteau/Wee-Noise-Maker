@@ -28,7 +28,11 @@ package body Enum_Next is
    function Next (Elt : T) return T is
    begin
       if Elt = T'Last then
-         return T'First;
+         if Wrap then
+            return T'First;
+         else
+            return Elt;
+         end if;
       else
          return T'Succ (Elt);
       end if;
@@ -41,7 +45,11 @@ package body Enum_Next is
    function Prev (Elt : T) return T is
    begin
       if Elt = T'First then
-         return T'Last;
+         if Wrap then
+            return T'Last;
+         else
+            return Elt;
+         end if;
       else
          return T'Pred (Elt);
       end if;

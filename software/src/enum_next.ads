@@ -21,6 +21,7 @@
 
 generic
    type T is (<>);
+   Wrap : Boolean := True;
 package Enum_Next is
    function Next (Elt : T) return T with Inline_Always;
    function Prev (Elt : T) return T with Inline_Always;

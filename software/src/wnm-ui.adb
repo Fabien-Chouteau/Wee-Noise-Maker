@@ -36,6 +36,12 @@ package body WNM.UI is
    procedure Signal_Event (B : Button; Evt : Buttton_Event);
 
    procedure Toggle_FX (B : Keyboard_Button);
+   procedure Mute (Track : WNM.Tracks);
+   procedure Unmute (Track : WNM.Tracks);
+   procedure Toggle_Mute (Track : WNM.Tracks);
+   procedure Toggle_Solo (Track : WNM.Tracks);
+   function In_Solo return Boolean;
+   function Solo return WNM.Tracks;
 
    FX_Is_On : array (Keyboard_Button) of Boolean := (others => False);
    Last_Main_Mode : Main_Modes := Track_Mode;
@@ -44,6 +50,10 @@ package body WNM.UI is
    Select_Done : Boolean := False;
 
    Recording_On : Boolean := False;
+
+   Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
+   Solo_Mode_Enabled : Boolean := False;
+   Solo_Track : WNM.Tracks := 1;
 
    ----------------
    -- Input_Mode --
@@ -136,8 +146,15 @@ package body WNM.UI is
                   case B is
                   when Play =>
                      --  Switch to volume/BPM config mode
-                     Current_Input_Mode := Volume_BPM;
-                  --  when Rec =>
+                     if Solo_Mode_Enabled then
+                        Current_Input_Mode := Volume_BPM_Solo;
+                     else
+                        Current_Input_Mode := Volume_BPM_Mute;
+                     end if;
+
+
+
+                     --  when Rec =>
                   --     --  Switch to squence edition mode
                   --     Sequencer.Rec_Long;
                   --  when B1 .. B16 =>
@@ -280,13 +297,37 @@ package body WNM.UI is
                end if;
             end if;
 
-         when Volume_BPM =>
-            if B = Play and Evt = On_Release then
+         when Volume_BPM_Mute | Volume_BPM_Solo =>
+
+            if B = Play and then Evt = On_Release then
                Current_Input_Mode := Last_Main_Mode;
             end if;
 
-            if B in Keyboard_Button and Evt = On_Press then
-               WNM.Synth.Toggle_Mute (To_Value (B));
+            if Current_Input_Mode = Volume_BPM_Mute then
+
+               if B in Keyboard_Button and then Evt = On_Press then
+                  Toggle_Mute (To_Value (B));
+               end if;
+
+               if B = Track_Button and then Evt = On_Press then
+                  Current_Input_Mode := Volume_BPM_Solo;
+               end if;
+
+            else
+
+               if B = Track_Button and then Evt = On_Press then
+                  Current_Input_Mode := Volume_BPM_Mute;
+                  Solo_Mode_Enabled := False;
+               end if;
+
+               if B in Keyboard_Button and then Evt = On_Press then
+                  Toggle_Solo (To_Value (B));
+
+                  if not Solo_Mode_Enabled then
+                     --  We disabled solo so go back to mute mode
+                     Current_Input_Mode := Volume_BPM_Mute;
+                  end if;
+               end if;
             end if;
 
 
@@ -603,7 +644,7 @@ package body WNM.UI is
       R_Enco := WNM.Buttons.Right_Diff;
 
       case Current_Input_Mode is
-         when Volume_BPM =>
+         when Volume_BPM_Mute | Volume_BPM_Solo =>
             WNM.Sequencer.Change_BPM (R_Enco);
             WNM.Master_Volume.Change (L_Enco);
          when others =>
@@ -674,12 +715,16 @@ package body WNM.UI is
             end loop;
 
          --  Volume and BPM mode --
-         when Volume_BPM =>
-            for B in B1 .. B16 loop
-               if not WNM.Synth.Muted (To_Value (B)) then
-                  LED.Turn_On (B);
-               end if;
-            end loop;
+         when Volume_BPM_Mute | Volume_BPM_Solo =>
+            if Solo_Mode_Enabled then
+               LED.Turn_On (To_Button (Solo));
+            else
+               for B in B1 .. B16 loop
+                  if not Muted (To_Value (B)) then
+                     LED.Turn_On (B);
+                  end if;
+               end loop;
+            end if;
 
          when Pattern_Chaining =>
             for B in B1 .. B16 loop
@@ -735,5 +780,73 @@ package body WNM.UI is
 
       return Next_Start;
    end Update;
+
+   ----------
+   -- Mute --
+   ----------
+
+   procedure Mute (Track : WNM.Tracks) is
+   begin
+      Track_Muted (Track) := True;
+   end Mute;
+
+   ------------
+   -- Unmute --
+   ------------
+
+   procedure Unmute (Track : WNM.Tracks) is
+   begin
+      Track_Muted (Track) := False;
+   end Unmute;
+
+   -----------------
+   -- Toggle_Mute --
+   -----------------
+
+   procedure Toggle_Mute (Track : WNM.Tracks) is
+   begin
+      Track_Muted (Track) := not Track_Muted (Track);
+   end Toggle_Mute;
+
+   -----------
+   -- Muted --
+   -----------
+
+   function Muted (Track : WNM.Tracks) return Boolean
+   is (if In_Solo
+       then Solo /= Track
+       else Track_Muted (Track));
+
+   -----------------
+   -- Toggle_Solo --
+   -----------------
+
+   procedure Toggle_Solo (Track : WNM.Tracks) is
+   begin
+      if Solo_Mode_Enabled then
+         if Solo_Track = Track then
+            Solo_Mode_Enabled := False;
+         else
+            Solo_Track := Track;
+         end if;
+      else
+         Solo_Mode_Enabled := True;
+         Solo_Track := Track;
+      end if;
+   end Toggle_Solo;
+
+   -------------
+   -- In_Solo --
+   -------------
+
+   function In_Solo return Boolean
+   is (Solo_Mode_Enabled);
+
+   ----------
+   -- Solo --
+   ----------
+
+   function Solo return WNM.Tracks
+   is (Solo_Track);
 
 end WNM.UI;

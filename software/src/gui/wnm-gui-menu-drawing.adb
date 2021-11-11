@@ -26,7 +26,7 @@ package body WNM.GUI.Menu.Drawing is
    Title_Y_Offset : constant := 10;
    Scroll_Bar_Y_Offset : constant := 19;
 
-   Value_Text_Y : constant := Box_Bottom - 15;
+   Value_Text_Y : constant := Box_Bottom - 13;
    Title_Text_Y : constant := Box_Top + 4;
 
    Arrow_Y_Offset : constant :=
@@ -104,7 +104,7 @@ package body WNM.GUI.Menu.Drawing is
    procedure Draw_Precentage (Title : String;
                               Val : Percentage)
    is
-      X : Integer := Box_Center.X - 50;
+      X : Integer := Box_Left + 4;
    begin
       Print (X_Offset    => X,
              Y_Offset    => Title_Text_Y,
@@ -116,7 +116,7 @@ package body WNM.GUI.Menu.Drawing is
       Screen.Draw_Line ((Box_Center.X - 50 + Val, Box_Center.Y - 2),
                         (Box_Center.X - 50 + Val, Box_Center.Y + 2));
 
-      X := Box_Center.X - 50;
+      X := Box_Center.X - 11;
       Print (X_Offset    => X,
              Y_Offset    => Value_Text_Y,
              Str         => Val'Img & "%");
@@ -130,7 +130,7 @@ package body WNM.GUI.Menu.Drawing is
    procedure Draw_Pan (Title : String;
                        Val : Pan)
    is
-      X : Integer := Box_Center.X - 50;
+      X : Integer := Box_Left + 4;
    begin
       Print (X_Offset    => X,
              Y_Offset    => Title_Text_Y,
@@ -142,7 +142,7 @@ package body WNM.GUI.Menu.Drawing is
       Screen.Draw_Line ((Box_Center.X + Val, Box_Center.Y - 2),
                         (Box_Center.X + Val, Box_Center.Y + 2));
 
-      X := Box_Center.X - 50;
+      X := Box_Center.X - 8;
       Print (X_Offset    => X,
              Y_Offset    => Value_Text_Y,
              Str         => Val'Img);
@@ -174,7 +174,7 @@ package body WNM.GUI.Menu.Drawing is
    procedure Draw_MIDI_Note (Key      : MIDI.MIDI_Key;
                              Selected : Boolean)
    is
-      X : Integer := Box_Center.X - 40;
+      X : Integer := Box_Left + 4;
    begin
       if Selected then
          Screen.Draw_Line ((X - 1, Select_Line_Y),
@@ -345,24 +345,75 @@ package body WNM.GUI.Menu.Drawing is
 
    end Draw_Scale_Mode;
 
-   ---------------
-   -- Draw_Text --
-   ---------------
+   -------------------------
+   -- Draw_Chord_Duration --
+   -------------------------
 
-   procedure Draw_Text (Title : String;
+   procedure Draw_Chord_Duration (D        : Chord_Sequencer.Chord_Duration;
+                                  Selected : Boolean)
+   is
+      X : Integer := Box_Center.X + 10;
+   begin
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + 3 * 6, Select_Line_Y));
+      end if;
+
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Chord_Sequencer.Img (D));
+   end Draw_Chord_Duration;
+
+
+   ---------------------
+   -- Draw_Chord_Kind --
+   ---------------------
+
+   procedure Draw_Chord_Kind (Str      : String;
+                              Selected : Boolean)
+   is
+      X : Integer := Box_Left + 4;
+   begin
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + 3 * 6, Select_Line_Y));
+      end if;
+
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Str);
+   end Draw_Chord_Kind;
+
+   ----------------
+   -- Draw_Title --
+   ----------------
+
+   procedure Draw_Title (Title : String;
                         Val   : String)
    is
-      X : Integer := Box_Center.X - 50;
+      X : Integer := Box_Left + 4;
    begin
       Print (X_Offset    => X,
              Y_Offset    => Title_Text_Y,
              Str         => Title);
 
-      X := Box_Center.X - 50;
+      X := Box_Left + 4;
+      Print (X_Offset    => X,
+             Y_Offset    => Title_Text_Y + 8,
+             Str         => Val);
+   end Draw_Title;
+
+   ----------------
+   -- Draw_Value --
+   ----------------
+
+   procedure Draw_Value (Val : String) is
+      X : Integer := Box_Left + 4;
+   begin
       Print (X_Offset    => X,
              Y_Offset    => Value_Text_Y,
              Str         => Val);
-   end Draw_Text;
+   end Draw_Value;
 
    ---------------
    -- Draw_Knob --

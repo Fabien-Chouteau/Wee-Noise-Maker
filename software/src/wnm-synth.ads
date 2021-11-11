@@ -39,15 +39,6 @@ package WNM.Synth is
 
    procedure Event (Msg : MIDI.Message);
 
-   procedure Mute (Track : WNM.Tracks);
-   procedure Unmute (Track : WNM.Tracks);
-   procedure Toggle_Mute (Track : WNM.Tracks);
-   function Muted (Track : WNM.Tracks) return Boolean;
-
-   procedure Toggle_Solo (Track : WNM.Tracks);
-   function In_Solo return Boolean;
-   function Solo return WNM.Tracks;
-
    procedure Change_Pan (Track : WNM.Tracks;
                          Pan   : Integer);
    function Pan (Track : WNM.Tracks) return Integer;

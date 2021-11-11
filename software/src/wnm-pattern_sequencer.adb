@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Chord_Sequencer;
+
 package body WNM.Pattern_Sequencer is
 
    Max_Patterns_In_Sequence : constant := 30;
@@ -38,7 +40,7 @@ package body WNM.Pattern_Sequencer is
    Cue_Next : Boolean := False;
    Sequences : array (Boolean) of Pattern_Seq;
 
-   type Play_Kind is (Stop, One_Shot, Play_Loop);
+   type Play_Kind is (Stop, Play_Loop);
    Playing_State : Play_Kind := Stop;
 
    type Recording_Kind is (None, Waiting_First_Pattern, Rec);
@@ -214,7 +216,7 @@ package body WNM.Pattern_Sequencer is
          Start (Sequences (not Seq_Flip), P);
       else
          Start (Sequences (Seq_Flip), P);
-         Playing_State := One_Shot;
+         Playing_State := Play_Loop;
       end if;
    end Single_Play;
 
@@ -249,6 +251,9 @@ package body WNM.Pattern_Sequencer is
 
    procedure Signal_End_Of_Pattern is
    begin
+
+      Chord_Sequencer.Signal_End_Of_Pattern;
+
       if Cue_Next then
 
          Cue_Next := False;
@@ -260,14 +265,22 @@ package body WNM.Pattern_Sequencer is
          case Playing_State is
          when Stop =>
             raise Program_Error;
-         when One_Shot =>
-            Playing_State := Stop;
+         --  when One_Shot =>
+         --     Playing_State := Stop;
          when Play_Loop =>
             Signal_End_Of_Pattern (Sequences (Seq_Flip));
          end case;
       end if;
 
-
    end Signal_End_Of_Pattern;
+
+   ------------------------
+   -- Signal_Mid_Pattern --
+   ------------------------
+
+   procedure Signal_Mid_Pattern is
+   begin
+      Chord_Sequencer.Signal_Mid_Pattern;
+   end Signal_Mid_Pattern;
 
 end WNM.Pattern_Sequencer;

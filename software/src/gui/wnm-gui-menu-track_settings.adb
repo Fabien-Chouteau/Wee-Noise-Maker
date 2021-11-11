@@ -28,7 +28,8 @@ with WNM.GUI.Menu.Text_Dialog;
 
 package body WNM.GUI.Menu.Track_Settings is
 
-   package Settings_Next is new Enum_Next (Settings);
+   package Settings_Next is new Enum_Next (Settings,
+                                           Wrap => False);
    use Settings_Next;
 
    Track_Settings_Singleton : aliased Track_Settings_Menu;
@@ -73,21 +74,21 @@ package body WNM.GUI.Menu.Track_Settings is
          when Pan    => Draw_Pan ("Pan:", WNM.Synth.Pan (Editing_Track) / 2);
 
          when MIDI_Chan =>
-            Draw_Text ("MIDI Channel:",
-                       Sequencer.MIDI_Chan (Editing_Track)'Img);
+            Draw_Title ("MIDI Channel:", "");
+            Draw_Value (Sequencer.MIDI_Chan (Editing_Track)'Img);
 
          when MIDI_Instrument =>
-            Draw_Text ("MIDI instrument:",
-                       Builtin_Instruments (This.Instrument).Name);
+            Draw_Title ("MIDI instrument:", "");
+            Draw_Value (Builtin_Instruments (This.Instrument).Name);
 
          when CC_A | CC_B | CC_C | CC_D =>
             declare
                CC : constant Sequencer.CC_Id :=
                  To_CC_Id (This.Current_Setting);
             begin
-               Draw_Text ("MIDI CC " & Sequencer.CC_Letter (CC),
-                          "Controller:" &
-                            Sequencer.CC_Controller (Editing_Track, CC)'Img);
+               Draw_Title ("MIDI CC " & Sequencer.CC_Letter (CC) & ":", "");
+               Draw_Value ("Controller:" &
+                             Sequencer.CC_Controller (Editing_Track, CC)'Img);
             end;
 
          when CC_Label_A | CC_Label_B | CC_Label_C | CC_Label_D =>
@@ -95,8 +96,9 @@ package body WNM.GUI.Menu.Track_Settings is
                CC : constant Sequencer.CC_Id :=
                  To_CC_Id (This.Current_Setting);
             begin
-               Draw_Text ("MIDI CC " & Sequencer.CC_Letter (CC) & " Label:",
-                          Sequencer.CC_Controller_Label (Editing_Track, CC));
+               Draw_Title ("MIDI CC " & Sequencer.CC_Letter (CC) & " Label:",
+                           "");
+               Draw_Value (Sequencer.CC_Controller_Label (Editing_Track, CC));
             end;
       end case;
 
@@ -200,9 +202,9 @@ package body WNM.GUI.Menu.Track_Settings is
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
-               This.Current_Setting := Next (This.Current_Setting);
+               Next (This.Current_Setting);
             elsif Event.Value < 0 then
-               This.Current_Setting := Prev (This.Current_Setting);
+               Prev (This.Current_Setting);
             end if;
       end case;
    end On_Event;

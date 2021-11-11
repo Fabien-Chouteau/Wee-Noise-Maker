@@ -36,10 +36,6 @@ package body WNM.Synth is
    Recording_Source : Rec_Source;
    Recording_Size   : File_Signed_Size;
 
-   Track_Muted : array (WNM.Tracks) of Boolean := (others => False);
-   Solo_Mode_Enabled : Boolean := False;
-   Solo_Track : WNM.Tracks := 1;
-
    Pan_For_Track : array (WNM.Tracks) of Integer := (others => 0)
      with Atomic_Components;
    Volume_For_Track : array (WNM.Tracks) of Integer := (others => 50)
@@ -56,7 +52,6 @@ package body WNM.Synth is
    procedure Copy_Stereo_To_Mono (L, R : Mono_Buffer;
                                   Dst : out Mono_Buffer);
 
-   function Is_It_On (Track : Stream_Track) return Boolean;
    procedure Process_MIDI_Events;
 
    ------------------
@@ -89,19 +84,6 @@ package body WNM.Synth is
          end if;
       end loop;
    end Copy_Stereo_To_Mono;
-
-   --------------
-   -- Is_It_On --
-   --------------
-
-   function Is_It_On (Track : Stream_Track) return Boolean
-   is (Track = Always_On
-       or else
-         (not Track_Muted (To_Track (Track)) and then not Solo_Mode_Enabled)
-       or else
-         (not Track_Muted (To_Track (Track)) and then Solo_Track = To_Track (Track))
-       or else
-         (Solo_Mode_Enabled and then Solo_Track = To_Track (Track)));
 
    -----------
    -- Event --
@@ -185,72 +167,6 @@ package body WNM.Synth is
       return 1;
       -- return Sample_For_Track (Track);
    end Sample_Of_Track;
-
-   ----------
-   -- Mute --
-   ----------
-
-   procedure Mute (Track : WNM.Tracks) is
-   begin
-      Track_Muted (Track) := True;
-   end Mute;
-
-   ------------
-   -- Unmute --
-   ------------
-
-   procedure Unmute (Track : WNM.Tracks) is
-   begin
-      Track_Muted (Track) := False;
-   end Unmute;
-
-   -----------------
-   -- Toggle_Mute --
-   -----------------
-
-   procedure Toggle_Mute (Track : WNM.Tracks) is
-   begin
-      Track_Muted (Track) := not Track_Muted (Track);
-   end Toggle_Mute;
-
-   -----------
-   -- Muted --
-   -----------
-
-   function Muted (Track : WNM.Tracks) return Boolean
-   is (Track_Muted (Track));
-
-   -----------------
-   -- Toggle_Solo --
-   -----------------
-
-   procedure Toggle_Solo (Track : WNM.Tracks) is
-   begin
-      if Solo_Mode_Enabled then
-         if Solo_Track = Track then
-            Solo_Mode_Enabled := False;
-         else
-            Solo_Track := Track;
-         end if;
-      else
-         Solo_Mode_Enabled := True;
-         Solo_Track := Track;
-      end if;
-   end Toggle_Solo;
-
-   -------------
-   -- In_Solo --
-   -------------
-
-   function In_Solo return Boolean
-   is (Solo_Mode_Enabled);
-
-   ----------
-   -- Solo --
-   ----------
-
-   function Solo return WNM.Tracks
-   is (Solo_Track);
 
    ----------------
    -- Change_Pan --
@@ -394,10 +310,7 @@ package body WNM.Synth is
          begin
             for Track in Stream_Track loop
                Next_Buffer (Track, Sample_Buf, Success);
-               if Success
-                 and then
-                  (Track = Always_On or else not Track_Muted (To_Track (Track)))
-               then
+               if Success then
                   Mix (Sample_Buf, Track);
                end if;
             end loop;
@@ -515,10 +428,7 @@ package body WNM.Synth is
       begin
          for Track in Stream_Track loop
             Next_Buffer (Track, Sample_Buf, Success);
-            if Success
-              and then
-                (Track = Always_On or else not Track_Muted (To_Track (Track)))
-            then
+            if Success then
                Mix (Sample_Buf, Track);
             end if;
          end loop;

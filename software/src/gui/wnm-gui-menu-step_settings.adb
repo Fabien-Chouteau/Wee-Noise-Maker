@@ -27,9 +27,11 @@ with WNM.UI;
 
 package body WNM.GUI.Menu.Step_Settings is
 
-   package Top_Settings_Next is new Enum_Next (Top_Settings);
+   package Top_Settings_Next is new Enum_Next (Top_Settings,
+                                               Wrap => False);
    use Top_Settings_Next;
-   package Sub_Settings_Next is new Enum_Next (Sub_Settings);
+   package Sub_Settings_Next is new Enum_Next (Sub_Settings,
+                                               Wrap => False);
    use Sub_Settings_Next;
 
    Step_Settings_Singleton : aliased Step_Settings_Menu;
@@ -79,22 +81,28 @@ package body WNM.GUI.Menu.Step_Settings is
 
       case Top_Setting is
          when Condition =>
-            Draw_Text ("Condition", Img (Sequencer.Trig (Trig)));
+            Draw_Title ("Condition", "");
+            Draw_Value (Img (Sequencer.Trig (Trig)));
 
          when Note      =>
             case This.Current_Setting is
                when Note =>
-                  Draw_Text (Img (Sequencer.Note_Mode (Trig)), "");
+                  Draw_Title (Img (Sequencer.Note_Mode (Trig)), "");
                when Duration =>
-                  Draw_Text ("Duration", "");
+                  Draw_Title ("Duration", "");
                when Velo =>
-                  Draw_Text ("Velocity", "");
+                  Draw_Title ("Velocity", "");
                when others =>
                   raise Program_Error;
             end case;
 
-            Draw_MIDI_Note (Sequencer.Note (Trig),
-                            This.Current_Setting = Note);
+            case Sequencer.Note_Mode (Trig) is
+               when Note | Note_In_Chord | Note_In_Scale =>
+                  Draw_MIDI_Note (Sequencer.Note (Trig),
+                                  This.Current_Setting = Note);
+               when Chord =>
+                  Draw_Value (Sequencer.Note (Trig)'Img);
+            end case;
 
             Draw_Duration (Sequencer.Duration (Trig),
                            This.Current_Setting = Duration);
@@ -105,11 +113,11 @@ package body WNM.GUI.Menu.Step_Settings is
          when Repeat =>
             case This.Current_Setting is
                when Repeat =>
-                  Draw_Text ("Repeat Count", "");
-                  Draw_Text ("", Sequencer.Repeat (Trig)'Img);
+                  Draw_Title ("Repeat Count", "");
+                  Draw_Value (Sequencer.Repeat (Trig)'Img);
                when Repeat_Rate =>
-                  Draw_Text ("Repeat Rate", "");
-                  Draw_Text ("", Img (Sequencer.Repeat_Rate (Trig)));
+                  Draw_Title ("Repeat Rate", "");
+                  Draw_Value (Img (Sequencer.Repeat_Rate (Trig)));
                when others =>
                   raise Program_Error;
             end case;
@@ -123,14 +131,14 @@ package body WNM.GUI.Menu.Step_Settings is
                   when CC_C => Sequencer.C,
                   when others => Sequencer.D);
             begin
-               Draw_Text (Sequencer.CC_Controller_Label (Editing_Track, Id),
-                          "");
+               Draw_Title (Sequencer.CC_Controller_Label (Editing_Track, Id),
+                           "");
 
                if Sequencer.CC_Enabled (Trig, Id) then
                   Draw_MIDI_Val (Sequencer.CC_Value (Trig, Id),
                                 Selected => False);
                else
-                  Draw_Text ("", "- Disabled -");
+                  Draw_Value ("- Disabled -");
                end if;
             end;
       end case;
@@ -219,9 +227,9 @@ package body WNM.GUI.Menu.Step_Settings is
             end case;
          when Encoder_Left =>
             if Event.Value > 0 then
-               This.Current_Setting := Next (This.Current_Setting);
+               Next (This.Current_Setting);
             elsif Event.Value < 0 then
-               This.Current_Setting := Prev (This.Current_Setting);
+               Prev (This.Current_Setting);
             end if;
       end case;
    end On_Event;

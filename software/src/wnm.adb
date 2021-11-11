@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with HAL; use HAL;
+
 package body WNM is
 
    ---------
@@ -100,6 +102,29 @@ package body WNM is
           when 14 => B14,
           when 15 => B15,
           when 16 => B16);
+
+   Rand_X : UInt32 := 123456789;
+   Rand_Y : UInt32 := 362436069;
+   Rand_Z : UInt32 := 521288629;
+
+   ------------
+   -- Random --
+   ------------
+
+   function Random return Rand_Percent is
+      T : UInt32;
+   begin
+      Rand_X := Rand_X xor Shift_Left (Rand_X, 16);
+      Rand_X := Rand_X xor Shift_Right (Rand_X, 5);
+      Rand_X := Rand_X xor Shift_Left (Rand_X, 1);
+
+      T := Rand_X;
+      Rand_X := Rand_Y;
+      Rand_Y := Rand_Z;
+      Rand_Z := T xor Rand_X xor Rand_Y;
+
+      return Rand_Percent (Rand_Z mod 100);
+   end Random;
 
    ----------------
    -- Enum_Count --

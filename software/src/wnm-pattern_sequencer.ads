@@ -44,5 +44,6 @@ package WNM.Pattern_Sequencer is
    function Is_In_Pattern_Sequence (Pattern : Patterns) return Boolean;
 
    procedure Signal_End_Of_Pattern;
+   procedure Signal_Mid_Pattern;
 
 end WNM.Pattern_Sequencer;

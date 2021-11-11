@@ -85,13 +85,19 @@ package WNM is
 
    --  Enums utils --
    pragma Warnings (Off, "use clause for package");
-   package Trigger_Next is new Enum_Next (Trigger);
+   package Trigger_Next is new Enum_Next (Trigger,
+                                          Wrap => False);
    use Trigger_Next;
-   package Repeat_Next is new Enum_Next (Repeat);
+
+   package Repeat_Next is new Enum_Next (Repeat,
+                                         Wrap => False);
    use Repeat_Next;
-   package Repeat_Rate_Next is new Enum_Next (Repeat_Rate);
+
+   package Repeat_Rate_Next is new Enum_Next (Repeat_Rate,
+                                              Wrap => False);
    use Repeat_Rate_Next;
-   package Note_Duration_Next is new Enum_Next (Note_Duration);
+   package Note_Duration_Next is new Enum_Next (Note_Duration,
+                                                Wrap => False);
    use Note_Duration_Next;
    pragma Warnings (On, "use clause for package");
 
@@ -114,6 +120,9 @@ package WNM is
           when 15 => "15",
           when 16 => "16")
    with Inline_Always;
+
+   type Rand_Percent is range 0 .. 100;
+   function Random return Rand_Percent;
 
    generic
       type T is (<>);

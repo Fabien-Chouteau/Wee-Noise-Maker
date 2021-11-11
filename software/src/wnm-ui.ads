@@ -35,7 +35,8 @@ package WNM.UI is
                             Track_Select,
                             Step_Select,
 
-                            Volume_BPM,
+                            Volume_BPM_Mute,
+                            Volume_BPM_Solo,
                             FX_Alt,
                             Copy,
                             Pattern_Chaining
@@ -48,6 +49,8 @@ package WNM.UI is
    function Recording return Boolean;
 
    function FX_On (B : Keyboard_Button) return Boolean;
+
+   function Muted (Track : WNM.Tracks) return Boolean;
 
    Copy_T : WNM.Sequence_Copy.Copy_Transaction;
 

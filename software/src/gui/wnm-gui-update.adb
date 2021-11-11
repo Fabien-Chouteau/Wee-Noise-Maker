@@ -89,7 +89,7 @@ package body WNM.GUI.Update is
       Screen.Draw_H_Line (8);
 
       case WNM.UI.Input_GUI_Mode is
-         when WNM.UI.Volume_BPM =>
+         when WNM.UI.Volume_BPM_Mute | WNM.UI.Volume_BPM_Solo =>
             BPM := Integer (WNM.Sequencer.BPM);
             Volume := Integer (WNM.Master_Volume.Value);
 
@@ -101,6 +101,15 @@ package body WNM.GUI.Update is
                                           Value => BPM,
                                           Min   => 50,
                                           Max   => 200);
+
+            case WNM.UI.Input_GUI_Mode is
+               when WNM.UI.Volume_BPM_Mute =>
+                  WNM.GUI.Menu.Drawing.Draw_Value ("Mute");
+               when WNM.UI.Volume_BPM_Solo =>
+                  WNM.GUI.Menu.Drawing.Draw_Value ("Solo");
+               when others =>
+                  raise Program_Error;
+            end case;
 
          --  when WNM.UI.Pattern_Mode =>
          --     B := 1;

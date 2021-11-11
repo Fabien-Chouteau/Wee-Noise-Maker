@@ -61,8 +61,16 @@ package WNM.GUI.Menu.Drawing is
    procedure Draw_Scale_Mode (M        : Chord_Sequencer.Scale_Name;
                               Selected : Boolean);
 
-   procedure Draw_Text (Title : String;
-                        Val   : String);
+   procedure Draw_Chord_Duration (D        : Chord_Sequencer.Chord_Duration;
+                                  Selected : Boolean);
+
+   procedure Draw_Chord_Kind (Str      : String;
+                              Selected : Boolean);
+
+   procedure Draw_Title (Title : String;
+                         Val   : String);
+
+   procedure Draw_Value (Val : String);
 
    procedure Draw_Knob (Title : String;
                         Value : Natural);

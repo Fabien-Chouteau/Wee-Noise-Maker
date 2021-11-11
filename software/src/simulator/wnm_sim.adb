@@ -214,9 +214,9 @@ package body WNM_Sim is
                elsif Event.key.code = sfKeyLeft then
                   Encoder_Left := -1;
                elsif Event.key.code = sfKeyDown then
-                  Encoder_Right := 1;
-               elsif Event.key.code = sfKeyUp then
                   Encoder_Right := -1;
+               elsif Event.key.code = sfKeyUp then
+                  Encoder_Right := 1;
                end if;
             end if;
 
