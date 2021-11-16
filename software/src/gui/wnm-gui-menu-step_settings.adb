@@ -102,6 +102,9 @@ package body WNM.GUI.Menu.Step_Settings is
                                   This.Current_Setting = Note);
                when Chord =>
                   Draw_Value (Sequencer.Note (Trig)'Img);
+
+               when Arp =>
+                  Draw_Value ("---");
             end case;
 
             Draw_Duration (Sequencer.Duration (Trig),

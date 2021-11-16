@@ -89,16 +89,19 @@ package WNM.Sequencer is
    procedure Repeat_Rate_Next (Step : Sequencer_Steps);
    procedure Repeat_Rate_Prev (Step : Sequencer_Steps);
 
-   type Note_Mode_Kind is (Note, Chord, Note_In_Chord, Note_In_Scale);
+   type Note_Mode_Kind is (Note, Chord,
+                           Note_In_Chord, Note_In_Scale,
+                           Arp);
    package Note_Mode_Kind_Next is new Enum_Next (Note_Mode_Kind);
    use Note_Mode_Kind_Next;
 
    function Img (M : Note_Mode_Kind) return String
    is (case M is
-          when Note => "Note",
-          when Chord => "Chord",
+          when Note          => "Note",
+          when Chord         => "Chord",
           when Note_In_Chord => "Note in chord",
-          when Note_In_Scale => "Note in scale");
+          when Note_In_Scale => "Note in scale",
+          when Arp           => "Arpeggiator");
 
    function Note_Mode (Step : Sequencer_Steps) return Note_Mode_Kind;
    procedure Note_Mode_Next (Step : Sequencer_Steps);

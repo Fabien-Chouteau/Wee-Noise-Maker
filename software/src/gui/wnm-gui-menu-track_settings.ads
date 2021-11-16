@@ -28,7 +28,10 @@ package WNM.GUI.Menu.Track_Settings is
 
 private
 
-   type Settings is (Volume, Pan,
+   type Settings is (Volume,
+                     Pan,
+                     Arp_Mode,
+                     Arp_Notes,
                      MIDI_Chan,
                      MIDI_Instrument,
                      CC_A, CC_Label_A,

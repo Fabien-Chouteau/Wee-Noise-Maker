@@ -25,6 +25,7 @@ with WNM.Synth;
 with WNM.Sequencer;        use WNM.Sequencer;
 with WNM.GUI.Popup;
 with WNM.GUI.Menu.Text_Dialog;
+with WNM.Arpeggiator;
 
 package body WNM.GUI.Menu.Track_Settings is
 
@@ -72,6 +73,14 @@ package body WNM.GUI.Menu.Track_Settings is
                                          WNM.Synth.Volume (Editing_Track));
 
          when Pan    => Draw_Pan ("Pan:", WNM.Synth.Pan (Editing_Track) / 2);
+
+         when Arp_Mode =>
+            Draw_Title ("Arpeggiator mode:", "");
+            Draw_Value (Arpeggiator.Img (Arpeggiator.Mode));
+
+         when Arp_Notes =>
+            Draw_Title ("Arpeggiator notes:", "");
+            Draw_Value (Arpeggiator.Img (Arpeggiator.Notes));
 
          when MIDI_Chan =>
             Draw_Title ("MIDI Channel:", "");
@@ -164,6 +173,20 @@ package body WNM.GUI.Menu.Track_Settings is
 
                when Pan =>
                   Synth.Change_Pan (Editing_Track, Event.Value);
+
+               when Arp_Mode =>
+                  if Event.Value > 0 then
+                     Arpeggiator.Mode_Next;
+                  else
+                     Arpeggiator.Mode_Prev;
+                  end if;
+
+               when Arp_Notes =>
+                  if Event.Value > 0 then
+                     Arpeggiator.Notes_Next;
+                  else
+                     Arpeggiator.Notes_Prev;
+                  end if;
 
                when MIDI_Chan =>
                   if Event.Value > 0 then
