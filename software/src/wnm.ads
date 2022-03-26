@@ -49,7 +49,7 @@ package WNM is
                           N_16th, N_32nd);
    function Img (D : Note_Duration) return String;
 
-   type Repeat is mod 9;
+   type Repeat is mod 8;
 
    type Repeat_Rate is (Rate_1_2, Rate_1_3, Rate_1_4, Rate_1_5,
                         Rate_1_6, Rate_1_8, Rate_1_10, Rate_1_12, Rate_1_16,

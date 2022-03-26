@@ -4,9 +4,80 @@ with Littlefs; use Littlefs;
 with WNM.Storage;
 with WNM.Factory_Reset;
 
+with WNM.Screen;
+with WNM.GUI.Bitmap_Fonts;
+with WNM.Buttons;
+
 package body WNM.File_System is
 
    FS : aliased Littlefs.LFS_T;
+
+   --------------------------
+   -- Query_User_To_Format --
+   --------------------------
+
+   function Query_User_To_Format return Boolean is
+      X : Integer;
+      Play, Last_Play : Boolean := False;
+      Rec, Last_Rec : Boolean := False;
+   begin
+      Screen.Clear;
+      X := 1;
+      GUI.Bitmap_Fonts.Print (X, 1, "No file-system found");
+
+      X := 1;
+      GUI.Bitmap_Fonts.Print (X, 9, "Click Play to format");
+      X := 1;
+      GUI.Bitmap_Fonts.Print (X, 18, "Click Rec to shutdown");
+
+      Screen.Update;
+
+      loop
+         Buttons.Scan;
+         Last_Play := Play;
+         Last_Rec := Rec;
+         Play := Buttons.Is_Pressed (WNM.Play);
+         Rec := Buttons.Is_Pressed (WNM.Rec);
+         if Last_Rec and then not Rec then
+            return False;
+         elsif Last_Play and then not Play then
+            return True;
+         end if;
+      end loop;
+   end Query_User_To_Format;
+
+   -----------
+   -- Mount --
+   -----------
+
+   procedure Mount is
+      Err : int;
+
+      Do_Reset : constant Boolean := False;
+   begin
+      Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
+      if Err /= 0 then
+         if Query_User_To_Format then
+            Err := Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all);
+            if Err /= 0 then
+               raise Program_Error with "Format error: " & Err'Img;
+            end if;
+
+            Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
+            if Err /= 0 then
+               raise Program_Error with "Mount error after format: " & Err'Img;
+            end if;
+
+            if Do_Reset then
+               WNM.Factory_Reset.Reset (FS);
+            end if;
+         else
+            raise Program_Error with "No FS available, nothing we can do from here";
+         end if;
+      end if;
+
+
+   end Mount;
 
    -----------
    -- Close --
@@ -124,23 +195,4 @@ package body WNM.File_System is
       end if;
    end For_Each_File_In_Dir;
 
-   Err : int;
-
-   Do_Reset : constant Boolean := False;
-begin
-   if Do_Reset then
-      Err := Littlefs.Format (FS, WNM.Storage.Get_LFS_Config.all);
-      if Err /= 0 then
-         raise Program_Error with "Format error:" & Err'Img;
-      end if;
-   end if;
-
-   --  Err := Littlefs.Mount (FS, WNM.Storage.Get_LFS_Config.all);
-   --  if Err /= 0 then
-   --     raise Program_Error with "Mount error:" & Err'Img;
-   --  end if;
-
-   if Do_Reset then
-      WNM.Factory_Reset.Reset (FS);
-   end if;
 end WNM.File_System;

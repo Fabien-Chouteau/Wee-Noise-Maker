@@ -165,6 +165,7 @@ package body WNM.Storage is
          Ret.Attr_Max := 0;
          return Ret;
       end Create;
+
    end FD_Backend;
 
    --------------------
@@ -178,42 +179,56 @@ package body WNM.Storage is
 
 begin
 
-   if WNM_Sim.Switch_Storage_Image /= null
-     and then
-       WNM_Sim.Switch_Storage_Image.all /= ""
+   if WNM_Sim.Switch_Storage_Image = null
+     or else
+       WNM_Sim.Switch_Storage_Image.all = ""
    then
+      --  Create a temp image
+
+      Create_Temp_File (FD, WNM_Sim.Switch_Storage_Image);
 
       declare
-         Image_Path : constant String := WNM_Sim.Switch_Storage_Image.all;
+         function ftruncate (FS : int;
+                             Length : Long_Integer)
+                             return int;
+         pragma Import (C, ftruncate, "ftruncate");
+
       begin
-         --  The image file should exists and be writable
-
-         if not Is_Regular_File (Image_Path) then
-            Put_Line ("Image file '" & Image_Path & "' does not exists");
-            GNAT.OS_Lib.OS_Exit (1);
-         elsif not Is_Owner_Writable_File (Image_Path) then
-            Put_Line ("Image file '" & Image_Path & "' is not writable");
-            GNAT.OS_Lib.OS_Exit (1);
-         else
-            Put_Line ("Open image file '" & Image_Path & "'...");
-            FD := Open_Read_Write (Image_Path, Binary);
-         end if;
-
-         if FD = Invalid_FD then
-            Put_Line ("Cannot open image file '" & Image_Path & "': " &
-                        GNAT.OS_Lib.Errno_Message);
-            OS_Exit (1);
-         end if;
-
-         if File_Length (FD) /= WNM.Storage.Size then
-            Put_Line ("Invalid size for image file '" & Image_Path & "'");
-            OS_Exit (1);
+         if ftruncate (int (FD), Long_Integer (WNM.Storage.Size)) /= 0 then
+            raise Program_Error with "ftruncate error: " &
+              GNAT.OS_Lib.Errno_Message;
          end if;
       end;
-   else
-      Put_Line ("--img required.");
-      OS_Exit (1);
+      Close (FD);
    end if;
 
+   declare
+      Image_Path : constant String := WNM_Sim.Switch_Storage_Image.all;
+   begin
+      --  The image file should exists and be writable
+
+      if not Is_Regular_File (Image_Path) then
+         Put_Line ("Image file '" & Image_Path & "' does not exists");
+         GNAT.OS_Lib.OS_Exit (1);
+      elsif not Is_Owner_Writable_File (Image_Path) then
+         Put_Line ("Image file '" & Image_Path & "' is not writable");
+         GNAT.OS_Lib.OS_Exit (1);
+      else
+         Put_Line ("Open image file '" & Image_Path & "'...");
+         FD := Open_Read_Write (Image_Path, Binary);
+      end if;
+
+      if FD = Invalid_FD then
+         Put_Line ("Cannot open image file '" & Image_Path & "': " &
+                     GNAT.OS_Lib.Errno_Message);
+         OS_Exit (1);
+      end if;
+
+      if File_Length (FD) /= WNM.Storage.Size then
+         Put_Line ("Invalid size for image file '" & Image_Path & "'");
+         OS_Exit (1);
+      end if;
+   end;
    Config := FD_Backend.Create (FD);
+
 end WNM.Storage;

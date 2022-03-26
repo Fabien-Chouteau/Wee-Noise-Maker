@@ -8,7 +8,8 @@ package WNM.MIDI.Queues is
       with procedure Process (Msg : Message);
    procedure Synth_Pop;
 
-   procedure MIDI_Out_Read (G : in out BBqueue.Buffers.Read_Grant);
+   procedure MIDI_Out_Read (G   : in out BBqueue.Buffers.Read_Grant;
+                            Max :        BBqueue.Count := BBqueue.Count'Last);
    procedure MIDI_Out_Release (G : in out BBqueue.Buffers.Read_Grant);
 
 private

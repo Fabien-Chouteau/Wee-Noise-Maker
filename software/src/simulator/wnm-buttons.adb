@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with Ada.Synchronous_Task_Control;
+
 with WNM_Sim;
 
 package body WNM.Buttons is
@@ -60,8 +62,13 @@ package body WNM.Buttons is
    begin
       for B in Button loop
          Key_State (B) :=
-           (if WNM_Sim.SFML_Pressed (To_SFML_Key (B)) then Down else Up);
+           (if WNM_Sim.SFML_Pressed (To_SFML_Key (B))
+            or else
+            WNM_Sim.Force_Pressed (B)
+            then Down else Up);
       end loop;
+
+      Ada.Synchronous_Task_Control.Set_True (WNM_Sim.Button_Scan_Signal);
    end Scan;
 
    -----------

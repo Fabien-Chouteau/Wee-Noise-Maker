@@ -309,6 +309,17 @@ package WNM.MIDI is
           when B8  => "B8 ",
           when others => "---");
 
+   function Img (M : Message) return String
+   is (case M.Kind is
+          when Note_On => "On " & Key_Img (M.Key) & " " & M.Velocity'Img,
+          when Note_Off => "Off " & Key_Img (M.Key) & " " & M.Velocity'Img,
+          when Aftertouch => "Aftertouch " & Key_Img (M.Key) & " " & M.Velocity'Img,
+          when Continous_Controller => "CC " & M.Controller'Img & M.Controller_Value'Img,
+          when Patch_Change => "Patch change" & M.Instrument'Img,
+          when Channel_Pressure => "Pressure" & M.Pressure'Img,
+          when Pitch_Bend => "Pitch Bend" & M.Bend'Img
+      );
+
    Key_To_Frequency : constant array (MIDI_Key) of Float :=
      (0   => 8.1757989156,
       1   => 8.6619572180,

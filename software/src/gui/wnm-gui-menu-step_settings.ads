@@ -19,6 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Sequencer;
+
 package WNM.GUI.Menu.Step_Settings is
 
    procedure Push_Window;
@@ -29,8 +31,8 @@ private
    type Top_Settings is (Condition, Note, Repeat, CC_A, CC_B, CC_C, CC_D);
    function Top_Settings_Count is new Enum_Count (Top_Settings);
 
-   type Sub_Settings is (Condition, Note, Duration, Velo, Repeat, Repeat_Rate,
-                         CC_A, CC_B, CC_C, CC_D);
+   subtype Sub_Settings is WNM.Sequencer.User_Step_Settings;
+
    function Sub_Settings_Count is new Enum_Count (Sub_Settings);
 
    type Step_Settings_Menu is new Menu_Window with record

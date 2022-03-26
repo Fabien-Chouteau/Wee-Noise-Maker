@@ -31,8 +31,8 @@ package WNM.RP2040.PIO is
    -- PIO 0 --
 
    Encoder_PIO    : PIO_Device renames RP.Device.PIO_0;
-   Encoder_L_SM     : constant PIO_SM := 0;
-   Encoder_R_SM     : constant PIO_SM := 1;
+   Encoder_L_SM   : constant PIO_SM := 0;
+   Encoder_R_SM   : constant PIO_SM := 1;
    Encoder_Offset : constant PIO_Address := 0;
    Encoder_Last   : constant PIO_Address :=
      Encoder_Offset + Pio_Rotary_Encoder_Program_Instructions'Length - 1;

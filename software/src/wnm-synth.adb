@@ -165,7 +165,7 @@ package body WNM.Synth is
       pragma Unreferenced (Track);
    begin
       return 1;
-      -- return Sample_For_Track (Track);
+      --  return Sample_For_Track (Track);
    end Sample_Of_Track;
 
    ----------------

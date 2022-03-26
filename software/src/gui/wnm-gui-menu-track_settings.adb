@@ -19,7 +19,6 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with HAL.Bitmap;           use HAL.Bitmap;
 with WNM.GUI.Menu.Drawing; use WNM.GUI.Menu.Drawing;
 with WNM.Synth;
 with WNM.Sequencer;        use WNM.Sequencer;

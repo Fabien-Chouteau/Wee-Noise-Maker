@@ -3,6 +3,8 @@ with System;
 
 package WNM.File_System is
 
+   procedure Mount;
+
    subtype File_Descriptor is Littlefs.LFS_File;
    subtype File_Size is Littlefs.LFS_Size;
    subtype File_Signed_Size is Littlefs.LFS_Signed_Size;

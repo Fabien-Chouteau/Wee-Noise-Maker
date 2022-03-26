@@ -70,7 +70,11 @@ package WNM.GUI.Menu.Drawing is
    procedure Draw_Title (Title : String;
                          Val   : String);
 
-   procedure Draw_Value (Val : String);
+   procedure Draw_Value (Val      : String;
+                         Selected : Boolean := False);
+
+   procedure Draw_Value_Left (Val      : String;
+                              Selected : Boolean := False);
 
    procedure Draw_Knob (Title : String;
                         Value : Natural);

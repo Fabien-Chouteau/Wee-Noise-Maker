@@ -27,15 +27,6 @@ with WNM.UI;
 
 package WNM.Sequencer is
 
-   --  type Sequencer_State is (Pause,
-   --                           Play,
-   --                           Edit,
-   --                           Play_And_Rec,
-   --                           Play_And_Edit);
-   --
-   --  function State return Sequencer_State;
-   --  --  Current state of the sequencer
-
    function Playing_Step return Sequencer_Steps;
    function Playing_Pattern return Patterns;
 
@@ -58,11 +49,6 @@ package WNM.Sequencer is
 
    procedure Do_Copy (T : in out WNM.Sequence_Copy.Copy_Transaction)
      with Pre => WNM.Sequence_Copy.Is_Complete (T);
-
-   procedure Set_Instrument (Val : Keyboard_Value);
-   --  Set the instrument of the current track
-
-   function Instrument (Track : Tracks) return Keyboard_Value;
 
    procedure Set_BPM (BPM : Beat_Per_Minute);
    procedure Change_BPM (BPM_Delta : Integer);
@@ -151,5 +137,141 @@ package WNM.Sequencer is
    function CC_Value (Step : Sequencer_Steps; Id : CC_Id) return MIDI.MIDI_Data;
    procedure CC_Value_Inc (Step : Sequencer_Steps; Id : CC_Id);
    procedure CC_Value_Dec (Step : Sequencer_Steps; Id : CC_Id);
+
+   type Step_Settings is (Condition,
+                          Note,
+                          Duration,
+                          Velo,
+                          Repeat,
+                          Repeat_Rate,
+                          CC_A,
+                          CC_B,
+                          CC_C,
+                          CC_D,
+                          Note_Mode,
+                          Extended,
+                          Reserved);
+
+   for Step_Settings'Size use 4;
+   for Step_Settings use (Condition   => 0,
+                          Note        => 1,
+                          Duration    => 2,
+                          Velo        => 3,
+                          Repeat      => 4,
+                          Repeat_Rate => 5,
+                          CC_A        => 6,
+                          CC_B        => 7,
+                          CC_C        => 8,
+                          CC_D        => 9,
+                          Note_Mode   => 10,
+                          Extended    => 14,
+                          Reserved    => 15);
+
+   subtype User_Step_Settings is Step_Settings range Condition .. CC_D;
+
+   procedure Next_Value (S : User_Step_Settings);
+   procedure Prev_Value (S : User_Step_Settings);
+   procedure Next_Value_Fast (S : User_Step_Settings);
+   procedure Prev_Value_Fast (S : User_Step_Settings);
+
+   type Track_Setting_Kind is (Volume,
+                               Pan,
+                               Arp_Mode,
+                               Arp_Notes,
+                               MIDI_Chan,
+                               CC_A_Id,
+                               CC_B_Id,
+                               CC_C_Id,
+                               CC_D_Id,
+                               CC_A_Label,
+                               CC_B_Label,
+                               CC_C_Label,
+                               CC_D_Label,
+                               Extended,
+                               Reserved);
+
+   for Track_Setting_Kind'Size use 4;
+
+   for Track_Setting_Kind use (Volume     => 0,
+                               Pan        => 1,
+                               Arp_Mode   => 2,
+                               Arp_Notes  => 3,
+                               MIDI_Chan  => 4,
+                               CC_A_Id    => 5,
+                               CC_B_Id    => 6,
+                               CC_C_Id    => 7,
+                               CC_D_Id    => 8,
+                               CC_A_Label => 9,
+                               CC_B_Label => 10,
+                               CC_C_Label => 11,
+                               CC_D_Label => 12,
+                               Extended   => 14,
+                               Reserved   => 15);
+private
+
+   type CC_Val_Array is array (CC_Id) of MIDI.MIDI_Data;
+   type CC_Ena_Array is array (CC_Id) of Boolean;
+
+   type Step_Rec is record
+      Trig        : Trigger;
+      Repeat      : WNM.Repeat;
+      Repeat_Rate : WNM.Repeat_Rate;
+
+      Note_Mode : Note_Mode_Kind;
+      Note      : MIDI.MIDI_Key;
+      Duration  : Note_Duration;
+      Velo      : MIDI.MIDI_Data;
+      CC_Ena    : CC_Ena_Array;
+      CC_Val    : CC_Val_Array;
+   end record;
+
+
+   Default_Step : constant Step_Rec :=
+     (Trig => None,
+      Repeat => 0,
+      Repeat_Rate => Rate_1_8,
+      Note_Mode => Note,
+      Note => MIDI.C4,
+      Duration => Quarter,
+      Velo => MIDI.MIDI_Data'Last,
+      CC_Ena => (others => False),
+      CC_Val => (others => 0));
+
+   type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
+   type Pattern is array (Tracks) of Sequence;
+   Sequences : array (Patterns) of Pattern :=
+     (others => (others => (others => Default_Step)));
+
+   type CC_Setting is record
+      Controller : MIDI.MIDI_Data := 0;
+      Label      : Controller_Label := "Noname Controller";
+   end record;
+   type CC_Setting_Array is array (CC_Id) of CC_Setting;
+
+   type Track_Setting is record
+      Chan : MIDI.MIDI_Channel := 0;
+      CC : CC_Setting_Array;
+   end record;
+
+   Track_Settings : array (Tracks) of Track_Setting
+     := (others => (Chan => 0,
+                    CC => ((0, "Control 0        "),
+                           (1, "Control 1        "),
+                           (2, "Control 2        "),
+                           (3, "Control 3        ")
+                           )
+                   )
+        );
+
+   Sequencer_BPM : Beat_Per_Minute := 120;
+
+   Current_Playing_Step : Sequencer_Steps := Sequencer_Steps'First with Atomic;
+
+   --  Current_Seq_State : Sequencer_State := Pause with Atomic;
+   Current_Track     : Tracks := Tracks'First with Atomic;
+
+   Current_Editing_Pattern : Patterns := Patterns'First;
+   Current_Editing_Track : Tracks := Tracks'First;
+   Current_Editing_Step : Sequencer_Steps := Sequencer_Steps'First;
 
 end WNM.Sequencer;

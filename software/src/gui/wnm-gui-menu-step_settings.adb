@@ -51,16 +51,16 @@ package body WNM.GUI.Menu.Step_Settings is
 
    function To_Top (S : Sub_Settings) return Top_Settings
    is (case S is
-          when Condition => Condition,
-          when Note => Note,
-          when Duration => Note,
-          when Velo => Note,
-          when Repeat => Repeat,
-          when Repeat_Rate => Repeat,
-          when CC_A => CC_A,
-          when CC_B => CC_B,
-          when CC_C => CC_C,
-          when CC_D => CC_D);
+          when Sequencer.Condition => Condition,
+          when Sequencer.Note => Note,
+          when Sequencer.Duration => Note,
+          when Sequencer.Velo => Note,
+          when Sequencer.Repeat => Repeat,
+          when Sequencer.Repeat_Rate => Repeat,
+          when Sequencer.CC_A => CC_A,
+          when Sequencer.CC_B => CC_B,
+          when Sequencer.CC_C => CC_C,
+          when Sequencer.CC_D => CC_D);
 
    ----------
    -- Draw --
@@ -88,7 +88,7 @@ package body WNM.GUI.Menu.Step_Settings is
             case This.Current_Setting is
                when Note =>
                   Draw_Title (Img (Sequencer.Note_Mode (Trig)), "");
-               when Duration =>
+               when Sequencer.Duration =>
                   Draw_Title ("Duration", "");
                when Velo =>
                   Draw_Title ("Velocity", "");
@@ -108,7 +108,7 @@ package body WNM.GUI.Menu.Step_Settings is
             end case;
 
             Draw_Duration (Sequencer.Duration (Trig),
-                           This.Current_Setting = Duration);
+                           This.Current_Setting = Sequencer.Duration);
 
             Draw_MIDI_Val (Sequencer.Velo (Trig),
                            This.Current_Setting = Velo);
@@ -117,13 +117,17 @@ package body WNM.GUI.Menu.Step_Settings is
             case This.Current_Setting is
                when Repeat =>
                   Draw_Title ("Repeat Count", "");
-                  Draw_Value (Sequencer.Repeat (Trig)'Img);
-               when Repeat_Rate =>
+               when Sequencer.Repeat_Rate =>
                   Draw_Title ("Repeat Rate", "");
-                  Draw_Value (Img (Sequencer.Repeat_Rate (Trig)));
                when others =>
                   raise Program_Error;
             end case;
+
+            Draw_Value (Sequencer.Repeat (Trig)'Img,
+                        Selected => This.Current_Setting = Repeat);
+
+            Draw_Value_Left (Img (Sequencer.Repeat_Rate (Trig)),
+                             Selected => This.Current_Setting = Sequencer.Repeat_Rate);
 
          when CC_A .. CC_D =>
             declare
@@ -160,6 +164,8 @@ package body WNM.GUI.Menu.Step_Settings is
    begin
       case Event.Kind is
          when Left_Press =>
+            null;
+         when Right_Press =>
             case This.Current_Setting is
                when CC_A => Sequencer.CC_Toggle (Trig, A);
                when CC_B => Sequencer.CC_Toggle (Trig, B);
@@ -170,64 +176,14 @@ package body WNM.GUI.Menu.Step_Settings is
 
                when others => null;
             end case;
-         when Right_Press =>
-            --  Never exit the step settings
-            null;
+
          when Encoder_Right =>
-            case This.Current_Setting is
-               when Condition =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Trig_Next (Trig);
-                  else
-                     WNM.Sequencer.Trig_Prev (Trig);
-                  end if;
-               when Note =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Note_Next (Trig);
-                  else
-                     WNM.Sequencer.Note_Prev (Trig);
-                  end if;
-               when Duration =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Duration_Next (Trig);
-                  else
-                     WNM.Sequencer.Duration_Prev (Trig);
-                  end if;
-               when Repeat =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Repeat_Next (Trig);
-                  else
-                     WNM.Sequencer.Repeat_Prev (Trig);
-                  end if;
-               when Repeat_Rate =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Repeat_Rate_Next (Trig);
-                  else
-                     WNM.Sequencer.Repeat_Rate_Prev (Trig);
-                  end if;
-               when Velo =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.Velo_Next (Trig);
-                  else
-                     WNM.Sequencer.Velo_Prev (Trig);
-                  end if;
-               when CC_A | CC_B | CC_C | CC_D =>
-                  if Event.Value > 0 then
-                     WNM.Sequencer.CC_Value_Inc (Trig,
-                                                 (case This.Current_Setting is
-                                                     when CC_A => A,
-                                                     when CC_B => B,
-                                                     when CC_C => C,
-                                                     when others => D));
-                  else
-                     WNM.Sequencer.CC_Value_Dec (Trig,
-                                                 (case This.Current_Setting is
-                                                     when CC_A => A,
-                                                     when CC_B => B,
-                                                     when CC_C => C,
-                                                     when others => D));
-                  end if;
-            end case;
+            if Event.Value > 0 then
+               WNM.Sequencer.Next_Value (This.Current_Setting);
+            else
+               WNM.Sequencer.Prev_Value (This.Current_Setting);
+            end if;
+
          when Encoder_Left =>
             if Event.Value > 0 then
                Next (This.Current_Setting);

@@ -27,12 +27,16 @@ with WNM.GUI.Menu.FM_Settings;
 with WNM.GUI.Menu.Create_Sample;
 with WNM.GUI.Menu.Passthrough;
 
+with WNM.Projects;
+
 package body WNM.GUI.Menu.Root is
 
    Root_Window_Singleton : aliased Root_Menu;
 
    function Menu_Item_Text (Item : Menu_Items) return String
    is (case Item is
+          when Save_Project    => "Save project",
+          when Load_Project    => "Load project",
           when Create_Sample   => "Create sample",
           when Change_Sample   => "Change sample",
           when FM_Tune         => "FM Tuner",
@@ -79,6 +83,10 @@ package body WNM.GUI.Menu.Root is
       case Event.Kind is
          when Left_Press =>
             case This.Item is
+               when Save_Project =>
+                  WNM.Projects.Save;
+               when Load_Project =>
+                  WNM.Projects.Load;
                when Create_Sample =>
                   Menu.Create_Sample.Push_Window;
                when Change_Sample =>

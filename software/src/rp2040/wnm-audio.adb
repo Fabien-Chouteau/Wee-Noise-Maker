@@ -20,15 +20,15 @@ package body WNM.Audio is
    Out_Buffer :  Stereo_Buffer := (others => (0, 0));
    In_Buffer  :  Stereo_Buffer := (others => (0, 0));
 
-   Data_Out    : RP.GPIO.GPIO_Point := (Pin => 22);
    Data_In     : RP.GPIO.GPIO_Point := (Pin => 21);
+   Data_Out    : RP.GPIO.GPIO_Point := (Pin => 22);
    BCLK        : RP.GPIO.GPIO_Point := (Pin => 23);
    LRCLK       : RP.GPIO.GPIO_Point := (Pin => 24);
    MCLK        : RP.GPIO.GPIO_Point := (Pin => 25);
 
    DMA_IRQ     : constant RP.DMA.DMA_IRQ_Id := 0;
 
-   MCLK_Requested_Frequency : constant := 256 * 44100;
+   MCLK_Requested_Frequency : constant := 256 * WNM.Sample_Frequency;
    MCLK_PWM : constant RP.PWM.PWM_Slice := RP.PWM.To_PWM (MCLK).Slice;
 
    DAC_Dev : SGTL5000.SGTL5000_DAC (WNM.RP2040.I2C.Port,
@@ -52,6 +52,10 @@ package body WNM.Audio is
       Out_Buffer := In_Buffer;
 
       Out_Buffer (Out_Buffer'First) := (30000, 30000);
+      for X in 1 .. 40 loop
+         Out_Buffer (Out_Buffer'First + X) := (2#1010101010#,
+                                               2#1010101010#);
+      end loop;
 
       RP.DMA.Start
          (Channel => WNM.RP2040.I2S_OUT_DMA,
@@ -191,6 +195,7 @@ package body WNM.Audio is
 
       -- I2S PIO --
 
+      Enable (I2S_PIO);
       Load (I2S_PIO,
             Prog   => Audio_I2s_Program_Instructions,
             Offset => I2S_Offset);
@@ -206,10 +211,6 @@ package body WNM.Audio is
           Wrap        => I2S_Offset + Audio_I2s_Wrap,
           Wrap_Target => I2S_Offset + Audio_I2s_Wrap_Target);
 
-      Set_Clock_Frequency
-        (Config,
-         Sample_Rate * Sample_Bits * Channels * Cycles_Per_Sample);
-
       Set_Config (I2S_PIO, I2S_SM, Config);
       SM_Initialize (I2S_PIO, I2S_SM, I2S_Offset, Config);
 
@@ -220,6 +221,11 @@ package body WNM.Audio is
 
       Execute (I2S_PIO, I2S_SM,
                PIO_Instruction (I2S_Offset + Offset_entry_point));
+
+      Set_Clock_Frequency
+        (Config,
+         Sample_Rate * Sample_Bits * Channels * Cycles_Per_Sample);
+      Set_Config (I2S_PIO, I2S_SM, Config);
 
       Set_Enabled (I2S_PIO, I2S_SM, True);
 

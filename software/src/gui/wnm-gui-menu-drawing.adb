@@ -174,7 +174,7 @@ package body WNM.GUI.Menu.Drawing is
    procedure Draw_MIDI_Note (Key      : MIDI.MIDI_Key;
                              Selected : Boolean)
    is
-      X : Integer := Box_Left + 4;
+      X : Integer := Box_Left + 8;
    begin
       if Selected then
          Screen.Draw_Line ((X - 1, Select_Line_Y),
@@ -372,7 +372,7 @@ package body WNM.GUI.Menu.Drawing is
    procedure Draw_Chord_Kind (Str      : String;
                               Selected : Boolean)
    is
-      X : Integer := Box_Left + 4;
+      X : Integer := Box_Left + 8;
    begin
       if Selected then
          Screen.Draw_Line ((X - 1, Select_Line_Y),
@@ -407,13 +407,40 @@ package body WNM.GUI.Menu.Drawing is
    -- Draw_Value --
    ----------------
 
-   procedure Draw_Value (Val : String) is
-      X : Integer := Box_Left + 4;
+   procedure Draw_Value (Val      : String;
+                         Selected : Boolean := False)
+   is
+      X : Integer := Box_Left + 8;
    begin
+
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + Val'Length * 6, Select_Line_Y));
+      end if;
+
       Print (X_Offset    => X,
              Y_Offset    => Value_Text_Y,
              Str         => Val);
    end Draw_Value;
+
+   ---------------------
+   -- Draw_Value_Left --
+   ---------------------
+
+   procedure Draw_Value_Left (Val      : String;
+                              Selected : Boolean := False)
+   is
+      X : Integer := Box_Center.X + 4;
+   begin
+      if Selected then
+         Screen.Draw_Line ((X - 1, Select_Line_Y),
+                           (X + Val'Length * 6, Select_Line_Y));
+      end if;
+
+      Print (X_Offset    => X,
+             Y_Offset    => Value_Text_Y,
+             Str         => Val);
+   end Draw_Value_Left;
 
    ---------------
    -- Draw_Knob --

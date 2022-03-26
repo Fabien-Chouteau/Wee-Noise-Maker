@@ -52,10 +52,10 @@ package body WNM.Buttons is
                                        Data    => (0 => Reg, 1 => Val),
                                        Status  => Status);
 
-      if Status /= Ok then
-         RP2040.I2C.Display_Device_Scan;
-         raise Program_Error;
-      end if;
+      --  if Status /= Ok then
+      --     RP2040.I2C.Display_Device_Scan;
+      --     raise Program_Error;
+      --  end if;
    end Write_Reg;
 
    --------------
@@ -73,10 +73,12 @@ package body WNM.Buttons is
                                 Status        => Status);
 
       if Status /= Ok then
-         RP2040.I2C.Display_Device_Scan;
-         raise Program_Error;
+         --  RP2040.I2C.Display_Device_Scan;
+         --  raise Program_Error;
+         Val := 0;
+      else
+         Val := Data (Data'First);
       end if;
-      Val := Data (Data'First);
    end Read_Reg;
 
    ----------------

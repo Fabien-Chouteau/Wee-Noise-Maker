@@ -76,13 +76,13 @@ package body WNM.LED is
       for L in LEDs loop
          if LED_Brightness (L) /= 0 then
             case L is
-              when B1 .. B8 | B9 .. B16 =>
-               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfBlue;
-              when Rec =>
-               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfRed;
-              when Play =>
-               WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfGreen;
-         end case;
+               when B1 .. B8 | B9 .. B16 =>
+                  WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfBlue;
+               when Rec =>
+                  WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfRed;
+               when Play =>
+                  WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfGreen;
+            end case;
          else
             WNM_Sim.SFML_LEDs (L) := Sf.Graphics.Color.sfTransparent;
          end if;

@@ -103,7 +103,7 @@ package body WNM.Short_Term_Sequencer is
       procedure Insert_After (First : Event_Access) is
          Cursor : Event_Access := First;
       begin
-         while Cursor.Next /= null and then Cursor.Expiration < Exp loop
+         while Cursor.Next /= null and then Cursor.Next.Expiration <= Exp loop
             Cursor := Cursor.Next;
          end loop;
 
@@ -113,7 +113,7 @@ package body WNM.Short_Term_Sequencer is
 
    begin
 
-      if Last_Insert /= null and then Last_Insert.Expiration >= Exp then
+      if Last_Insert /= null and then Last_Insert.Expiration <= Exp then
 
          --  The last insert is valid and earlier than the event we want to
          --  insert. Therefore we don't have to walk through all the list,
@@ -121,14 +121,14 @@ package body WNM.Short_Term_Sequencer is
 
          Insert_After (Last_Insert);
 
-      elsif List_Head = null or else List_Head.Expiration >= Exp then
+      elsif List_Head = null or else List_Head.Expiration > Exp then
 
          --  Head insert
          Node.Next := List_Head;
          List_Head := Node;
       else
 
-         --  Insert after the first node
+         --  Insert somewhere after the first node
          Insert_After (List_Head);
       end if;
 
@@ -163,6 +163,10 @@ package body WNM.Short_Term_Sequencer is
       if List_Head /= null and then List_Head.Expiration <= Now then
          Node := List_Head;
 
+         if Last_Insert = Node then
+            Last_Insert := null;
+         end if;
+
          List_Head := Node.Next;
 
          D := Node.D;
@@ -173,6 +177,22 @@ package body WNM.Short_Term_Sequencer is
          Success := False;
       end if;
    end Pop;
+
+   --  -----------------
+   --  -- Print_Queue --
+   --  -----------------
+   --
+   --  procedure Print_Queue is
+   --     Node : Event_Access;
+   --  begin
+   --     Ada.Text_IO.Put_Line ("Short_Term_Sequencer Queue:");
+   --     Node := List_Head;
+   --     while Node /= null loop
+   --        Ada.Text_IO.Put_Line (Node.Expiration'Img & " " & MIDI.Img (Node.D));
+   --        Node := Node.Next;
+   --     end loop;
+   --     Ada.Text_IO.Put_Line ("---------------------------");
+   --  end Print_Queue;
 
 begin
    for Index in Node_Index loop

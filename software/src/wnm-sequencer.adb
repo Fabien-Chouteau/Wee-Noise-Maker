@@ -29,61 +29,6 @@ with HAL;                   use HAL;
 
 package body WNM.Sequencer is
 
-   type CC_Val_Array is array (CC_Id) of MIDI.MIDI_Data;
-   type CC_Ena_Array is array (CC_Id) of Boolean;
-
-   type Step_Rec is record
-      Trig        : Trigger := None;
-      Repeat      : WNM.Repeat := 0;
-      Repeat_Rate : WNM.Repeat_Rate := Rate_1_8;
-
-      Note_Mode : Note_Mode_Kind := Note;
-      Note      : MIDI.MIDI_Key := MIDI.C4;
-      Duration  : Note_Duration := Quarter;
-      Velo      : MIDI.MIDI_Data := MIDI.MIDI_Data'Last;
-      CC_Ena    : CC_Ena_Array := (others => False);
-      CC_Val    : CC_Val_Array := (others => 0);
-   end record;
-
-   type Sequence is array (Sequencer_Steps) of Step_Rec with Pack;
-   type Pattern is array (Tracks) of Sequence;
-   Sequences : array (Patterns) of Pattern;
-
-   type CC_Setting is record
-      Controller : MIDI.MIDI_Data := 0;
-      Label      : Controller_Label := "Noname Controller";
-   end record;
-   type CC_Setting_Array is array (CC_Id) of CC_Setting;
-
-   type Track_Setting is record
-      Chan : MIDI.MIDI_Channel := 0;
-      CC : CC_Setting_Array;
-   end record;
-
-   Track_Settings : array (Tracks) of Track_Setting
-     := (others => (Chan => 0,
-                    CC => ((0, "Control 0        "),
-                           (1, "Control 1        "),
-                           (2, "Control 2        "),
-                           (3, "Control 3        ")
-                           )
-                   )
-        );
-
-   Sequencer_BPM : Beat_Per_Minute := 120;
-
-   Current_Playing_Step : Sequencer_Steps := Sequencer_Steps'First with Atomic;
-
-   --  Current_Seq_State : Sequencer_State := Pause with Atomic;
-   Current_Track     : Tracks := Tracks'First with Atomic;
-
-   Current_Editing_Pattern : Patterns := Patterns'First;
-   Current_Editing_Track : Tracks := Tracks'First;
-   Current_Editing_Step : Sequencer_Steps := Sequencer_Steps'First;
-
-   Track_Instrument  : array (Tracks) of Keyboard_Value :=
-     (others => Keyboard_Value'First);
-
    --  Next_Start : Synth.Sample_Time := Synth.Sample_Time'First;
    Next_Start : Time.Time_Microseconds := Time.Time_Microseconds'First;
 
@@ -370,22 +315,6 @@ package body WNM.Sequencer is
 
    end Do_Copy;
 
-   --------------------
-   -- Set_Instrument --
-   --------------------
-
-   procedure Set_Instrument (Val : Keyboard_Value) is
-   begin
-      Track_Instrument (Current_Track) := Val;
-   end Set_Instrument;
-
-   ----------------
-   -- Instrument --
-   ----------------
-
-   function Instrument (Track : Tracks) return Keyboard_Value
-   is (Track_Instrument (Track));
-
    -------------
    -- Set_BPM --
    -------------
@@ -578,7 +507,6 @@ package body WNM.Sequencer is
                Repeat_Time + Duration);
          end loop;
       end loop;
-
    end MIDI_Play_Chord;
 
    ---------------
@@ -1291,21 +1219,86 @@ package body WNM.Sequencer is
         (Step).CC_Ena (Id) := True;
    end CC_Value_Dec;
 
---  begin
-   --  Sequences (B1) (B1) (1)  := (Always, 3, Rate_1_8, others => <>);
-   --  Sequences (B1) (B2) (2)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B3) (3)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B4) (4)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B5) (5)  := (Always, 3, Rate_1_8, others => <>);
-   --  Sequences (B1) (B6) (6)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B7) (7)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B8) (8)  := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B9) (9)  := (Always, 3, Rate_1_8, others => <>);
-   --  Sequences (B1) (B10) (10) := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B11) (11) := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B12) (12) := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B13) (13) := (Always, 3, Rate_1_8, others => <>);
-   --  Sequences (B1) (B14) (14) := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B15) (15) := (Always, 0, Rate_1_8);
-   --  Sequences (B1) (B16) (16) := (Always, 0, Rate_1_8);
+
+   ----------------
+   -- Next_Value --
+   ----------------
+
+   procedure Next_Value (S : User_Step_Settings) is
+   begin
+      case S is
+         when Condition    => Trig_Next (Current_Editing_Step);
+         when Note         => Note_Next (Current_Editing_Step);
+         when Duration     => Duration_Next (Current_Editing_Step);
+         when Velo         => Velo_Next (Current_Editing_Step);
+         when Repeat       => Repeat_Next (Current_Editing_Step);
+         when Repeat_Rate  => Repeat_Rate_Next (Current_Editing_Step);
+         when CC_A .. CC_D =>
+            CC_Value_Inc (Current_Editing_Step,
+                          (case S is
+                              when CC_A   => A,
+                              when CC_B   => B,
+                              when CC_C   => C,
+                              when others => D));
+      end case;
+   end Next_Value;
+
+   ----------------
+   -- Prev_Value --
+   ----------------
+
+   procedure Prev_Value (S : User_Step_Settings) is
+   begin
+      case S is
+         when Condition    => Trig_Prev (Current_Editing_Step);
+         when Note         => Note_Prev (Current_Editing_Step);
+         when Duration     => Duration_Prev (Current_Editing_Step);
+         when Velo         => Velo_Prev (Current_Editing_Step);
+         when Repeat       => Repeat_Prev (Current_Editing_Step);
+         when Repeat_Rate  => Repeat_Rate_Prev (Current_Editing_Step);
+         when CC_A .. CC_D =>
+            CC_Value_Dec (Current_Editing_Step,
+                          (case S is
+                              when CC_A   => A,
+                              when CC_B   => B,
+                              when CC_C   => C,
+                              when others => D));
+      end case;
+   end Prev_Value;
+
+   ---------------------
+   -- Next_Value_Fast --
+   ---------------------
+
+   procedure Next_Value_Fast (S : User_Step_Settings) is
+   begin
+      null;
+   end Next_Value_Fast;
+
+   ---------------------
+   -- Prev_Value_Fast --
+   ---------------------
+
+   procedure Prev_Value_Fast (S : User_Step_Settings) is
+   begin
+      null;
+   end Prev_Value_Fast;
+
+begin
+   Sequences (1) (1) (1)  := (Always, 3, Rate_1_8, others => <>);
+   --  Sequences (1) (2) (2)  := (Always, 0, Rate_1_8);
+   --  Sequences (1) (3) (3)  := (Always, 0, Rate_1_8);
+   --  Sequences (1) (4) (4)  := (Always, 0, Rate_1_8);
+   Sequences (1) (1) (5)  := (Always, 3, Rate_1_8, others => <>);
+   --  Sequences (1) (6) (6)  := (Always, 0, Rate_1_8);
+   --  Sequences (1) (7) (7)  := (Always, 0, Rate_1_8);
+   --  Sequences (1) (8) (8)  := (Always, 0, Rate_1_8);
+   Sequences (1) (1) (9)  := (Always, 3, Rate_1_8, others => <>);
+   --  Sequences (1) (10) (10) := (Always, 0, Rate_1_8);
+   --  Sequences (1) (11) (11) := (Always, 0, Rate_1_8);
+   --  Sequences (1) (12) (12) := (Always, 0, Rate_1_8);
+   Sequences (1) (1) (13) := (Always, 3, Rate_1_8, others => <>);
+   --  Sequences (1) (14) (14) := (Always, 0, Rate_1_8);
+   --  Sequences (1) (15) (15) := (Always, 0, Rate_1_8);
+   --  Sequences (1) (16) (16) := (Always, 0, Rate_1_8);
 end WNM.Sequencer;

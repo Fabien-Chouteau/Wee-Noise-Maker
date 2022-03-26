@@ -89,7 +89,6 @@ package body WNM.MIDI.Queues is
       return Ret;
    end Pop;
 
-
    -----------------------
    -- Push_To_Out_Queue --
    -----------------------
@@ -117,9 +116,11 @@ package body WNM.MIDI.Queues is
    -- MIDI_Out_Read --
    -------------------
 
-   procedure MIDI_Out_Read (G : in out BBqueue.Buffers.Read_Grant) is
+   procedure MIDI_Out_Read (G   : in out BBqueue.Buffers.Read_Grant;
+                            Max :        BBqueue.Count := BBqueue.Count'Last)
+   is
    begin
-      BBqueue.Buffers.Read (MIDI_Out_Queue, G);
+      BBqueue.Buffers.Read (MIDI_Out_Queue, G, Max);
    end MIDI_Out_Read;
 
    ----------------------

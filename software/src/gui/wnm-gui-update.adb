@@ -20,7 +20,6 @@
 -------------------------------------------------------------------------------
 
 with HAL;                   use HAL;
-with HAL.Bitmap;
 with WNM.GUI.Bitmap_Fonts;  use WNM.GUI.Bitmap_Fonts;
 with WNM.GUI.Parameters;
 with WNM.Screen;

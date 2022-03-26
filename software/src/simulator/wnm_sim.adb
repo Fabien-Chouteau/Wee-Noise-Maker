@@ -20,6 +20,11 @@ with Ada.Unchecked_Conversion;
 
 with simulator_assets;
 with GNAT.Command_Line; use GNAT.Command_Line;
+with BBqueue.Buffers;
+with BBqueue;
+with WNM.MIDI.Queues;
+
+with System;
 
 package body WNM_Sim is
 
@@ -27,6 +32,36 @@ package body WNM_Sim is
    function Hack_SF_Binding is new Ada.Unchecked_Conversion (sfSprite_Ptr,
                                                              sfView_Ptr);
    pragma Warnings (On);
+
+   --------------------
+   -- Print_MIDI_Out --
+   --------------------
+
+   procedure Print_MIDI_Out is
+      use BBqueue;
+      use BBqueue.Buffers;
+      use WNM.MIDI;
+      use Ada.Text_IO;
+
+      Out_Grant : Buffers.Read_Grant;
+   begin
+
+      loop
+         WNM.MIDI.Queues.MIDI_Out_Read (Out_Grant, 3);
+
+         exit when State (Out_Grant) /= Valid;
+
+         declare
+            Addr : constant System.Address := Slice (Out_Grant).Addr;
+            Msg : WNM.MIDI.Message with Import, Address => Addr;
+         begin
+            Put_Line (Img (Msg));
+         end;
+
+         WNM.MIDI.Queues.MIDI_Out_Release (Out_Grant);
+
+      end loop;
+   end Print_MIDI_Out;
 
    --------------
    -- Set_View --
@@ -248,6 +283,9 @@ package body WNM_Sim is
 
          setView (Window, Letter_Box_View);
          display (Window);
+
+         Print_MIDI_Out;
+
       end loop;
    exception
       when E : others =>

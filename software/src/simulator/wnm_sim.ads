@@ -1,3 +1,5 @@
+with Ada.Synchronous_Task_Control;
+
 with GNAT.Strings;
 
 with Sf;
@@ -5,6 +7,7 @@ with Sf.Window.Keyboard; use Sf.Window.Keyboard;
 with Sf.Graphics.Color;
 
 with WNM.Screen;
+with WNM;
 
 package WNM_Sim
 with Elaborate_Body
@@ -56,8 +59,13 @@ is
    SFML_Pressed : array (SFML_Keys) of Boolean := (others => False);
    pragma Volatile_Components (SFML_Pressed);
 
+   Force_Pressed : array (WNM.Button) of Boolean := (others => False);
+   pragma Volatile_Components (Force_Pressed);
+
+   Button_Scan_Signal : Ada.Synchronous_Task_Control.Suspension_Object;
+
    Encoder_Right : Integer := 0;
-   Encoder_Left : Integer := 0;
+   Encoder_Left  : Integer := 0;
 
    SFML_LEDs : array (WNM.LEDs) of sf.Graphics.Color.sfColor :=
      (others => sf.Graphics.Color.sfTransparent);
