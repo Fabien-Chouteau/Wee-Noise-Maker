@@ -19,18 +19,15 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
+with WNM.Sample_Library;
+
 package WNM.GUI.Menu.Sample_Trim is
 
    procedure Push_Window;
 
-   function Start return Natural;
-   function Stop return Natural;
-
 private
 
-   type Trim_Window is new Menu_Window with record
-      Start, Stop, Size, Increment : Natural;
-   end record;
+   type Trim_Window is new Menu_Window with null record;
 
    overriding
    procedure Draw (This : in out Trim_Window);

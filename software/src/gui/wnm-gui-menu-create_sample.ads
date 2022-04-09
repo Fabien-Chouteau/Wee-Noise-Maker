@@ -38,7 +38,7 @@ private
 
    type Create_Sample_Menu is new Menu_Window with record
       State        : Create_Sample_State;
-      Sample_Entry : Sample_Entry_Index := Invalid_Sample_Entry;
+      Sample_Entry : Sample_Index := Invalid_Sample_Entry;
 
       Input_Before : Audio.Input_Kind;
    end record;

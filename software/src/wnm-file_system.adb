@@ -167,8 +167,27 @@ package body WNM.File_System is
 
    function Available return File_Signed_Size is
    begin
-      return WNM.Storage.Size  - Littlefs.Size (FS) * 2048;
+      return WNM.Storage.FS_Size - Littlefs.Size (FS) * Storage.Sector_Size;
    end Available;
+
+   --------------
+   -- Get_Line --
+   --------------
+
+   procedure Get_Line
+     (FD   : aliased in out File_Descriptor;
+      Item : out String;
+      Last : out Natural)
+   is
+   begin
+      Last := Item'First - 1;
+      for Elt of Item loop
+
+         exit when Read (FD, Elt'Address, 1) /= 1;
+         Last := Last + 1;
+         exit when Elt = ASCII.LF;
+      end loop;
+   end Get_Line;
 
    --------------------------
    -- For_Each_File_In_Dir --

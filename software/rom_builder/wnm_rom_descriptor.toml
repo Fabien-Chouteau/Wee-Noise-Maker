@@ -1,0 +1,174 @@
+[samples]
+
+1 = {name = "BT0A0A7", file="samples_dl/BT0A0A7.WAV.raw"}
+# X = {name = "BT0A0D0", file="samples_dl/BT0A0D0.WAV.raw"}
+# X = {name = "BT0A0D3", file="samples_dl/BT0A0D3.WAV.raw"}
+# X = {name = "BT0A0DA", file="samples_dl/BT0A0DA.WAV.raw"}
+2 = {name = "BT0AAD0", file="samples_dl/BT0AAD0.WAV.raw"}
+# X = {name = "BT0AADA", file="samples_dl/BT0AADA.WAV.raw"}
+# X = {name = "BT3A0D0", file="samples_dl/BT3A0D0.WAV.raw"}
+# X = {name = "BT3A0D3", file="samples_dl/BT3A0D3.WAV.raw"}
+3 = {name = "BT3A0D7", file="samples_dl/BT3A0D7.WAV.raw"}
+# X = {name = "BT3A0DA", file="samples_dl/BT3A0DA.WAV.raw"}
+# X = {name = "BT3AAD0", file="samples_dl/BT3AAD0.WAV.raw"}
+# X = {name = "BT3AADA", file="samples_dl/BT3AADA.WAV.raw"}
+4 = {name = "BT7A0D0", file="samples_dl/BT7A0D0.WAV.raw"}
+# X = {name = "BT7A0D3", file="samples_dl/BT7A0D3.WAV.raw"}
+# X = {name = "BT7A0D7", file="samples_dl/BT7A0D7.WAV.raw"}
+# X = {name = "BT7A0DA", file="samples_dl/BT7A0DA.WAV.raw"}
+5 = {name = "BT7AAD0", file="samples_dl/BT7AAD0.WAV.raw"}
+# X = {name = "BT7AADA", file="samples_dl/BT7AADA.WAV.raw"}
+# X = {name = "BTAA0D0", file="samples_dl/BTAA0D0.WAV.raw"}
+# X = {name = "BTAA0D3", file="samples_dl/BTAA0D3.WAV.raw"}
+6 = {name = "BTAA0D7", file="samples_dl/BTAA0D7.WAV.raw"}
+# X = {name = "BTAA0DA", file="samples_dl/BTAA0DA.WAV.raw"}
+# X = {name = "BTAAAD0", file="samples_dl/BTAAAD0.WAV.raw"}
+7 = {name = "BTAAADA", file="samples_dl/BTAAADA.WAV.raw"}
+
+8 = {name = "CLOP1", file="samples_dl/CLOP1.WAV.raw"}
+9 = {name = "CLOP2", file="samples_dl/CLOP2.WAV.raw"}
+10 = {name = "CLOP3", file="samples_dl/CLOP3.WAV.raw"}
+11 = {name = "CLOP4", file="samples_dl/CLOP4.WAV.raw"}
+
+12 = {name = "CSHD0", file="samples_dl/CSHD0.WAV.raw"}
+# X = {name = "CSHD2", file="samples_dl/CSHD2.WAV.raw"}
+# X = {name = "CSHD4", file="samples_dl/CSHD4.WAV.raw"}
+13 = {name = "CSHD6", file="samples_dl/CSHD6.WAV.raw"}
+# X = {name = "CSHD8", file="samples_dl/CSHD8.WAV.raw"}
+14 = {name = "CSHDA", file="samples_dl/CSHDA.WAV.raw"}
+
+15 = {name = "HANDCLP1", file="samples_dl/HANDCLP1.WAV.raw"}
+16 = {name = "HANDCLP2", file="samples_dl/HANDCLP2.WAV.raw"}
+
+17 = {name = "HHCD0", file="samples_dl/HHCD0.WAV.raw"}
+# X = {name = "HHCD2", file="samples_dl/HHCD2.WAV.raw"}
+# X = {name = "HHCD4", file="samples_dl/HHCD4.WAV.raw"}
+# X = {name = "HHCD6", file="samples_dl/HHCD6.WAV.raw"}
+18 = {name = "HHCD8", file="samples_dl/HHCD8.WAV.raw"}
+# X = {name = "HHCDA", file="samples_dl/HHCDA.WAV.raw"}
+# X = {name = "HHOD0", file="samples_dl/HHOD0.WAV.raw"}
+19 = {name = "HHOD2", file="samples_dl/HHOD2.WAV.raw"}
+# X = {name = "HHOD4", file="samples_dl/HHOD4.WAV.raw"}
+# X = {name = "HHOD6", file="samples_dl/HHOD6.WAV.raw"}
+# X = {name = "HHOD8", file="samples_dl/HHOD8.WAV.raw"}
+20 = {name = "HHODA", file="samples_dl/HHODA.WAV.raw"}
+
+21 = {name = "HT0D0", file="samples_dl/HT0D0.WAV.raw"}
+# X = {name = "HT0D3", file="samples_dl/HT0D3.WAV.raw"}
+# X = {name = "HT0D7", file="samples_dl/HT0D7.WAV.raw"}
+# X = {name = "HT0DA", file="samples_dl/HT0DA.WAV.raw"}
+22 = {name = "HT3D0", file="samples_dl/HT3D0.WAV.raw"}
+# X = {name = "HT3D3", file="samples_dl/HT3D3.WAV.raw"}
+# X = {name = "HT3D7", file="samples_dl/HT3D7.WAV.raw"}
+# X = {name = "HT3DA", file="samples_dl/HT3DA.WAV.raw"}
+23 = {name = "HT7D0", file="samples_dl/HT7D0.WAV.raw"}
+# X = {name = "HT7D3", file="samples_dl/HT7D3.WAV.raw"}
+# X = {name = "HT7D7", file="samples_dl/HT7D7.WAV.raw"}
+# X = {name = "HT7DA", file="samples_dl/HT7DA.WAV.raw"}
+24 = {name = "HTAD0", file="samples_dl/HTAD0.WAV.raw"}
+# X = {name = "HTAD3", file="samples_dl/HTAD3.WAV.raw"}
+# X = {name = "HTAD7", file="samples_dl/HTAD7.WAV.raw"}
+25 = {name = "HTADA", file="samples_dl/HTADA.WAV.raw"}
+
+26 = {name = "LT0D0", file="samples_dl/LT0D0.WAV.raw"}
+# X = {name = "LT0D3", file="samples_dl/LT0D3.WAV.raw"}
+# X = {name = "LT0D7", file="samples_dl/LT0D7.WAV.raw"}
+# X = {name = "LT0DA", file="samples_dl/LT0DA.WAV.raw"}
+27 = {name = "LT3D0", file="samples_dl/LT3D0.WAV.raw"}
+# X = {name = "LT3D3", file="samples_dl/LT3D3.WAV.raw"}
+# X = {name = "LT3D7", file="samples_dl/LT3D7.WAV.raw"}
+# X = {name = "LT3DA", file="samples_dl/LT3DA.WAV.raw"}
+28 = {name = "LT7D0", file="samples_dl/LT7D0.WAV.raw"}
+# X = {name = "LT7D3", file="samples_dl/LT7D3.WAV.raw"}
+# X = {name = "LT7D7", file="samples_dl/LT7D7.WAV.raw"}
+# X = {name = "LT7DA", file="samples_dl/LT7DA.WAV.raw"}
+29 = {name = "LTAD0", file="samples_dl/LTAD0.WAV.raw"}
+# X = {name = "LTAD3", file="samples_dl/LTAD3.WAV.raw"}
+# X = {name = "LTAD7", file="samples_dl/LTAD7.WAV.raw"}
+# X = {name = "LTADA", file="samples_dl/LTADA.WAV.raw"}
+
+30 = {name = "MT0D0", file="samples_dl/MT0D0.WAV.raw"}
+# X = {name = "MT0D3", file="samples_dl/MT0D3.WAV.raw"}
+# X = {name = "MT0D7", file="samples_dl/MT0D7.WAV.raw"}
+# X = {name = "MT0DA", file="samples_dl/MT0DA.WAV.raw"}
+31 = {name = "MT3D0", file="samples_dl/MT3D0.WAV.raw"}
+# X = {name = "MT3D3", file="samples_dl/MT3D3.WAV.raw"}
+# X = {name = "MT3D7", file="samples_dl/MT3D7.WAV.raw"}
+# X = {name = "MT3DA", file="samples_dl/MT3DA.WAV.raw"}
+32 = {name = "MT7D0", file="samples_dl/MT7D0.WAV.raw"}
+# X = {name = "MT7D3", file="samples_dl/MT7D3.WAV.raw"}
+# X = {name = "MT7D7", file="samples_dl/MT7D7.WAV.raw"}
+# X = {name = "MT7DA", file="samples_dl/MT7DA.WAV.raw"}
+33 = {name = "MTAD0", file="samples_dl/MTAD0.WAV.raw"}
+# X = {name = "MTAD3", file="samples_dl/MTAD3.WAV.raw"}
+# X = {name = "MTAD7", file="samples_dl/MTAD7.WAV.raw"}
+# X = {name = "MTADA", file="samples_dl/MTADA.WAV.raw"}
+
+34 = {name = "OPCL1", file="samples_dl/OPCL1.WAV.raw"}
+# X = {name = "OPCL2", file="samples_dl/OPCL2.WAV.raw"}
+35 = {name = "OPCL3", file="samples_dl/OPCL3.WAV.raw"}
+# X = {name = "OPCL4", file="samples_dl/OPCL4.WAV.raw"}
+
+36 = {name = "RIDED0", file="samples_dl/RIDED0.WAV.raw"}
+# X = {name = "RIDED2", file="samples_dl/RIDED2.WAV.raw"}
+37 = {name = "RIDED4", file="samples_dl/RIDED4.WAV.raw"}
+# X = {name = "RIDED6", file="samples_dl/RIDED6.WAV.raw"}
+# X = {name = "RIDED8", file="samples_dl/RIDED8.WAV.raw"}
+38 = {name = "RIDEDA", file="samples_dl/RIDEDA.WAV.raw"}
+
+39 = {name = "RIM127", file="samples_dl/RIM127.WAV.raw"}
+40 = {name = "RIM63", file="samples_dl/RIM63.WAV.raw"}
+
+41 = {name = "ST0T0S0", file="samples_dl/ST0T0S0.WAV.raw"}
+# X = {name = "ST0T0S3", file="samples_dl/ST0T0S3.WAV.raw"}
+# X = {name = "ST0T0S7", file="samples_dl/ST0T0S7.WAV.raw"}
+# X = {name = "ST0T0SA", file="samples_dl/ST0T0SA.WAV.raw"}
+# X = {name = "ST0T3S3", file="samples_dl/ST0T3S3.WAV.raw"}
+# X = {name = "ST0T3S7", file="samples_dl/ST0T3S7.WAV.raw"}
+# X = {name = "ST0T3SA", file="samples_dl/ST0T3SA.WAV.raw"}
+# X = {name = "ST0T7S3", file="samples_dl/ST0T7S3.WAV.raw"}
+# X = {name = "ST0T7S7", file="samples_dl/ST0T7S7.WAV.raw"}
+42 = {name = "ST0T7SA", file="samples_dl/ST0T7SA.WAV.raw"}
+# X = {name = "ST0TAS3", file="samples_dl/ST0TAS3.WAV.raw"}
+# X = {name = "ST0TAS7", file="samples_dl/ST0TAS7.WAV.raw"}
+# X = {name = "ST0TASA", file="samples_dl/ST0TASA.WAV.raw"}
+# X = {name = "ST3T0S0", file="samples_dl/ST3T0S0.WAV.raw"}
+# X = {name = "ST3T0S3", file="samples_dl/ST3T0S3.WAV.raw"}
+# X = {name = "ST3T0S7", file="samples_dl/ST3T0S7.WAV.raw"}
+# X = {name = "ST3T0SA", file="samples_dl/ST3T0SA.WAV.raw"}
+# X = {name = "ST3T3S3", file="samples_dl/ST3T3S3.WAV.raw"}
+# X = {name = "ST3T3S7", file="samples_dl/ST3T3S7.WAV.raw"}
+43 = {name = "ST3T3SA", file="samples_dl/ST3T3SA.WAV.raw"}
+# X = {name = "ST3T7S3", file="samples_dl/ST3T7S3.WAV.raw"}
+# X = {name = "ST3T7S7", file="samples_dl/ST3T7S7.WAV.raw"}
+# X = {name = "ST3T7SA", file="samples_dl/ST3T7SA.WAV.raw"}
+# X = {name = "ST3TAS3", file="samples_dl/ST3TAS3.WAV.raw"}
+# X = {name = "ST3TAS7", file="samples_dl/ST3TAS7.WAV.raw"}
+# X = {name = "ST3TASA", file="samples_dl/ST3TASA.WAV.raw"}
+# X = {name = "ST7T0S0", file="samples_dl/ST7T0S0.WAV.raw"}
+# X = {name = "ST7T0S3", file="samples_dl/ST7T0S3.WAV.raw"}
+44 = {name = "ST7T0S7", file="samples_dl/ST7T0S7.WAV.raw"}
+# X = {name = "ST7T0SA", file="samples_dl/ST7T0SA.WAV.raw"}
+# X = {name = "ST7T3S3", file="samples_dl/ST7T3S3.WAV.raw"}
+# X = {name = "ST7T3S7", file="samples_dl/ST7T3S7.WAV.raw"}
+# X = {name = "ST7T3SA", file="samples_dl/ST7T3SA.WAV.raw"}
+# X = {name = "ST7T7S3", file="samples_dl/ST7T7S3.WAV.raw"}
+# X = {name = "ST7T7S7", file="samples_dl/ST7T7S7.WAV.raw"}
+45 = {name = "ST7T7SA", file="samples_dl/ST7T7SA.WAV.raw"}
+# X = {name = "ST7TAS3", file="samples_dl/ST7TAS3.WAV.raw"}
+# X = {name = "ST7TAS7", file="samples_dl/ST7TAS7.WAV.raw"}
+# X = {name = "ST7TASA", file="samples_dl/ST7TASA.WAV.raw"}
+
+46 = {name = "STAT0S0", file="samples_dl/STAT0S0.WAV.raw"}
+# X = {name = "STAT0S3", file="samples_dl/STAT0S3.WAV.raw"}
+# X = {name = "STAT0S7", file="samples_dl/STAT0S7.WAV.raw"}
+47 = {name = "STAT0SA", file="samples_dl/STAT0SA.WAV.raw"}
+# X = {name = "STAT3S3", file="samples_dl/STAT3S3.WAV.raw"}
+# X = {name = "STAT3S7", file="samples_dl/STAT3S7.WAV.raw"}
+48 = {name = "STAT3SA", file="samples_dl/STAT3SA.WAV.raw"}
+# X = {name = "STAT7S3", file="samples_dl/STAT7S3.WAV.raw"}
+# X = {name = "STAT7S7", file="samples_dl/STAT7S7.WAV.raw"}
+49 = {name = "STAT7SA", file="samples_dl/STAT7SA.WAV.raw"}
+# X = {name = "STATAS3", file="samples_dl/STATAS3.WAV.raw"}
+# X = {name = "STATAS7", file="samples_dl/STATAS7.WAV.raw"}
+50 = {name = "STATASA", file="samples_dl/STATASA.WAV.raw"}

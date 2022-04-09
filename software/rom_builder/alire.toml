@@ -1,0 +1,16 @@
+name = "wnm_rom_builder"
+description = "Shiny new project"
+version = "0.0.0"
+
+authors = ["Fabien Chouteau"]
+maintainers = ["Fabien Chouteau <fabien.chouteau@gmail.com>"]
+maintainers-logins = ["Fabien-Chouteau"]
+
+executables = ["wnm_rom_builder"]
+
+[[depends-on]]
+fsmaker = "~0.0.0"
+hal = "~0.3.0"
+
+[[pins]]
+fsmaker = { url='https://github.com/Fabien-Chouteau/fsmaker' }

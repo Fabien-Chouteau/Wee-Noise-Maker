@@ -23,6 +23,7 @@ with WNM.Power_Control;
 with WNM.GUI.Menu.Drawing;           use WNM.GUI.Menu.Drawing;
 with WNM.GUI.Menu.Sample_Select;     use WNM.GUI.Menu.Sample_Select;
 with WNM.GUI.Menu.Text_Dialog;       use WNM.GUI.Menu.Text_Dialog;
+with WNM.GUI.Menu.Sample_Edit;
 with WNM.GUI.Menu.FM_Settings;
 with WNM.GUI.Menu.Create_Sample;
 with WNM.GUI.Menu.Passthrough;
@@ -37,6 +38,7 @@ package body WNM.GUI.Menu.Root is
    is (case Item is
           when Save_Project    => "Save project",
           when Load_Project    => "Load project",
+          when Edit_Sample     => "Edit sample",
           when Create_Sample   => "Create sample",
           when Change_Sample   => "Change sample",
           when FM_Tune         => "FM Tuner",
@@ -87,6 +89,8 @@ package body WNM.GUI.Menu.Root is
                   WNM.Projects.Save;
                when Load_Project =>
                   WNM.Projects.Load;
+               when Edit_Sample =>
+                  Menu.Sample_Edit.Push_Window;
                when Create_Sample =>
                   Menu.Create_Sample.Push_Window;
                when Change_Sample =>

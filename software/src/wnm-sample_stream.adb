@@ -22,8 +22,7 @@
 with Interfaces; use Interfaces;
 with System.Storage_Elements; use System.Storage_Elements;
 
-with WNM.File_System; use WNM.File_System;
-with Littlefs;
+with WNM.Sample_Library; use WNM.Sample_Library;
 
 package body WNM.Sample_Stream is
 
@@ -81,11 +80,9 @@ package body WNM.Sample_Stream is
 
    procedure Close_Stream (ST : Stream_Track) is
    begin
-      if Streams (St).State /= Unused then
+      if Streams (St).State /= Ready then
 
-         Close (Streams (St).FD);
-
-         Streams (St).State := Unused;
+         Streams (St).State := Ready;
       end if;
    end Close_Stream;
 
@@ -111,23 +108,24 @@ package body WNM.Sample_Stream is
    -----------
 
    procedure Start (Track       : Stream_Track;
-                    Start_Point : Natural;
-                    End_Point   : Natural;
+                    Sample      : Sample_Library.Sample_Index;
+                    Start_Point : Sample_Library.Sample_Point_Index;
+                    End_Point   : Sample_Library.Sample_Point_Index;
                     Looping     : Boolean)
    is
    begin
-      if Streams (Track).State = Unused then
-         return;
-      end if;
-
       Streams (Track).State := Running;
 
+      Streams (Track).Sample := Sample;
       Streams (Track).Looping := Looping;
       Streams (Track).Start_Point := Start_Point;
       Streams (Track).Cursor := Start_Point;
       Streams (Track).End_Point := End_Point;
 
-      Seek (Streams (Track).FD, Offset (Start_Point), Littlefs.LFS_SEEK_SET);
+      if Sample /= Invalid_Sample_Entry then
+         Streams (Track).End_Point := Sample_Library.Entry_Len (Sample);
+      end if;
+
    end Start;
 
    -----------------
@@ -138,65 +136,52 @@ package body WNM.Sample_Stream is
                           Buffer  : out Audio.Mono_Buffer;
                           Success : out Boolean)
    is
-      Len : File_Signed_Size;
    begin
-      if Streams (Track).State /= Running then
+
+      if Streams (Track).State /= Running
+        and then
+          Streams (Track).Sample = Invalid_Sample_Entry
+      then
          Success := False;
          return;
       end if;
 
-      Len := Read (Streams (Track).FD, Buffer'Address, Buffer'Length * 2);
+      declare
+         Cursor : Sample_Point_Index renames Streams (Track).Cursor;
 
-      Streams (Track).Cursor := Streams (Track).Cursor + Natural (Len);
+         Sample : Single_Sample_Data renames
+           Sample_Library.Sample_Data (Streams (Track).Sample);
 
-      if Len /= Buffer'Length * 2 then
-         Success := False;
-      else
-         Success := True;
-      end if;
+         Remaining : constant Sample_Point_Count := Sample'Last - Cursor;
+         Len       : constant Sample_Point_Count :=
+           Sample_Point_Count'Min (Remaining, Buffer'Length);
+
+         Out_Index : Natural := Buffer'First;
+      begin
+         if Len /= 0 then
+            for Index in Cursor .. Cursor + Len - 1 loop
+               Buffer (Out_Index) := Sample (Index);
+               Out_Index := Out_Index + 1;
+            end loop;
+
+            for Index in Out_Index .. Buffer'Last loop
+               Buffer (Index) := 0;
+            end loop;
+
+            Streams (Track).Cursor := Streams (Track).Cursor + Len;
+            Success := True;
+         else
+            Success := False;
+         end if;
+      end;
+
 
       if not Success
         or else
-          Streams (Track).Cursor > Streams (Track).End_Point
+          Streams (Track).Cursor >= Streams (Track).End_Point
       then
-         Streams (Track).State := Assigned;
+         Streams (Track).State := Ready;
       end if;
    end Next_Buffer;
-
-
-   ---------------
-   -- Copy_File --
-   ---------------
-
-   procedure Copy_File (Srcpath  : String;
-                        From, To : Natural;
-                        Dstpath  : String)
-   is
-      Src_FD, Dst_FD : aliased File_Descriptor;
-      Buf : Storage_Array (1 .. 512);
-
-      Len, Count : File_Signed_Size;
-   begin
-      Open_Read (Src_FD, Srcpath);
-      Create_File (Dst_FD, Dstpath);
-
-      Seek (Src_FD, Offset (From), Littlefs.LFS_SEEK_SET);
-
-      Count := File_Signed_Size (From);
-
-      loop
-         Len := Read (Src_FD, Buf'Address, Buf'Length);
-
-         exit when Len < 0;
-
-         Len := Write (Dst_FD, Buf'Address, File_Size (Len));
-
-         Count := Count + Len;
-         exit when Len /= Buf'Length or else Count >= File_Signed_Size (To);
-      end loop;
-
-      Close (Src_FD);
-      Close (Dst_FD);
-   end Copy_File;
 
 end WNM.Sample_Stream;

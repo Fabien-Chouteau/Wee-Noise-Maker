@@ -21,6 +21,8 @@
 
 with WNM.GUI.Bitmap_Fonts; use WNM.GUI.Bitmap_Fonts;
 
+with WNM.Sample_Edit;
+
 package body WNM.GUI.Menu.Drawing is
 
    Title_Y_Offset : constant := 10;
@@ -455,5 +457,81 @@ package body WNM.GUI.Menu.Drawing is
                         (Box_Left + 100, Box_Center.Y));
       Screen.Draw_Circle (Box_Center, 15);
    end Draw_Knob;
+
+   ------------------------
+   -- Draw_Sample_Select --
+   ------------------------
+
+   procedure Draw_Sample_Select (Val : Sample_Library.Valid_Sample_Index) is
+      use Sample_Library;
+
+      X : Integer;
+
+      function Display_Text (Val : Valid_Sample_Index) return String is
+         Num : constant String := (if Val < 10 then " " else "") & Val'Img;
+      begin
+         return Num (Num'First + 1 .. Num'Last) & " " & Entry_Name (Val);
+      end Display_Text;
+
+   begin
+
+      if Val /= Valid_Sample_Index'First then
+         X := Box_Left + 2;
+         Print (X_Offset => X,
+                Y_Offset => Value_Text_Y - 23,
+                Str      => Display_Text (Val - 1));
+      end if;
+
+      X := Box_Left + 2;
+      Print (X_Offset => X,
+             Y_Offset => Value_Text_Y - 11,
+             Str      => Display_Text (Val),
+             Invert_From => Box_Left,
+             Invert_To   => Box_Right);
+
+      if Val /= Valid_Sample_Index'Last then
+         X := Box_Left + 2;
+         Print (X_Offset => X,
+                Y_Offset => Value_Text_Y + 1,
+                Str      => Display_Text (Val + 1));
+      end if;
+   end Draw_Sample_Select;
+
+   -------------------
+   -- Draw_Waveform --
+   -------------------
+
+   procedure Draw_Waveform is
+      use Sample_Library;
+
+      X : Integer := Box_Left;
+      Y_Center : constant Integer := Box_Center.Y;
+   begin
+
+      Print (X_Offset => X,
+             Y_Offset => Box_Top,
+             Str      => Point_Index_To_Seconds (Sample_Edit.Start)'Img);
+
+      Print (X_Offset => X,
+             Y_Offset => Box_Top,
+             Str      => " .. ");
+
+      Print (X_Offset => X,
+             Y_Offset => Box_Top,
+             Str      => Point_Index_To_Seconds (Sample_Edit.Stop)'Img);
+
+
+      X := Box_Left;
+      for Elt of Sample_Edit.Waveform loop
+         declare
+            Val : constant Integer := Integer (Float (Elt) * 5.0);
+         begin
+            Screen.Draw_Line ((X, Y_Center - Val),
+                              (X, Y_Center + Val));
+         end;
+
+         X := X + 1;
+      end loop;
+   end Draw_Waveform;
 
 end WNM.GUI.Menu.Drawing;

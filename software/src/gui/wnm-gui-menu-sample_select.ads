@@ -25,11 +25,12 @@ package WNM.GUI.Menu.Sample_Select is
 
    procedure Push_Window;
 
+   function Selected return Sample_Index;
+
 private
 
    type Sample_Select_Window is new Menu_Window with record
-      From, To : WNM.Sample_Library.Sample_Entry_Index;
-      Index  : WNM.Sample_Library.Sample_Entry_Index;
+      Index  : WNM.Sample_Library.Sample_Index;
    end record;
 
    overriding

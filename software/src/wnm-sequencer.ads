@@ -24,6 +24,7 @@ with WNM.Synth;
 with WNM.MIDI;
 with WNM.Sequence_Copy;
 with WNM.UI;
+with WNM.Sample_Library;
 
 package WNM.Sequencer is
 
@@ -138,6 +139,11 @@ package WNM.Sequencer is
    procedure CC_Value_Inc (Step : Sequencer_Steps; Id : CC_Id);
    procedure CC_Value_Dec (Step : Sequencer_Steps; Id : CC_Id);
 
+   function Selected_Sample (T : Tracks)
+                              return Sample_Library.Valid_Sample_Index;
+   procedure Next_Sample (T : Tracks);
+   procedure Prev_Sample (T : Tracks);
+
    type Step_Settings is (Condition,
                           Note,
                           Duration,
@@ -251,6 +257,7 @@ private
    type Track_Setting is record
       Chan : MIDI.MIDI_Channel := 0;
       CC : CC_Setting_Array;
+      Sample : Sample_Library.Valid_Sample_Index := 1;
    end record;
 
    Track_Settings : array (Tracks) of Track_Setting
@@ -259,7 +266,8 @@ private
                            (1, "Control 1        "),
                            (2, "Control 2        "),
                            (3, "Control 3        ")
-                           )
+                          ),
+                    Sample => 1
                    )
         );
 

@@ -36,6 +36,11 @@ package WNM.File_System is
 
    function Available return File_Signed_Size;
 
+   procedure Get_Line
+     (FD   : aliased in out File_Descriptor;
+      Item :            out String;
+      Last :            out Natural);
+
    generic
       with procedure Process (Filename : String);
    procedure For_Each_File_In_Dir (Dirpath : String);

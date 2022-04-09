@@ -2,16 +2,20 @@ with Interfaces; use Interfaces;
 
 package WNM.Audio is
 
-   type Mono_Sample is new Integer_16 with Size => 16;
+   --  It can be quite confusing to use the term sample for both audio/music
+   --  sample (short bit of music) and PCM sample (signal processing). So in
+   --  this project we use the word "Point" for the signal processing.
 
-   type Stereo_Sample is record
-      L, R : Mono_Sample;
+   type Mono_Point is new Integer_16 with Size => 16;
+
+   type Stereo_Point is record
+      L, R : Mono_Point;
    end record with Pack, Size => 32;
 
-   type Mono_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Mono_Sample
+   type Mono_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Mono_Point
      with Pack, Size => WNM.Mono_Buffer_Size_In_Bytes * 8;
 
-   type Stereo_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Stereo_Sample
+   type Stereo_Buffer is array (1 .. WNM.Samples_Per_Buffer) of Stereo_Point
      with Pack, Size => WNM.Stereo_Buffer_Size_In_Bytes * 8;
 
    type Input_Kind is (None, Line_In);

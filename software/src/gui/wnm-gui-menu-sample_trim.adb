@@ -22,7 +22,11 @@
 with WNM.GUI.Bitmap_Fonts;     use WNM.GUI.Bitmap_Fonts;
 with WNM.Sample_Stream;
 with WNM.Screen;
+with WNM.Sample_Library; use WNM.Sample_Library;
 with WNM.Synth;
+
+with WNM.Sample_Edit;
+with WNM.GUI.Menu.Drawing;
 
 package body WNM.GUI.Menu.Sample_Trim is
 
@@ -37,76 +41,36 @@ package body WNM.GUI.Menu.Sample_Trim is
       Push (Sample_Trim_Singleton'Access);
    end Push_Window;
 
-   -----------
-   -- Start --
-   -----------
-
-   function Start return Natural
-   is (Sample_Trim_Singleton.Start);
-
-   ----------
-   -- Stop --
-   ----------
-
-   function Stop return Natural
-   is (Sample_Trim_Singleton.Stop);
-
    --------------------
    -- Preview_Sample --
    --------------------
 
    procedure Preview_Sample (This : Trim_Window) is
    begin
-      WNM.Sample_Stream.Assign_Sample (WNM.Sample_Stream.Always_On,
-                                       Sample_Rec_Filepath);
-
-      WNM.Sample_Stream.Start (Track       => WNM.Sample_Stream.Always_On,
-                               Start_Point => This.Start,
-                               End_Point   => This.Stop,
-                               Looping     => False);
+      null;
    end Preview_Sample;
 
    ----------
    -- Draw --
    ----------
 
-   overriding procedure Draw
+   overriding
+   procedure Draw
      (This : in out Trim_Window)
    is
-      X : Integer := 5;
-      Start : constant Natural := This.Start / This.Increment;
-      Stop  : constant Natural := This.Stop / This.Increment;
    begin
---        Print (Buffer      => Screen.all,
---               X_Offset    => X,
---               Y_Offset    => 0,
---               Str         => "Trim sample");
-
-      Screen.Draw_Line (Start     => (Start, 12 + 8),
-                        Stop      => (Stop, 12 + 8));
-      Screen.Draw_Line (Start     => (Start, 9 + 8),
-                        Stop      => (Start, 15 + 8));
-      Screen.Draw_Line (Start     => (Stop, 9 + 8),
-                        Stop      => (Stop, 15 + 8));
-      X := 5;
-      Print (X_Offset    => X,
-             Y_Offset    => 0 + 8,
-             Str         => This.Start'Img);
-      X := 5;
-      Print (X_Offset    => X,
-             Y_Offset    => 8 + 8,
-             Str         => This.Stop'Img);
+      WNM.GUI.Menu.Drawing.Draw_Waveform;
    end Draw;
 
    --------------
    -- On_Event --
    --------------
 
-   overriding procedure On_Event
+   overriding
+   procedure On_Event
      (This  : in out Trim_Window;
       Event : Menu_Event)
    is
-      Tmp : Integer;
    begin
       case Event.Kind is
          when Left_Press =>
@@ -114,29 +78,24 @@ package body WNM.GUI.Menu.Sample_Trim is
          when Right_Press =>
             This.Preview_Sample;
          when Encoder_Right =>
-            Tmp := This.Stop + Event.Value * This.Increment;
+            if Event.Value > 0 then
+               WNM.Sample_Edit.Inc_Stop;
+            elsif Event.Value < 0 then
+               WNM.Sample_Edit.Dec_Stop;
+            end if;
 
-            This.Stop := (if Tmp < This.Start then
-                             This.Start
-                          elsif Tmp > This.Size then
-                             This.Size
-                          else
-                             Tmp);
-
+            WNM.Sample_Edit.Update_Waveform;
             This.Preview_Sample;
 
          when Encoder_Left =>
-            Tmp := This.Start + Event.Value * This.Increment;
 
-            This.Start := (if Tmp < 0 then
-                             0
-                          elsif Tmp > This.Stop then
-                             This.Stop
-                          else
-                             Tmp);
+            if Event.Value > 0 then
+               WNM.Sample_Edit.Inc_Start;
+            elsif Event.Value < 0 then
+               WNM.Sample_Edit.Dec_Start;
+            end if;
 
-            This.Start := This.Start - (This.Start mod WNM.Mono_Buffer_Size_In_Bytes);
-
+            WNM.Sample_Edit.Update_Waveform;
             This.Preview_Sample;
       end case;
    end On_Event;
@@ -145,19 +104,10 @@ package body WNM.GUI.Menu.Sample_Trim is
    -- On_Pushed --
    ---------------
 
-   overriding procedure On_Pushed (This : in out Trim_Window)
-   is
+   overriding
+   procedure On_Pushed (This : in out Trim_Window) is
    begin
-
-      This.Start := 0;
-      This.Stop  := Synth.Record_Size;
-      This.Size  := This.Stop;
-
-      This.Increment := (This.Size / 95) + 1;
-
-      if This.Increment = 0 then
-         Pop (Exit_Value => Failure);
-      end if;
+      WNM.Sample_Edit.Update_Waveform;
    end On_Pushed;
 
 end WNM.GUI.Menu.Sample_Trim;

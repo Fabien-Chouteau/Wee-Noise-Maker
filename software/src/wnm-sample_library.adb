@@ -20,114 +20,168 @@
 -------------------------------------------------------------------------------
 
 with WNM.File_System;
+with System.Address_To_Access_Conversions;
+
+with Ada.Text_IO;
 
 package body WNM.Sample_Library is
 
-   function Valid_Entry (Index : Sample_Entry_Index) return Boolean
-     is (Index /= Invalid_Sample_Entry and then Index <= Last_Entry);
+   package Global_Address_To_Access
+   is new System.Address_To_Access_Conversions (Global_Sample_Array);
 
-   -----------------------
-   -- First_Valid_Entry --
-   -----------------------
+   -----------------
+   -- Sample_Data --
+   -----------------
 
-   function First_Valid_Entry return Sample_Entry_Index
-   is (if Last_Entry = Invalid_Sample_Entry
-       then Invalid_Sample_Entry
-       else Valid_Sample_Entry_Index'First);
-
-   ----------------------
-   -- Last_Valid_Entry --
-   ----------------------
-
-   function Last_Valid_Entry return Sample_Entry_Index
-   is (Last_Entry);
-
-   ----------------
-   -- Add_Sample --
-   ----------------
-
-   function Add_Sample (Name : String) return Sample_Entry_Index
-   is
+   function Sample_Data return not null Global_Sample_Array_Access is
    begin
-      --  Is there enough room to store the name?
-      if Name_Buffer'Length - Name_Buffer_Cnt >= Name'Length then
-
-         Last_Entry := Last_Entry + 1;
-         Entries (Last_Entry).Name_From := Name_Buffer_Cnt + 1;
-         Entries (Last_Entry).Name_To   := Name_Buffer_Cnt + Name'Length;
-         Name_Buffer_Cnt := Entries (Last_Entry).Name_To;
-
-         --  Insert name in the Name_Buffer
-         Name_Buffer
-           (Entries (Last_Entry).Name_From .. Entries (Last_Entry).Name_To)
-           := Name;
-
-         return Last_Entry;
-      end if;
-      return Invalid_Sample_Entry;
-   end Add_Sample;
+      return Global_Sample_Array_Access
+        (Global_Address_To_Access.To_Pointer (Storage.Sample_Data_Base));
+   end Sample_Data;
 
    ----------------
    -- Entry_Name --
    ----------------
 
-   function Entry_Name (Index : Sample_Entry_Index) return String is
+   function Entry_Name (Index : Sample_Index) return Sample_Entry_Name is
    begin
-      if Valid_Entry (Index) then
-         return Name_Buffer
-           (Entries (Index).Name_From .. Entries (Index).Name_To);
+      if Index /= Invalid_Sample_Entry and then Entries (Index).Used then
+         return Entries (Index).Name;
       else
-         return "";
+         return "-- No Sample --";
       end if;
    end Entry_Name;
 
-   ----------------
-   -- Entry_Path --
-   ----------------
+   ---------------
+   -- Entry_Len --
+   ---------------
 
-   function Entry_Path (Index : Sample_Entry_Index) return String is
+   function Entry_Len (Index : Sample_Index) return Sample_Point_Count is
    begin
-      if Valid_Entry (Index) then
-         return Root_Samples_Path & Entry_Name (Index);
+      if Index /= Invalid_Sample_Entry and then Entries (Index).Used then
+         return Entries (Index).Length;
       else
-         return "";
+         return 0;
       end if;
-   end Entry_Path;
+   end Entry_Len;
 
-   ------------------------
-   -- User_Sample_Exists --
-   ------------------------
+   ---------------------
+   -- Parse_Info_Line --
+   ---------------------
 
-   function User_Sample_Exists (Name : String) return Boolean is
+   procedure Parse_Info_Line (Line : String) is
+      Delim_Char : constant Character := ':';
+
+      Delim1, Delim2 : Natural := Line'Last;
+
+      Sample_Id : Valid_Sample_Index;
    begin
-
-      for Index in Valid_Sample_Entry_Index'First .. Last_Entry loop
-         if Entry_Name (Index) = Name then
-            return True;
+      for Index in Line'First .. Line'Last loop
+         if Line (Index) = Delim_Char then
+            Delim1 := Index;
+            exit;
          end if;
       end loop;
 
-      return False;
-   end User_Sample_Exists;
+      for Index in Delim1 + 1 .. Line'Last loop
+         if Line (Index) = Delim_Char then
+            Delim2 := Index;
+            exit;
+         end if;
+      end loop;
+
+      declare
+         ID : constant Natural :=
+           Natural'Value (Line (Line'First .. Delim1 - 1));
+      begin
+         Ada.Text_IO.Put_Line ("Sample ID:" & ID'Img);
+         if ID in
+           Natural (Valid_Sample_Index'First) .. Natural (Valid_Sample_Index'Last)
+         then
+            Sample_Id := Valid_Sample_Index (ID);
+         else
+            raise Program_Error;
+         end if;
+      end;
+
+      declare
+         Name : constant String := Line (Delim1 + 1 .. Delim2 - 1);
+      begin
+         Ada.Text_IO.Put_Line ("Sample Name: '" & Name & "'");
+
+         if Name'Length = Sample_Entry_Name'Length then
+            Entries (Sample_Id).Name := Name;
+         end if;
+      end;
+
+      declare
+         Len : constant Natural :=
+           Natural'Value (Line (Delim2 + 1 .. Line'Last));
+      begin
+         Ada.Text_IO.Put_Line ("Sample Len:" & Len'Img);
+         if Len in
+           Natural (Sample_Point_Count'First) .. Natural (Sample_Point_Count'Last)
+         then
+            Entries (Sample_Id).Length := Sample_Point_Count (Len);
+            Entries (Sample_Id).Used := Len > 0;
+         else
+            raise Program_Error;
+         end if;
+      end;
+
+
+   end Parse_Info_Line;
 
    ----------
    -- Load --
    ----------
 
    procedure Load is
-      procedure Add_To_Library (Filename : String);
+      use WNM.File_System;
 
-      procedure Add_To_Library (Filename : String) is
-         Unused : Sample_Entry_Index;
-      begin
-         Unused := Add_Sample (Filename);
-      end Add_To_Library;
-
-      procedure For_Each_File
-      is new WNM.File_System.For_Each_File_In_Dir (Add_To_Library);
-
+      FD : aliased File_Descriptor;
+      Line : String (1 .. 64);
+      Last : Natural;
    begin
-      For_Each_File (Root_Samples_Path);
+      --  Entries (1).Used := True;
+      --  Entries (1).Name := "123456789ABCDEF";
+      --
+      --  Entries (2).Used := True;
+      --  Entries (2).Name := "This is sample ";
+      --
+      --  Entries (3).Used := True;
+      --  Entries (3).Name := "This is sample ";
+
+
+      Open_Read (FD, "/sample_entries.txt");
+
+      loop
+         Get_Line (FD, Line, Last);
+         exit when Last < Line'First;
+
+         Ada.Text_IO.Put_Line ("Get_Line => '" & Line (1 .. Last) & "'");
+
+         if Line (Last) = ASCII.LF then
+            Last := Last - 1;
+         end if;
+
+         if Last >= Line'First then
+            Parse_Info_Line (Line (1 .. Last));
+         end if;
+      end loop;
+
+      Close (FD);
    end Load;
+
+   ----------------------------
+   -- Point_Index_To_Seconds --
+   ----------------------------
+
+   function Point_Index_To_Seconds (Index : Sample_Point_Index)
+                                    return Sample_Time
+   is
+   begin
+      return Sample_Time (Float (Index) / Float (WNM.Sample_Frequency));
+   end Point_Index_To_Seconds;
 
 end WNM.Sample_Library;

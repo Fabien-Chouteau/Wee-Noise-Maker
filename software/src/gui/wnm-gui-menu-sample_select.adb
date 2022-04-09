@@ -37,6 +37,13 @@ package body WNM.GUI.Menu.Sample_Select is
       Push (Sample_Select'Access);
    end Push_Window;
 
+   --------------
+   -- Selected --
+   --------------
+
+   function Selected return Sample_Index
+   is (Sample_Select.Index);
+
    ----------
    -- Draw --
    ----------
@@ -46,25 +53,7 @@ package body WNM.GUI.Menu.Sample_Select is
      (This : in out Sample_Select_Window)
    is
    begin
-
-
-      if This.From = 0
-        or else
-         This.To = 0
-        or else
-          This.From > This.To
-      then
-         Draw_Menu_Box ("Sample select",
-                        --  Text   => "No samples...",
-                        Count  => 1,
-                        Index  => 0);
-         return;
-      end if;
-
-      Draw_Menu_Box ("Sample select",
-                     --  Text  => Entry_Name (This.Index),
-                     Count => This.To - This.From + 1,
-                     Index => This.Index);
+      Draw_Sample_Select (This.Index);
    end Draw;
 
    --------------
@@ -79,26 +68,21 @@ package body WNM.GUI.Menu.Sample_Select is
    begin
       case Event.Kind is
          when Left_Press =>
-            Exit_Menu;
+            Menu.Pop (Exit_Value => Success);
          when Right_Press =>
-            Menu.Pop (Exit_Value => None);
+            Menu.Pop (Exit_Value => Failure);
          when Encoder_Right =>
-            null;
-         when Encoder_Left =>
-            if This.Index /= Invalid_Sample_Entry then
-               if Event.Value > 0 then
-                  if This.Index /= This.To then
-                     This.Index := This.Index + 1;
-                  end if;
-               elsif Event.Value < 0 then
-                  if This.Index /= This.From then
-                     This.Index := This.Index - 1;
-                  end if;
+            if Event.Value > 0 then
+               if This.Index /= Valid_Sample_Index'Last then
+                  This.Index := This.Index + 1;
                end if;
-               WNM.Synth.Assign_Sample
-                 (WNM.Sequencer.Editing_Track,
-                  Sample_Library.Entry_Path (This.Index));
+            elsif Event.Value < 0 then
+               if This.Index /= Valid_Sample_Index'First then
+                  This.Index := This.Index - 1;
+               end if;
             end if;
+         when Encoder_Left =>
+            null;
       end case;
    end On_Event;
 
@@ -110,13 +94,7 @@ package body WNM.GUI.Menu.Sample_Select is
      (This  : in out Sample_Select_Window)
    is
    begin
-      This.From := Sample_Library.First_Valid_Entry;
-      This.To := Sample_Library.Last_Valid_Entry;
-      This.Index := This.From;
-      if This.Index /= Invalid_Sample_Entry then
-         WNM.Synth.Assign_Sample (WNM.Sequencer.Editing_Track,
-                                    Sample_Library.Entry_Path (This.Index));
-      end if;
+      This.Index := Valid_Sample_Index'First;
    end On_Pushed;
 
    --------------

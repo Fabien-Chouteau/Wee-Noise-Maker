@@ -34,6 +34,7 @@ private
                      Arp_Notes,
                      MIDI_Chan,
                      MIDI_Instrument,
+                     Sample,
                      CC_A, CC_Label_A,
                      CC_B, CC_Label_B,
                      CC_C, CC_Label_C,

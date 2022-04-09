@@ -47,16 +47,10 @@ package WNM.Synth is
                             Volume : Integer);
    function Volume (Track : WNM.Tracks) return Natural;
 
-   procedure Load_Samples;
-   procedure Assign_Sample (Track       : WNM.Tracks;
-                            Sample_Path : String);
-   function Sample_Of_Track (Track : WNM.Tracks)
-                             return WNM.Sample_Library.Sample_Entry_Index;
-
    function Update return WNM.Time.Time_Microseconds;
 
-   procedure Next_Samples (Output : out Audio.Stereo_Buffer;
-                           Input  :     Audio.Stereo_Buffer);
+   procedure Next_Points (Output : out Audio.Stereo_Buffer;
+                          Input  :     Audio.Stereo_Buffer);
 
    procedure Set_Passthrough (Kind : Audio.Input_Kind);
    function Get_Passthrough return Audio.Input_Kind;

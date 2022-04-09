@@ -1219,6 +1219,38 @@ package body WNM.Sequencer is
         (Step).CC_Ena (Id) := True;
    end CC_Value_Dec;
 
+   ---------------------
+   -- Selected_Sample --
+   ---------------------
+
+   function Selected_Sample (T : Tracks)
+                             return Sample_Library.Valid_Sample_Index
+   is
+   begin
+      return Track_Settings (T).Sample;
+   end Selected_Sample;
+
+   -----------------
+   -- Next_Sample --
+   -----------------
+
+   procedure Next_Sample (T : Tracks) is
+   begin
+      if Selected_Sample (T) /= Sample_Library.Valid_Sample_Index'Last then
+         Track_Settings (T).Sample := Track_Settings (T).Sample + 1;
+      end if;
+   end Next_Sample;
+
+   -----------------
+   -- Prev_Sample --
+   -----------------
+
+   procedure Prev_Sample (T : Tracks) is
+   begin
+      if Selected_Sample (T) /= Sample_Library.Valid_Sample_Index'First then
+         Track_Settings (T).Sample := Track_Settings (T).Sample - 1;
+      end if;
+   end Prev_Sample;
 
    ----------------
    -- Next_Value --

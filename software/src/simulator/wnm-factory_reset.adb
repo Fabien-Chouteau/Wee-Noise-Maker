@@ -34,9 +34,9 @@ package body WNM.Factory_Reset is
 
       APU : VirtAPU.Instance (1, WNM.Sample_Frequency);
 
-      type Buffer_Type is array (Natural range <>) of Mono_Sample;
+      type Buffer_Type is array (Natural range <>) of Mono_Point;
       procedure Next_Samples is new VirtAPU.Next_Samples_Int
-        (Mono_Sample,
+        (Mono_Point,
          Buffer_Type);
 
       Buf : Buffer_Type (1 .. WNM.Samples_Per_Buffer);

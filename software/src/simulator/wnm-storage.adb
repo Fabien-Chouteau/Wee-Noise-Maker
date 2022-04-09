@@ -6,10 +6,16 @@ with Interfaces; use Interfaces;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
+with WNM.Sample_Library;
+
 with WNM_Sim;
 with System;
 
 package body WNM.Storage is
+
+   Sample_Data : WNM.Sample_Library.Global_Sample_Array;
+
+   procedure Load_Sample_Data (FD : GNAT.OS_Lib.File_Descriptor);
 
    type LFS_Config_Access is access all Standard.Littlefs.LFS_Config;
 
@@ -147,12 +153,11 @@ package body WNM.Storage is
          Ret.Prog := Prog'Access;
          Ret.Erase := Erase'Access;
          Ret.Sync := Sync'Access;
-         Ret.Read_Size := 2048;
-         Ret.Prog_Size := 2048;
-         Ret.Block_Size := 2048;
+         Ret.Read_Size := Sector_Size;
+         Ret.Prog_Size := Sector_Size;
+         Ret.Block_Size := Sector_Size;
 
-         Ret.Block_Count :=
-           LFS_Size (GNAT.OS_Lib.File_Length (FD)) / Ret.Block_Size;
+         Ret.Block_Count := FS_Sectors;
 
          Ret.Block_Cycles := 700;
          Ret.Cache_Size := Ret.Block_Size;
@@ -177,6 +182,36 @@ package body WNM.Storage is
       return Config;
    end Get_LFS_Config;
 
+   ----------------------
+   -- Sample_Data_Base --
+   ----------------------
+
+   function Sample_Data_Base return System.Address is
+   begin
+      return Sample_Data'Address;
+   end Sample_Data_Base;
+
+   ----------------------
+   -- Load_Sample_Data --
+   ----------------------
+
+   procedure Load_Sample_Data (FD : GNAT.OS_Lib.File_Descriptor) is
+   begin
+
+      --  The sample data is located after the FS in ROM image
+
+      GNAT.OS_Lib.Lseek (FD     => FD,
+                         offset => Long_Integer (FS_Size),
+                         origin => GNAT.OS_Lib.Seek_Set);
+
+      if GNAT.OS_Lib.Read
+        (FD, Sample_Data'Address, Sample_Data'Size / 8) /= Sample_Data'Size / 8
+      then
+         Put_Line ("Cannot load sample data from ROM image");
+         GNAT.OS_Lib.OS_Exit (1);
+      end if;
+   end Load_Sample_Data;
+
 begin
 
    if WNM_Sim.Switch_Storage_Image = null
@@ -194,7 +229,9 @@ begin
          pragma Import (C, ftruncate, "ftruncate");
 
       begin
-         if ftruncate (int (FD), Long_Integer (WNM.Storage.Size)) /= 0 then
+         if ftruncate (int (FD),
+                       Long_Integer (WNM.Storage.Total_Storage_Size)) /= 0
+         then
             raise Program_Error with "ftruncate error: " &
               GNAT.OS_Lib.Errno_Message;
          end if;
@@ -224,11 +261,14 @@ begin
          OS_Exit (1);
       end if;
 
-      if File_Length (FD) /= WNM.Storage.Size then
+      if File_Length (FD) /= WNM.Storage.Total_Storage_Size then
          Put_Line ("Invalid size for image file '" & Image_Path & "'");
          OS_Exit (1);
       end if;
    end;
+
+   Load_Sample_Data (FD);
+
    Config := FD_Backend.Create (FD);
 
 end WNM.Storage;

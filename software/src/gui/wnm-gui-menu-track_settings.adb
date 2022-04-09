@@ -89,6 +89,10 @@ package body WNM.GUI.Menu.Track_Settings is
             Draw_Title ("MIDI instrument:", "");
             Draw_Value (Builtin_Instruments (This.Instrument).Name);
 
+         when Sample =>
+
+            Draw_Sample_Select (Sequencer.Selected_Sample (Editing_Track));
+
          when CC_A | CC_B | CC_C | CC_D =>
             declare
                CC : constant Sequencer.CC_Id :=
@@ -203,6 +207,13 @@ package body WNM.GUI.Menu.Track_Settings is
                      if This.Instrument > Builtin_Instruments'First then
                         This.Instrument := This.Instrument - 1;
                      end if;
+                  end if;
+
+               when Sample =>
+                  if Event.Value > 0 then
+                     Sequencer.Next_Sample (Editing_Track);
+                  else
+                     Sequencer.Prev_Sample (Editing_Track);
                   end if;
 
                when CC_A | CC_B | CC_C | CC_D =>

@@ -23,6 +23,7 @@ with WNM.MIDI;
 with WNM.Screen;
 with WNM.GUI.Bitmap_Fonts;
 with WNM.Chord_Sequencer;
+with WNM.Sample_Library;
 
 package WNM.GUI.Menu.Drawing is
 
@@ -78,5 +79,9 @@ package WNM.GUI.Menu.Drawing is
 
    procedure Draw_Knob (Title : String;
                         Value : Natural);
+
+   procedure Draw_Sample_Select (Val : Sample_Library.Valid_Sample_Index);
+
+   procedure Draw_Waveform;
 
 end WNM.GUI.Menu.Drawing;

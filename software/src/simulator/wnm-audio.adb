@@ -51,8 +51,8 @@ package body WNM.Audio is
    task body Synth_Task is
    begin
       loop
-         WNM.Synth.Next_Samples (Flip_Out_Buffers (Flip),
-                                 Flip_In_Buffers (Flip));
+         WNM.Synth.Next_Points (Flip_Out_Buffers (Flip),
+                                Flip_In_Buffers (Flip));
 
          Ada.Synchronous_Task_Control.Suspend_Until_True (Synth_Trig);
          Ada.Synchronous_Task_Control.Set_False (Synth_Trig);

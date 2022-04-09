@@ -27,8 +27,9 @@ with WNM;                        use WNM;
 with WNM.Audio;                  use WNM.Audio;
 with WNM.File_System;            use WNM.File_System;
 with WNM.MIDI.Queues;
---  with Hex_Dump;
 --  with Semihosting;
+
+with WNM.Sequencer;
 
 package body WNM.Synth is
 
@@ -40,9 +41,6 @@ package body WNM.Synth is
      with Atomic_Components;
    Volume_For_Track : array (WNM.Tracks) of Integer := (others => 50)
      with Atomic_Components;
-   --  Sample_For_Track : array (WNM.Tracks) of Sample_Entry_Index :=
-   --    (others => Invalid_Sample_Entry)
-   --    with Atomic_Components;
 
    Passthrough : Input_Kind := Line_In;
 
@@ -75,12 +73,12 @@ package body WNM.Synth is
          Tmp := Integer_32 (L (Index)) + Integer_32 (R (Index));
          Tmp := Tmp / 2;
 
-         if Tmp > Integer_32 (Mono_Sample'Last) then
-            Dst (Index) := Mono_Sample'Last;
+         if Tmp > Integer_32 (Mono_Point'Last) then
+            Dst (Index) := Mono_Point'Last;
          elsif Tmp < Integer_32 (Integer_16'First) then
-            Dst (Index) := Mono_Sample'First;
+            Dst (Index) := Mono_Point'First;
          else
-            Dst (Index) := Mono_Sample (Tmp);
+            Dst (Index) := Mono_Point (Tmp);
          end if;
       end loop;
    end Copy_Stereo_To_Mono;
@@ -92,6 +90,7 @@ package body WNM.Synth is
    procedure Event (Msg : MIDI.Message) is
       Track : constant WNM.Tracks := WNM.MIDI.To_Track (Msg.Chan);
    begin
+
       case Msg.Kind is
          when MIDI.Note_On =>
             Trig (Track);
@@ -109,64 +108,11 @@ package body WNM.Synth is
    procedure Trig (Track : WNM.Tracks) is
    begin
       Start (Track       => To_Stream_Track (Track),
-             Start_Point => 0,
-             End_Point   => Natural'Last,
+             Sample      => Sequencer.Selected_Sample (Track),
+             Start_Point => Sample_Library.Sample_Point_Index'First,
+             End_Point   => Sample_Library.Sample_Point_Index'Last,
              Looping     => False);
    end Trig;
-
-   ------------------
-   -- Load_Samples --
-   ------------------
-
-   procedure Load_Samples is
-   begin
-      Assign_Sample (ST_1, "/samples/kick");
-      Assign_Sample (ST_2, "/samples/snare");
-      Assign_Sample (ST_3, "/samples/hh");
-      Assign_Sample (ST_4, "/samples/clap");
-      Assign_Sample (ST_5, "/samples/rim");
-      --  Assign_Sample (ST_6, "/samples/hho");
-      --  Assign_Sample (ST_7, "/samples/hhc");
-      --  Assign_Sample (ST_8, "/samples/crash");
-      --  Assign_Sample (ST_9, "/samples/A4");
-      --  Assign_Sample (ST_10, "/samples/B4");
-      --  Assign_Sample (ST_11, "/samples/C5");
-      --  Assign_Sample (ST_12, "/samples/D5");
-      --  Assign_Sample (ST_13, "/samples/E5");
-      --  Assign_Sample (ST_14, "/samples/F5");
-      --  Assign_Sample (ST_15, "/samples/G5");
-      --  Assign_Sample (ST_16, "/samples/A5");
-      for ST in ST_6 .. ST_16 loop
-         Assign_Sample (ST, "samples/clap");
-      end loop;
-   end Load_Samples;
-
-   -------------------
-   -- Assign_Sample --
-   -------------------
-
-   procedure Assign_Sample (Track       : WNM.Tracks;
-                            Sample_Path : String)
-   is
-   begin
-      --  Sample_For_Track (Track) := Sample;
-
-      Sample_Stream.Assign_Sample (Sample_Stream.To_Stream_Track (Track),
-                                  Sample_Path);
-   end Assign_Sample;
-
-   ---------------------
-   -- Sample_Of_Track --
-   ---------------------
-
-   function Sample_Of_Track (Track : WNM.Tracks)
-                             return WNM.Sample_Library.Sample_Entry_Index
-   is
-      pragma Unreferenced (Track);
-   begin
-      return 1;
-      --  return Sample_For_Track (Track);
-   end Sample_Of_Track;
 
    ----------------
    -- Change_Pan --
@@ -229,117 +175,6 @@ package body WNM.Synth is
    ------------
 
    function Update return WNM.Time.Time_Microseconds is
-
-      procedure Process (Out_L, Out_R : out Mono_Buffer;
-                         In_L,  In_R  :     Mono_Buffer);
-      pragma Unreferenced (Process);
-      -------------
-      -- Process --
-      -------------
-
-      procedure Process (Out_L, Out_R : out Mono_Buffer;
-                         In_L,  In_R  :     Mono_Buffer)
-      is
-         Len : File_System.File_Signed_Size;
-
-         procedure Mix (Mono_Samples : Mono_Buffer;
-                        ST           : Stream_Track);
-
-         ---------
-         -- Mix --
-         ---------
-
-         procedure Mix (Mono_Samples : Mono_Buffer;
-                        ST           : Stream_Track)
-         is
-            Val         : Integer_32;
-
-            Sample, Left, Right : Float;
-
-            Volume       : Float;
-            Pan          : Float;
-         begin
-            if ST = Always_On then
-               Volume := 1.0;
-               Pan    := 0.0;
-            else
-               Volume := Float (Volume_For_Track (To_Track (ST))) / 50.0;
-               Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
-            end if;
-
-            for Index in Mono_Samples'Range loop
-
-               Sample := Float (Mono_Samples (Index));
-               Sample := Sample * Volume;
-
-               Right := Sample * (1.0 - Pan);
-               Left  := Sample * (1.0 + Pan);
-
-               Val := Integer_32 (Out_L (Index)) + Integer_32 (Left);
-               if Val > Integer_32 (Mono_Sample'Last) then
-                  Out_L (Index) := Mono_Sample'Last;
-               elsif Val < Integer_32 (Integer_16'First) then
-                  Out_L (Index) := Mono_Sample'First;
-               else
-                  Out_L (Index) := Mono_Sample (Val);
-               end if;
-
-               Val := Integer_32 (Out_R (Index)) + Integer_32 (Right);
-               if Val > Integer_32 (Mono_Sample'Last) then
-                  Out_R (Index) := Mono_Sample'Last;
-               elsif Val < Integer_32 (Integer_16'First) then
-                  Out_R (Index) := Mono_Sample'First;
-               else
-                  Out_R (Index) := Mono_Sample (Val);
-               end if;
-            end loop;
-         end Mix;
-
-      begin
-         if Passthrough /= None then
-            Out_R := In_R;
-            Out_L := In_L;
-         else
-            Out_R := (others => 0);
-            Out_L := (others => 0);
-         end if;
-
-         declare
-            Sample_Buf : Mono_Buffer;
-            Success : Boolean;
-         begin
-            for Track in Stream_Track loop
-               Next_Buffer (Track, Sample_Buf, Success);
-               if Success then
-                  Mix (Sample_Buf, Track);
-               end if;
-            end loop;
-         end;
-
-         -- Recording --
-         if Recording_Source /= None then
-            declare
-               Sample_Buf : Mono_Buffer;
-            begin
-               case Recording_Source is
-               when None =>
-                  null;
-               when Line_In =>
-                  Copy_Stereo_To_Mono (In_L, In_R, Sample_Buf);
-               when Master_Output =>
-                  Copy_Stereo_To_Mono (Out_L, Out_R, Sample_Buf);
-               end case;
-
-               Len := Write (Recording_File, Sample_Buf'Address, Sample_Buf'Length * 2);
-               Recording_Size := Recording_Size + Len;
-            end;
-         end if;
-
-         Glob_Sample_Clock := Glob_Sample_Clock + Samples_Per_Buffer;
-      end Process;
-
-      --  procedure Generate_Audio is new WNM.Audio.Generate_Audio (Process);
-
       Now : constant WNM.Time.Time_Microseconds := WNM.Time.Clock;
    begin
       if Now >= Next_Start then
@@ -353,24 +188,24 @@ package body WNM.Synth is
       return Next_Start;
    end Update;
 
-   ------------------
-   -- Next_Samples --
-   ------------------
+   -----------------
+   -- Next_Points --
+   -----------------
 
-   procedure Next_Samples (Output : out Audio.Stereo_Buffer;
-                           Input  :     Audio.Stereo_Buffer)
+   procedure Next_Points (Output : out Audio.Stereo_Buffer;
+                          Input  :     Audio.Stereo_Buffer)
    is
       --  Len : File_System.File_Signed_Size;
 
-      procedure Mix (Mono_Samples : Mono_Buffer;
-                     ST           : Stream_Track);
+      procedure Mix (Mono_Points : Mono_Buffer;
+                     ST          : Stream_Track);
 
          ---------
          -- Mix --
          ---------
 
-      procedure Mix (Mono_Samples : Mono_Buffer;
-                     ST           : Stream_Track)
+      procedure Mix (Mono_Points : Mono_Buffer;
+                     ST          : Stream_Track)
       is
          Val         : Integer_32;
 
@@ -387,31 +222,32 @@ package body WNM.Synth is
             Pan    := Float (Pan_For_Track (To_Track (ST))) / 100.0;
          end if;
 
-         for Index in Mono_Samples'Range loop
+         for Index in Mono_Points'Range loop
 
-            Sample := Float (Mono_Samples (Index));
+            Sample := Float (Mono_Points (Index));
             Sample := Sample * Volume;
 
             Right := Sample * (1.0 - Pan);
             Left  := Sample * (1.0 + Pan);
 
             Val := Integer_32 (Output (Index).L) + Integer_32 (Left);
-            if Val > Integer_32 (Mono_Sample'Last) then
-               Output (Index).L := Mono_Sample'Last;
+            if Val > Integer_32 (Mono_Point'Last) then
+               Output (Index).L := Mono_Point'Last;
             elsif Val < Integer_32 (Integer_16'First) then
-               Output (Index).L := Mono_Sample'First;
+               Output (Index).L := Mono_Point'First;
             else
-               Output (Index).L := Mono_Sample (Val);
+               Output (Index).L := Mono_Point (Val);
             end if;
 
             Val := Integer_32 (Output (Index).R) + Integer_32 (Right);
-            if Val > Integer_32 (Mono_Sample'Last) then
-               Output (Index).R := Mono_Sample'Last;
+            if Val > Integer_32 (Mono_Point'Last) then
+               Output (Index).R := Mono_Point'Last;
             elsif Val < Integer_32 (Integer_16'First) then
-               Output (Index).R := Mono_Sample'First;
+               Output (Index).R := Mono_Point'First;
             else
-               Output (Index).R := Mono_Sample (Val);
+               Output (Index).R := Mono_Point (Val);
             end if;
+
          end loop;
       end Mix;
 
@@ -454,7 +290,7 @@ package body WNM.Synth is
       --  end if;
 
       Glob_Sample_Clock := Glob_Sample_Clock + Samples_Per_Buffer;
-   end Next_Samples;
+   end Next_Points;
 
    ---------------------
    -- Set_Passthrough --

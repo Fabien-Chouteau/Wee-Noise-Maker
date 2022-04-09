@@ -19,9 +19,8 @@
 --                                                                           --
 -------------------------------------------------------------------------------
 
-with WNM.File_System;
-
 with WNM.Audio;
+with WNM.Sample_Library;
 
 package WNM.Sample_Stream is
    pragma Elaborate_Body;
@@ -38,29 +37,26 @@ package WNM.Sample_Stream is
                             Filepath : String);
 
    procedure Start (Track       : Stream_Track;
-                    Start_Point : Natural;
-                    End_Point   : Natural;
+                    Sample      : Sample_Library.Sample_Index;
+                    Start_Point : Sample_Library.Sample_Point_Index;
+                    End_Point   : Sample_Library.Sample_Point_Index;
                     Looping     : Boolean);
 
    procedure Next_Buffer (Track   :     Stream_Track;
                           Buffer  : out Audio.Mono_Buffer;
                           Success : out Boolean);
 
-   procedure Copy_File (Srcpath  : String;
-                        From, To : Natural;
-                        Dstpath  : String);
-
 private
 
-   type Stream_State is (Unused, Assigned, Running);
+   type Stream_State is (Ready, Running);
 
    type Stream_Info is record
-      State       : Stream_State := Unused;
-      Cursor      : Natural;
-      Start_Point : Natural;
-      End_Point   : Natural;
+      State       : Stream_State := Ready;
+      Sample      : Sample_Library.Sample_Index := Sample_Library.Invalid_Sample_Entry;
+      Cursor      : Sample_Library.Sample_Point_Index;
+      Start_Point : Sample_Library.Sample_Point_Index;
+      End_Point   : Sample_Library.Sample_Point_Index;
       Looping     : Boolean;
-      FD          : aliased File_System.File_Descriptor;
    end record;
 
    Streams : array (Stream_Track) of Stream_Info;

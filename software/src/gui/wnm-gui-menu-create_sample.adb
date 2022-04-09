@@ -115,16 +115,7 @@ package body WNM.GUI.Menu.Create_Sample is
          when Enter_Name =>
 
             if Exit_Value = Success then
-               declare
-                  Name : constant String := Text_Dialog.Value;
-               begin
-                  if Sample_Library.User_Sample_Exists (Name) then
-                     Yes_No_Dialog.Set_Title ("Replace sample?");
-                  else
-                     Yes_No_Dialog.Set_Title ("Create sample?");
-                  end if;
-                  New_State := Confirm;
-               end;
+               New_State := Confirm;
             else
                New_State := Trim;
             end if;
@@ -133,18 +124,18 @@ package body WNM.GUI.Menu.Create_Sample is
 
             if Exit_Value = Success then
                declare
-                  New_Sample_Path : constant String :=
-                    Root_Samples_Path & Text_Dialog.Value;
-                  Unref : Boolean with Unreferenced;
+                  --  New_Sample_Path : constant String :=
+                  --    Root_Samples_Path & Text_Dialog.Value;
+                  --  Unref : Boolean with Unreferenced;
                begin
-                  --  Copy sample with it's new name
-                  WNM.Sample_Stream.Copy_File (Sample_Rec_Filepath,
-                                               Menu.Sample_Trim.Start,
-                                               Menu.Sample_Trim.Stop,
-                                               New_Sample_Path);
-
-                  --  Add it to the library
-                  This.Sample_Entry := Add_Sample (Text_Dialog.Value);
+                  --  --  Copy sample with it's new name
+                  --  WNM.Sample_Stream.Copy_File (Sample_Rec_Filepath,
+                  --                               Menu.Sample_Trim.Start,
+                  --                               Menu.Sample_Trim.Stop,
+                  --                               New_Sample_Path);
+                  --
+                  --  --  Add it to the library
+                  --  This.Sample_Entry := Add_Sample (Text_Dialog.Value);
                   New_State := Assign_To_Track;
                end;
             else
@@ -152,14 +143,14 @@ package body WNM.GUI.Menu.Create_Sample is
             end if;
 
          when Assign_To_Track =>
-            if Exit_Value = Success
-              and then
-                This.Sample_Entry /= Invalid_Sample_Entry
-            then
-               WNM.Synth.Assign_Sample
-                 (Menu.Assign_To_Track.Selected_Track,
-                  Sample_Library.Entry_Path (This.Sample_Entry));
-            end if;
+            --  if Exit_Value = Success
+            --    and then
+            --      This.Sample_Entry /= Invalid_Sample_Entry
+            --  then
+            --     WNM.Synth.Assign_Sample
+            --       (Menu.Assign_To_Track.Selected_Track,
+            --        Sample_Library.Entry_Path (This.Sample_Entry));
+            --  end if;
             Menu.Exit_Menu;
             return;
       end case;
